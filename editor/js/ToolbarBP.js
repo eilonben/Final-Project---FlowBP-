@@ -6,7 +6,6 @@ ToolbarBP.prototype = Object.create(Toolbar.prototype);
 ToolbarBP.prototype.init = function () {
 
     var sw = screen.width;
-    alert('gggg');
     // Takes into account initial compact mode
     sw -= (screen.height > 740) ? 56 : 0;
 
@@ -55,8 +54,9 @@ ToolbarBP.prototype.init = function () {
     elts[2].setAttribute('title', mxResources.get('redo') + ' (' + this.editorUi.actions.get('redo').shortcut + ')');
 
     if (sw >= 320) {
-        var elts = this.addItems(['-', 'delete']);
+        var elts = this.addItems(['-', 'delete','runModel']);
         elts[1].setAttribute('title', mxResources.get('delete') + ' (' + this.editorUi.actions.get('delete').shortcut + ')');
+        elts[2].setAttribute('title', mxResources.get('delete') + ' (' + this.editorUi.actions.get('runModel').shortcut + ')');
     }
 
     if (sw >= 550) {
