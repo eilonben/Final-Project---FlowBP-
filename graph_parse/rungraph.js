@@ -68,46 +68,45 @@ function getRandomItem(set) {
     return items[Math.floor(Math.random() * items.length)];
 }
 
-function* goToFollowers(c, contxt, ths, bpEngine,model) {
-	 var edg = model.getEdges(c, false, true, true);
-	if (contxt.forward !== undefined) {
-		edg=edg.filter(n =>  Object.keys(contxt.forward).indexOf(""+n.getAttribute("name"))!== -1);
-	}
+function* goToFollowers(c, ctx, ths, bpEngine,model) {
+    var edg = model.getEdges(c, false, true, true);
+    if (ctx.forward !== undefined) {
+        edg=edg.filter(n =>  Object.keys(ctx.forward).indexOf(""+n.getAttribute("name"))!== -1);
+    }
 
-	
-	if (edg.length > 0) {
-		// Run extra followers in new threads
-		for (var i = 1; i < edg.length; i++) {
-		    let target = edg[i].getTerminal(false);
-			if(target!== undefined) {
-				var ctx = ((contxt.forward == undefined) ? contxt : contxt.forward[edg[i].getAttribute("name")]);
-				ctx.forward = undefined;
-			
-				runInNewBT(target,ctx,bpEngine);
-			}
-		}	
-		
-		// Run the first follower in the same thread.
-		if(edg[0].getTerminal(false)!== undefined) {
-			var ctx = ((contxt.forward == undefined) ? contxt : contxt.forward[edg[0].getAttribute("name")]);
-			ctx.forward = undefined;
-			
-			yield* runInSameBT(edg[0].getTerminal(false), ctx, ths, bpEngine,model);
-		}
-	}
+
+    if (edg.length > 0) {
+        // Run extra followers in new threads
+        for (var i = 1; i < edg.length; i++) {
+            let target = edg[i].getTerminal(false);
+            if(target!== undefined) {
+                var ctx = ((ctx.forward == undefined) ? ctx : ctx.forward[edg[i].getAttribute("name")]);
+                ctx.forward = undefined;
+
+                runInNewBT(target,ctx,bpEngine);
+            }
+        }
+
+        // Run the first follower in the same thread.
+        if(edg[0].getTerminal(false)!== undefined) {
+            var ctx = ((ctx.forward == undefined) ? ctx : ctx.forward[edg[0].getAttribute("name")]);
+            ctx.forward = undefined;
+
+            yield* runInSameBT(edg[0].getTerminal(false), ctx, ths, bpEngine,model);
+        }
+    }
 }
 
-function runInNewBT(c, ctx,bpEngine,model) {
-	// Cloning - Is this the right way?
-	var contxt = JSON.parse(JSON.stringify(ctx));
-	window.bpEngine.registerBThread(function* () {
-		// eval("var f=f" + c.getId());
-		//
-		// f(contxt, this, bpEngine);
+function runInNewBT(c,ctx,bpEngine,model) {
+    // Cloning - Is this the right way?
+    var ctx = JSON.parse(JSON.stringify(ctx));
+    window.bpEngine.registerBThread(function* () {
+        if(c.getAttribute("code")!== undefined)
+            eval(c.getAttribute("code"));
         if (c.getAttribute("sync") !==undefined)
             yield JSON.parse(c.getAttribute("sync"));
-        yield* goToFollowers(c, contxt, this, bpEngine,model);
-	}());
+        yield* goToFollowers(c, ctx, this, bpEngine,model);
+    }());
 };
 
 function getshape(str) {
@@ -116,27 +115,29 @@ function getshape(str) {
 
 }
 
-function* runInSameBT(c, contxt, ths, bpEngine,model) {
-	// eval("var f=f" + c.getId());
-	//
-	// f(contxt, ths, bpEngine);
+function* runInSameBT(c, ctx, ths, bpEngine,model) {
+    if(c.getAttribute("code")!== undefined)
+        eval(c.getAttribute("code"));
 
     if (c.getAttribute("sync") !==undefined)
         yield JSON.parse(c.getAttribute("sync"));
 
-	yield *goToFollowers(c, contxt, ths, bpEngine,model);
+    yield *goToFollowers(c, ctx, ths, bpEngine,model);
 };
 
 function startRunning(model) {
 // Start the context nodes
     var cells = model.cells;
     var arr = Object.keys(cells).map(function(key){return cells[key]});
-    var contextNds = model.filterCells(arr,
+    var startNds = model.filterCells(arr,
         function (cell) {
             return cell.getStyle() !== undefined && getshape(cell.getStyle())==="startnode";
         });
-    for (var i =0;i<contextNds.length; i++) {
-    	runInNewBT(contextNds[i],{},bpEngine,model);
+    for (var i =0;i<startNds.length; i++) {
+        let ctx = {};
+        if(startNds[i].getAttribute("context")!== undefined)
+            ctx = JSON.parse(startNds[i].getAttribute("context"))
+        runInNewBT(startNds[i],ctx,bpEngine,model);
     }
     window.bpEngine.run().next();
     window.bpEngine.BThreads = [];

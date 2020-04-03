@@ -17,6 +17,7 @@
 
 function EditorUiBP(editor, container, lightbox) {
     EditorUi.call(this,editor, container, lightbox);
+    // new ActionsBP(this.actions);
 };
 EditorUiBP.prototype = Object.create(EditorUi.prototype);
 
@@ -28,6 +29,7 @@ EditorUiBP.prototype.createFormat = function(container)
 
 EditorUiBP.prototype.createToolbar = function(container)
 {
+    new ActionsBP(this.actions);
     return new ToolbarBP(this, container);
 };
 
