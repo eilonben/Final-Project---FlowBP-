@@ -97,7 +97,7 @@ function* goToFollowers(c, ctx, ths, bpEngine,model) {
     }
 }
 
-function runInNewBT(c, ctx,bpEngine,model) {
+function runInNewBT(c,ctx,bpEngine,model) {
     // Cloning - Is this the right way?
     var ctx = JSON.parse(JSON.stringify(ctx));
     window.bpEngine.registerBThread(function* () {
@@ -137,7 +137,7 @@ function startRunning(model) {
         let ctx = {};
         if(startNds[i].getAttribute("context")!== undefined)
             ctx = JSON.parse(startNds[i].getAttribute("context"))
-        runInNewBT(startNds[i],{},bpEngine,model);
+        runInNewBT(startNds[i],ctx,bpEngine,model);
     }
     window.bpEngine.run().next();
     window.bpEngine.BThreads = [];
