@@ -1,4 +1,7 @@
-
+window.sbs = {
+    stages: [],
+    curStage: 0
+};
 
 window.bpEngine = {
     BThreads: [],
@@ -105,6 +108,9 @@ function runInNewBT(c,ctx,bpEngine,model) {
             eval(c.getAttribute("code"));
         if (c.getAttribute("sync") !==undefined)
             yield JSON.parse(c.getAttribute("sync"));
+
+        window.sbs.stages.push(c.id);
+
         yield* goToFollowers(c, ctx, this, bpEngine,model);
     }());
 };
@@ -112,15 +118,15 @@ function runInNewBT(c,ctx,bpEngine,model) {
 function getshape(str) {
     var arr = str.split(";");
     return arr[0].split("=")[1].split(".")[1];
-
 }
 
 function* runInSameBT(c, ctx, ths, bpEngine,model) {
     if(c.getAttribute("code")!== undefined)
         eval(c.getAttribute("code"));
-
     if (c.getAttribute("sync") !==undefined)
         yield JSON.parse(c.getAttribute("sync"));
+
+    window.sbs.stages.push(c.id);
 
     yield *goToFollowers(c, ctx, ths, bpEngine,model);
 };
@@ -141,6 +147,10 @@ function startRunning(model) {
     }
     window.bpEngine.run().next();
     window.bpEngine.BThreads = [];
+}
+
+function getStage() {
+    return window.sbs.curStage < window.sbs.stages.length ? window.sbs.stages[window.sbs.curStage++] : -1
 }
 // function f1(){}
 // function f2(){}

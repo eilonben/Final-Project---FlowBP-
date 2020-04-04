@@ -34,4 +34,31 @@ ActionsBP.prototype.init = function(actions) {
             dlg.init();
         }
     });
+
+    actions.addAction('runSBS', function() {
+        ////////////////////////////////////
+        var mod = graph.getModel();
+
+        var stage = getStage();
+        if(stage == -1)
+            return;
+
+        var cell = mod.getCell(stage);
+        var style = cell.getStyle();
+        style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
+        mod.setStyle(cell, style);
+
+        var edges = mod.getIncomingEdges(cell);
+        //edges.forEach(edge => {
+        for(let i = 0; i < edges.length; i++){
+            var parent = edges[i].source
+            style = parent.getStyle();
+            if (style !== undefined) {
+                style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
+                mod.setStyle(parent, style);
+            }
+        }//)
+        ////////////////////////////////////
+    }, null, null);
+
 };

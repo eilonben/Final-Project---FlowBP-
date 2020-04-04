@@ -108,5 +108,7 @@ ToolbarBP.prototype.init = function () {
     var insertMenu = this.addMenu('', mxResources.get('insert') + ' (' + mxResources.get('doubleClickTooltip') + ')', true, 'insert', null, true);
     this.addDropDownArrow(insertMenu, 'geSprite-plus', 38, 48, -4, -3, 36, -8);
 
+    var elts = this.addItems(['-', 'runSBS']);
+    elts[1].setAttribute('title', mxResources.get('runSBS') + ' (' + this.editorUi.actions.get('runSBS').shortcut+ ')');
 }
 ToolbarBP.prototype.constructor = Toolbar;
