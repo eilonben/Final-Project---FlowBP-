@@ -1,6 +1,6 @@
 //decode the xml string received from Actions.js
 function parse_graph(xml_code) {
-    console.log(xml_code);
+    // console.log(xml_code);
     var doc = mxUtils.parseXml(xml_code);
     var codec = new mxCodec(doc);
     var model = new mxGraphModel();

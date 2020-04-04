@@ -320,7 +320,7 @@ FormatBP.prototype.refresh = function() {
             cont.appendChild(generalDIV);
 
         }else if(getshape(cell.getStyle())=="startnode"){
-
+            var dlg = new StartNodeForm(ui,cell)
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width="22%";
             var startnodeDIV =document.createElement('div');
@@ -329,11 +329,11 @@ FormatBP.prototype.refresh = function() {
             var textnode = document.createElement("p");
             textnode.innerHTML = '<font size="3">Start Node</font>';
             startnodeDIV.appendChild(textnode);
+            startnodeDIV.appendChild(dlg.container);
+            dlg.init();
 
             cont.appendChild(startnodeDIV);
         }
-
-        // Text
         /*mxUtils.write(label2, mxResources.get('text'));
         div.appendChild(dlg.container);
 

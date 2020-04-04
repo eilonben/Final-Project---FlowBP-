@@ -1,9 +1,7 @@
-
-
 window.bpEngine = {
     BThreads: [],
 
-    sync: function* (stmt){
+    sync: function* (stmt) {
         yield stmt;
     },
 
@@ -13,16 +11,16 @@ window.bpEngine = {
         window.bpEngine.BThreads.push(b);
     },
 
-    run: function*(){
-        while(true)
-        {
+    run: function* () {
+        while (true) {
             let e = getEvent();
-            if(e === null)
+            if (e === null)
                 yield 'waiting for an event';
             console.log(e + "\n");
             mxUtils.alert("event selected: " + e + "\n");
+            window.eventSelected = e;
             window.bpEngine.BThreads.forEach(bt => {
-                if(isReqWait(bt, e)) {
+                if (isReqWait(bt, e)) {
                     bt.stmt = fixStmt(bt.iterator.next().value)
                 }
             })
@@ -31,16 +29,17 @@ window.bpEngine = {
 }
 
 // to be implemented
-function waitForEvent(){}
+function waitForEvent() {
+}
 
-function fixStmt(stmt){
-    if (stmt===undefined)
-        return {request:[],block:[],wait:[]};
-    if(stmt.request === undefined)
+function fixStmt(stmt) {
+    if (stmt === undefined)
+        return {request: [], block: [], wait: []};
+    if (stmt.request === undefined)
         stmt.request = [];
-    if(stmt.block === undefined)
+    if (stmt.block === undefined)
         stmt.block = [];
-    if( stmt.wait === undefined)
+    if (stmt.wait === undefined)
         stmt.wait = [];
     return stmt
 }
@@ -63,15 +62,15 @@ function getEvent() {
 // get random item from a Set
 function getRandomItem(set) {
     let items = Array.from(set);
-    if(items.length == 0)
+    if (items.length == 0)
         return null;
     return items[Math.floor(Math.random() * items.length)];
 }
 
-function* goToFollowers(c, ctx, ths, bpEngine,model) {
+function* goToFollowers(c, payload, ths, bpEngine, model) {
     var edg = model.getEdges(c, false, true, true);
-    if (ctx.forward !== undefined) {
-        edg=edg.filter(n =>  Object.keys(ctx.forward).indexOf(""+n.getAttribute("name"))!== -1);
+    if (payload.forward !== undefined) {
+        edg = edg.filter(n => Object.keys(payload.forward).indexOf("" + n.getAttribute("name")) !== -1);
     }
 
 
@@ -79,33 +78,37 @@ function* goToFollowers(c, ctx, ths, bpEngine,model) {
         // Run extra followers in new threads
         for (var i = 1; i < edg.length; i++) {
             let target = edg[i].getTerminal(false);
-            if(target!== undefined) {
-                var ctx = ((ctx.forward == undefined) ? ctx : ctx.forward[edg[i].getAttribute("name")]);
-                ctx.forward = undefined;
+            if (target !== undefined) {
+                var nextPayload = ((payload.forward == undefined) ? payload : payload.forward[edg[i].getAttribute("name")]);
+                payload.forward = undefined;
 
-                runInNewBT(target,ctx,bpEngine);
+                yield* runInNewBT(target, nextPayload, bpEngine);
             }
         }
 
         // Run the first follower in the same thread.
-        if(edg[0].getTerminal(false)!== undefined) {
-            var ctx = ((ctx.forward == undefined) ? ctx : ctx.forward[edg[0].getAttribute("name")]);
-            ctx.forward = undefined;
+        if (edg[0].getTerminal(false) !== undefined) {
+            var nextPayload = ((payload.forward == undefined) ? payload : payload.forward[edg[0].getAttribute("name")]);
+            payload.forward = undefined;
 
-            yield* runInSameBT(edg[0].getTerminal(false), ctx, ths, bpEngine,model);
+            yield* runInSameBT(edg[0].getTerminal(false), nextPayload, ths, bpEngine, model);
         }
     }
 }
 
-function runInNewBT(c,ctx,bpEngine,model) {
+function* runInNewBT(c, payload, bpEngine, model) {
     // Cloning - Is this the right way?
-    var ctx = JSON.parse(JSON.stringify(ctx));
+    var cloned = JSON.parse(JSON.stringify(payload));
     window.bpEngine.registerBThread(function* () {
-        if(c.getAttribute("code")!== undefined)
-            eval(c.getAttribute("code"));
-        if (c.getAttribute("sync") !==undefined)
+        if (c.getAttribute("code") !== undefined) {
+            eval('var func = function(curr) {' + c.getAttribute("code") + '}');
+            func(curr);
+        }
+        if (c.getAttribute("sync") !== undefined) {
             yield JSON.parse(c.getAttribute("sync"));
-        yield* goToFollowers(c, ctx, this, bpEngine,model);
+            curr["selected"] = window.eventSelected;
+        }
+        yield* goToFollowers(c, cloned, this, bpEngine, model);
     }());
 };
 
@@ -115,33 +118,40 @@ function getshape(str) {
 
 }
 
-function* runInSameBT(c, ctx, ths, bpEngine,model) {
-    if(c.getAttribute("code")!== undefined)
-        eval(c.getAttribute("code"));
-
-    if (c.getAttribute("sync") !==undefined)
+function* runInSameBT(c, payload, ths, bpEngine, model) {
+    var curr = JSON.parse(JSON.stringify(payload));
+    if (c.getAttribute("code") !== undefined) {
+        eval('var func = function(curr) {' + c.getAttribute("code") + '}');
+        func(curr);
+    }
+    if (c.getAttribute("sync") !== undefined) {
         yield JSON.parse(c.getAttribute("sync"));
+        curr["selected"] = window.eventSelected;
+    }
 
-    yield *goToFollowers(c, ctx, ths, bpEngine,model);
+    yield* goToFollowers(c, curr, ths, bpEngine, model);
 };
 
 function startRunning(model) {
 // Start the context nodes
     var cells = model.cells;
-    var arr = Object.keys(cells).map(function(key){return cells[key]});
+    var arr = Object.keys(cells).map(function (key) {
+        return cells[key]
+    });
     var startNds = model.filterCells(arr,
         function (cell) {
-            return cell.getStyle() !== undefined && getshape(cell.getStyle())==="startnode";
+            return cell.getStyle() !== undefined && getshape(cell.getStyle()) === "startnode";
         });
-    for (var i =0;i<startNds.length; i++) {
-        let ctx = {};
-        if(startNds[i].getAttribute("context")!== undefined)
-            ctx = JSON.parse(startNds[i].getAttribute("context"))
-        runInNewBT(startNds[i],ctx,bpEngine,model);
+    for (var i = 0; i < startNds.length; i++) {
+        let payload = {};
+        if (startNds[i].getAttribute("payload") !== undefined)
+            payload = JSON.parse(startNds[i].getAttribute("payload"))
+        runInNewBT(startNds[i], payload, bpEngine, model).next();
     }
     window.bpEngine.run().next();
     window.bpEngine.BThreads = [];
 }
+
 // function f1(){}
 // function f2(){}
 // function f3(){}
@@ -163,5 +173,4 @@ function startRunning(model) {
 // runInNewBT(c2,{},bpEngine1);
 // runInNewBT(c3,{},bpEngine1);
 // bpEngine1.run().next();
-
 
