@@ -23,7 +23,7 @@ ActionsBP.prototype.init = function(actions) {
         parse_graph(code);
 
         mxUtils.alert("Code deployed");
-    });
+    }, null, null, 'Alt+Shift+R');
 
     actions.addAction('editBsync', function() {
         var cell = graph.getSelectionCell() || graph.getModel().getRoot();

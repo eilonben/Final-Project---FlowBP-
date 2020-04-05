@@ -6,7 +6,6 @@ ToolbarBP.prototype = Object.create(Toolbar.prototype);
 ToolbarBP.prototype.init = function () {
 
     var sw = screen.width;
-    alert('gggg');
     // Takes into account initial compact mode
     sw -= (screen.height > 740) ? 56 : 0;
 
@@ -108,5 +107,7 @@ ToolbarBP.prototype.init = function () {
     var insertMenu = this.addMenu('', mxResources.get('insert') + ' (' + mxResources.get('doubleClickTooltip') + ')', true, 'insert', null, true);
     this.addDropDownArrow(insertMenu, 'geSprite-plus', 38, 48, -4, -3, 36, -8);
 
-}
+    var elts = this.addItems(['-', 'runModel']);
+    elts[1].setAttribute('title','Execute');
+};
 ToolbarBP.prototype.constructor = Toolbar;
