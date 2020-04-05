@@ -5,7 +5,21 @@ FormatBP = function(editorUi, container)
 
 FormatBP.prototype = Object.create(Format.prototype);
 
+function removeAttribute (cell,name) {
+    var userObject = cell.getValue();
+    if (userObject != null && userObject.nodeType == mxConstants.NODETYPE_ELEMENT)
+        userObject.removeAttribute(name);
+};
+
+function deletePrevLabels(cell, value, graph) {
+    var prevAmount =cell.getAttribute('numberOfOutputs');
+    for (let i = prevAmount; i >value ; i--) {
+        removeAttribute(cell,'Outputnumber'+i);
+    }
+}
+
 FormatBP.prototype.refresh = function() {
+
 
     // Performance tweak: No refresh needed if not visible
     if (this.container.style.width == '0px')
@@ -141,24 +155,7 @@ FormatBP.prototype.refresh = function() {
         label2.style.backgroundColor = this.inactiveTabBackgroundColor;
         label3.style.backgroundColor = this.inactiveTabBackgroundColor;
 
-        /*	// Sty
-            if (containsLabel)
-            {
-                label2.style.borderLeftWidth = '0px';
-            }
-            else
-            {
-                label.style.borderLeftWidth = '0px';
-                mxUtils.write(label, mxResources.get('style'));
-                div.appendChild(label);
 
-                var stylePanel = div.cloneNode(false);
-                stylePanel.style.display = 'none';
-                this.panels.push(new StyleFormatPanel(this, ui, stylePanel));
-                this.container.appendChild(stylePanel);
-
-                addClickHandler(label, stylePanel, idx++);
-            }*/
         var getshape = function (str) {
             var arr = str.split(";");
             var styleShape=arr[0].split("=")[1].split(".")[1];
@@ -177,6 +174,7 @@ FormatBP.prototype.refresh = function() {
         var cell = graph.getSelectionCell() || graph.getModel().getRoot();
         var graph = ui.editor.graph;
         var value = graph.getModel().getValue(cell);
+        graph.getModel().getCell()
         if (!mxUtils.isNode(value))
         {
             var doc = mxUtils.createXmlDocument();
@@ -184,8 +182,23 @@ FormatBP.prototype.refresh = function() {
             obj.setAttribute('label', value || '');
             value = obj;
         }
+        if(graph.getModel().isEdge(cell)){
+  /*         var legal = checkLegal(cell.source);
+           if (legal) {
 
-        if(getshape(cell.getStyle())=="bsync"){
+               graph.getModel().beginUpdate();
+               try {
+
+                   updateEdgeLabels(cell);
+
+               }finally {
+                   graph.getModel().endUpdate();
+               }
+           }else{
+               //TODO-remove edge
+           }*/
+
+        }else if(getshape(cell.getStyle())=="bsync"){
             if (cell != null) {
                 var dlg = new BSyncForm(ui, cell);
                 //dlg.container.style.width="100%";
@@ -267,6 +280,7 @@ FormatBP.prototype.refresh = function() {
             }
             var NumberOfOutPutButton= createApplyButton();
             NumberOfOutPutButton.onclick=function(){
+                deletePrevLabels(cell,NumberOfOutPutBox.value,graph.getModel());
                 value.setAttribute("numberOfOutputs",NumberOfOutPutBox.value);
                 graph.getModel().setValue(cell, value);
                 createLabels(NumberOfOutPutBox.value);
@@ -333,27 +347,8 @@ FormatBP.prototype.refresh = function() {
             cont.appendChild(startnodeDIV);
         }
 
-        // Text
-        /*mxUtils.write(label2, mxResources.get('text'));
-        div.appendChild(dlg.container);
-
-        var textPanel = div.cloneNode(false);
-        textPanel.style.display = 'none';
-        this.panels.push(new TextFormatPanel(this, ui, textPanel));
-        this.container.appendChild(textPanel);*/
 
 
-        // Arrange
-        /*	mxUtils.write(label3, mxResources.get('arrange'));
-            div.appendChild(label3);
-
-            var arrangePanel = div.cloneNode(false);
-            arrangePanel.style.display = 'none';
-            this.panels.push(new ArrangePanel(this, ui, arrangePanel));
-            this.container.appendChild(arrangePanel);*/
-
-        //addClickHandler(label2, textPanel, idx++);
-        //addClickHandler(label3, arrangePanel, idx++);
     }
 };
 
