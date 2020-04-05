@@ -239,7 +239,87 @@ var CodeEditorDialog = function(editorUi,cell)
     tbody.appendChild(row);
     table.appendChild(tbody);
     this.container = table;
+};
 
 
+var StartNodeForm = function (editorUi, cell) {
 
+    var graph = editorUi.editor.graph;
+    var value = graph.getModel().getValue(cell);
+
+    // Converts the value to an XML node
+    if (!mxUtils.isNode(value)) {
+        var doc = mxUtils.createXmlDocument();
+        var obj = doc.createElement('object');
+        obj.setAttribute('label', value || '');
+        value = obj;
+    }
+
+
+    w = 800;
+    h = 350;
+    noHide = true;
+    var row, td
+
+    var table = document.createElement('table');
+    var tbody = document.createElement('tbody');
+
+    row = document.createElement('tr');
+
+    td = document.createElement('td');
+    td.style.fontSize = '10pt';
+    td.style.width = '100px';
+    // mxUtils.writeln(tbody, "BSync Form");
+    // mxUtils.writeln(tbody, "");
+
+
+    row.appendChild(td);
+    tbody.appendChild(row);
+
+    this.init = function () {
+
+    };
+
+    mxUtils.write(td, "Initial Payload");
+    var input = document.createElement('input');
+    input.setAttribute('type', 'text');
+    input.style.marginTop = '6px';
+    input.style.width = '300px';
+    input.style.backgroundRepeat = 'no-repeat';
+    input.style.backgroundPosition = '100% 50%';
+    input.style.paddingRight = '14px';
+    td.appendChild(input);
+    row.appendChild(td);
+
+    tbody.appendChild(row);
+
+    if (value.getAttribute("payload") != undefined)
+        input.value = value.getAttribute("payload");
+
+
+row = document.createElement('tr');
+td = document.createElement('td');
+td.style.paddingTop = '14px';
+td.style.whiteSpace = 'nowrap';
+td.setAttribute('align', 'left');
+{
+
+    var genericBtn = mxUtils.button(mxResources.get('apply'), function () {
+        value.setAttribute("payload", input.value);
+        graph.getModel().setValue(cell, value);
+
+        editorUi.hideDialog();
+    });
+    genericBtn.className = 'geBtn gePrimaryBtn';
+    td.appendChild(genericBtn);
+}
+
+if (!editorUi.editor.cancelFirst) {
+    td.appendChild(genericBtn);
+}
+
+row.appendChild(td);
+tbody.appendChild(row);
+table.appendChild(tbody);
+this.container = table;
 };
