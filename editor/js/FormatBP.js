@@ -5,15 +5,21 @@ FormatBP = function(editorUi, container)
 
 FormatBP.prototype = Object.create(Format.prototype);
 
-function checkLegal(source) {
-    return true;
-}
+function removeAttribute (cell,name) {
+    var userObject = cell.getValue();
+    if (userObject != null && userObject.nodeType == mxConstants.NODETYPE_ELEMENT)
+        userObject.removeAttribute(name);
+};
 
-function updateEdgeLabels(cell) {
-   //
+function deletePrevLabels(cell, value, graph) {
+    var prevAmount =cell.getAttribute('numberOfOutputs');
+    for (let i = prevAmount; i >value ; i--) {
+        removeAttribute(cell,'Outputnumber'+i);
+    }
 }
 
 FormatBP.prototype.refresh = function() {
+
 
     // Performance tweak: No refresh needed if not visible
     if (this.container.style.width == '0px')
@@ -168,6 +174,7 @@ FormatBP.prototype.refresh = function() {
         var cell = graph.getSelectionCell() || graph.getModel().getRoot();
         var graph = ui.editor.graph;
         var value = graph.getModel().getValue(cell);
+        graph.getModel().getCell()
         if (!mxUtils.isNode(value))
         {
             var doc = mxUtils.createXmlDocument();
@@ -273,6 +280,7 @@ FormatBP.prototype.refresh = function() {
             }
             var NumberOfOutPutButton= createApplyButton();
             NumberOfOutPutButton.onclick=function(){
+                deletePrevLabels(cell,NumberOfOutPutBox.value,graph.getModel());
                 value.setAttribute("numberOfOutputs",NumberOfOutPutBox.value);
                 graph.getModel().setValue(cell, value);
                 createLabels(NumberOfOutPutBox.value);
