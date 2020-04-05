@@ -54,9 +54,8 @@ ToolbarBP.prototype.init = function () {
     elts[2].setAttribute('title', mxResources.get('redo') + ' (' + this.editorUi.actions.get('redo').shortcut + ')');
 
     if (sw >= 320) {
-        var elts = this.addItems(['-', 'delete','runModel']);
+        var elts = this.addItems(['-', 'delete']);
         elts[1].setAttribute('title', mxResources.get('delete') + ' (' + this.editorUi.actions.get('delete').shortcut + ')');
-        elts[2].setAttribute('title', mxResources.get('delete') + ' (' + this.editorUi.actions.get('runModel').shortcut + ')');
     }
 
     if (sw >= 550) {
@@ -108,5 +107,7 @@ ToolbarBP.prototype.init = function () {
     var insertMenu = this.addMenu('', mxResources.get('insert') + ' (' + mxResources.get('doubleClickTooltip') + ')', true, 'insert', null, true);
     this.addDropDownArrow(insertMenu, 'geSprite-plus', 38, 48, -4, -3, 36, -8);
 
-}
+    var elts = this.addItems(['-', 'runModel']);
+    elts[1].setAttribute('title','Execute');
+};
 ToolbarBP.prototype.constructor = Toolbar;
