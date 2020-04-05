@@ -89,29 +89,22 @@ FormatBP.prototype.refresh = function() {
         div.appendChild(label);
         this.panels.push(new TextFormatPanel(this, ui, div));
     }
-    else
-    {
+    else {
         var containsLabel = this.getSelectionState().containsLabel;
         var currentLabel = null;
         var currentPanel = null;
 
-        var addClickHandler = mxUtils.bind(this, function(elt, panel, index)
-        {
-            var clickHandler = mxUtils.bind(this, function(evt)
-            {
-                if (currentLabel != elt)
-                {
-                    if (containsLabel)
-                    {
+        var addClickHandler = mxUtils.bind(this, function (elt, panel, index) {
+            var clickHandler = mxUtils.bind(this, function (evt) {
+                if (currentLabel != elt) {
+                    if (containsLabel) {
                         this.labelIndex = index;
                     }
-                    else
-                    {
+                    else {
                         this.currentIndex = index;
                     }
 
-                    if (currentLabel != null)
-                    {
+                    if (currentLabel != null) {
                         currentLabel.style.backgroundColor = this.inactiveTabBackgroundColor;
                         currentLabel.style.borderBottomWidth = '1px';
                     }
@@ -120,10 +113,8 @@ FormatBP.prototype.refresh = function() {
                     currentLabel.style.backgroundColor = '';
                     currentLabel.style.borderBottomWidth = '0px';
 
-                    if (currentPanel != panel)
-                    {
-                        if (currentPanel != null)
-                        {
+                    if (currentPanel != panel) {
+                        if (currentPanel != null) {
                             currentPanel.style.display = 'none';
                         }
 
@@ -135,8 +126,7 @@ FormatBP.prototype.refresh = function() {
 
             mxEvent.addListener(elt, 'click', clickHandler);
 
-            if (index == ((containsLabel) ? this.labelIndex : this.currentIndex))
-            {
+            if (index == ((containsLabel) ? this.labelIndex : this.currentIndex)) {
                 // Invokes handler directly as a workaround for no click on DIV in KHTML.
                 clickHandler();
             }
@@ -158,16 +148,16 @@ FormatBP.prototype.refresh = function() {
 
         var getshape = function (str) {
             var arr = str.split(";");
-            var styleShape=arr[0].split("=")[1].split(".")[1];
+            var styleShape = arr[0].split("=")[1].split(".")[1];
             return styleShape;
 
         };
 
-        var createApplyButton = function(){
-            var newButton= document.createElement("BUTTON");
+        var createApplyButton = function () {
+            var newButton = document.createElement("BUTTON");
             newButton.appendChild(document.createTextNode("Apply"));
-            newButton.id="nodeTitleButton";
-            newButton.style.marginLeft="10px";
+            newButton.id = "nodeTitleButton";
+            newButton.style.marginLeft = "10px";
             return newButton;
         };
 
@@ -175,37 +165,36 @@ FormatBP.prototype.refresh = function() {
         var graph = ui.editor.graph;
         var value = graph.getModel().getValue(cell);
         graph.getModel().getCell()
-        if (!mxUtils.isNode(value))
-        {
+        if (!mxUtils.isNode(value)) {
             var doc = mxUtils.createXmlDocument();
             var obj = doc.createElement('object');
             obj.setAttribute('label', value || '');
             value = obj;
         }
-        if(graph.getModel().isEdge(cell)){
-  /*         var legal = checkLegal(cell.source);
-           if (legal) {
+        if (graph.getModel().isEdge(cell)) {
+            /*         var legal = checkLegal(cell.source);
+                     if (legal) {
 
-               graph.getModel().beginUpdate();
-               try {
+                         graph.getModel().beginUpdate();
+                         try {
 
-                   updateEdgeLabels(cell);
+                             updateEdgeLabels(cell);
 
-               }finally {
-                   graph.getModel().endUpdate();
-               }
-           }else{
-               //TODO-remove edge
-           }*/
+                         }finally {
+                             graph.getModel().endUpdate();
+                         }
+                     }else{
+                         //TODO-remove edge
+                     }*/
 
-        }else if(getshape(cell.getStyle())=="bsync"){
+        } else if (getshape(cell.getStyle()) == "bsync") {
             if (cell != null) {
                 var dlg = new BSyncForm(ui, cell);
                 //dlg.container.style.width="100%";
                 var cont = document.getElementsByClassName("geFormatContainer")[0];
-                cont.style.width="22%";
-                var bsyncDIV =document.createElement('div');
-                bsyncDIV.style.marginLeft="10px";
+                cont.style.width = "22%";
+                var bsyncDIV = document.createElement('div');
+                bsyncDIV.style.marginLeft = "10px";
                 var textnode = document.createElement("p");
                 textnode.innerHTML = '<font size="3">BSync Node</font>';
                 bsyncDIV.appendChild(textnode);
@@ -216,11 +205,11 @@ FormatBP.prototype.refresh = function() {
                 cont.appendChild(bsyncDIV);
 
             }
-        }else if(getshape(cell.getStyle())=="general"){
+        } else if (getshape(cell.getStyle()) == "general") {
             var cont = document.getElementsByClassName("geFormatContainer")[0];
-            cont.style.width="22%";
-            var generalDIV =document.createElement('div');
-            generalDIV.style.marginLeft="10px";
+            cont.style.width = "22%";
+            var generalDIV = document.createElement('div');
+            generalDIV.style.marginLeft = "10px";
 
             //Title
             var textnode = document.createElement("p");
@@ -228,10 +217,10 @@ FormatBP.prototype.refresh = function() {
             generalDIV.appendChild(textnode);
 
             //Button code editor
-            var popUPbutton= document.createElement("BUTTON");
+            var popUPbutton = document.createElement("BUTTON");
             popUPbutton.appendChild(document.createTextNode("Open Code editor"));
-            popUPbutton.id="codeEditorButton";
-            popUPbutton.onclick=function() {
+            popUPbutton.id = "codeEditorButton";
+            popUPbutton.onclick = function () {
                 var dlg = new CodeEditorDialog(ui, cell);
                 var etd = ui;
                 etd.showDialog(dlg.container, 520, 420, true, true);
@@ -240,20 +229,20 @@ FormatBP.prototype.refresh = function() {
             generalDIV.appendChild(popUPbutton);
 
             //Node title - <not made change>
-            var nodeTitleDIV =document.createElement('div');
+            var nodeTitleDIV = document.createElement('div');
             var nodeTitleText = document.createElement("p");
             nodeTitleText.innerHTML = '<font size="2">Node Title:</font>';
             nodeTitleDIV.appendChild(nodeTitleText);
-            var nodeTitleButton= createApplyButton();
+            var nodeTitleButton = createApplyButton();
             var AreaTitleText = document.createElement("p");
             var titleBox = document.createElement("INPUT");
             titleBox.setAttribute("type", "text");
 
             if (undefined != value.getAttribute("NodeTitle"))
-                titleBox.setAttribute("value",value.getAttribute("NodeTitle"));
+                titleBox.setAttribute("value", value.getAttribute("NodeTitle"));
 
-            nodeTitleButton.onclick=function(){
-                value.setAttribute("NodeTitle",titleBox.value);
+            nodeTitleButton.onclick = function () {
+                value.setAttribute("NodeTitle", titleBox.value);
                 value.setAttribute('label', titleBox.value);
                 graph.getModel().setValue(cell, value);
             };
@@ -265,7 +254,7 @@ FormatBP.prototype.refresh = function() {
 
 
             //Number of outputs
-            var NumberOfOutPutDIV =document.createElement('div');
+            var NumberOfOutPutDIV = document.createElement('div');
             var NumberOfOutPutText = document.createElement("p");
             NumberOfOutPutText.innerHTML = '<font size="2">Number of outputs:</font>';
             NumberOfOutPutDIV.appendChild(NumberOfOutPutText);
@@ -274,14 +263,14 @@ FormatBP.prototype.refresh = function() {
             NumberOfOutPutBox.setAttribute("type", "number");
             if (undefined != value.getAttribute("numberOfOutputs")) {
                 NumberOfOutPutBox.setAttribute("value", value.getAttribute("numberOfOutputs"));
-            }else{
+            } else {
                 NumberOfOutPutBox.setAttribute("value", "1");
-                value.setAttribute("numberOfOutputs",1);
+                value.setAttribute("numberOfOutputs", 1);
             }
-            var NumberOfOutPutButton= createApplyButton();
-            NumberOfOutPutButton.onclick=function(){
-                deletePrevLabels(cell,NumberOfOutPutBox.value,graph.getModel());
-                value.setAttribute("numberOfOutputs",NumberOfOutPutBox.value);
+            var NumberOfOutPutButton = createApplyButton();
+            NumberOfOutPutButton.onclick = function () {
+                deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
+                value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
                 graph.getModel().setValue(cell, value);
                 createLabels(NumberOfOutPutBox.value);
             };
@@ -291,34 +280,34 @@ FormatBP.prototype.refresh = function() {
             generalDIV.appendChild(NumberOfOutPutDIV);
 
             //Output label - <not made change>
-            var OutputLabelDIV =document.createElement('div');
+            var OutputLabelDIV = document.createElement('div');
             var OutputLabelText = document.createElement("p");
             OutputLabelText.innerHTML = '<font size="2">Output labels:</font>';
             OutputLabelDIV.appendChild(OutputLabelText);
 
-            var createLabels=function (numOfOutputs) {
-                var InnerDIVOutputLabel =document.createElement('div');
-                InnerDIVOutputLabel.setAttribute("id","InnerDIVOutputLabel"+cell.id);
-                for (var i=0 ; i< numOfOutputs ; i++) {
-                    var oneTextLabelDiv =document.createElement('div');
-                    oneTextLabelDiv.innerHTML="L "+(i+1)+": ";
+            var createLabels = function (numOfOutputs) {
+                var InnerDIVOutputLabel = document.createElement('div');
+                InnerDIVOutputLabel.setAttribute("id", "InnerDIVOutputLabel" + cell.id);
+                for (var i = 0; i < numOfOutputs; i++) {
+                    var oneTextLabelDiv = document.createElement('div');
+                    oneTextLabelDiv.innerHTML = "L " + (i + 1) + ": ";
                     var OutputLabelTextBox = document.createElement("INPUT");
-                    OutputLabelTextBox.id = "nodeID"+cell.id+"Outputnumber"+(i+1);
+                    OutputLabelTextBox.id = "nodeID" + cell.id + "Outputnumber" + (i + 1);
                     OutputLabelTextBox.setAttribute("type", "text");
-                    if (undefined != value.getAttribute("Outputnumber"+(i+1))){
-                        OutputLabelTextBox.setAttribute("value",value.getAttribute("Outputnumber"+(i+1)));
+                    if (undefined != value.getAttribute("Outputnumber" + (i + 1))) {
+                        OutputLabelTextBox.setAttribute("value", value.getAttribute("Outputnumber" + (i + 1)));
                     }
                     oneTextLabelDiv.appendChild(OutputLabelTextBox);
-                    oneTextLabelDiv.style.marginBottom="5px";
+                    oneTextLabelDiv.style.marginBottom = "5px";
                     InnerDIVOutputLabel.appendChild(oneTextLabelDiv);
                 }
 
-                if(numOfOutputs>=1){
-                    var applyButtonLabels =createApplyButton();
+                if (numOfOutputs >= 1) {
+                    var applyButtonLabels = createApplyButton();
                     InnerDIVOutputLabel.appendChild(applyButtonLabels);
-                    applyButtonLabels.onclick=function(){
-                        for (var i=0 ; i<numOfOutputs ;i++){
-                            value.setAttribute("Outputnumber"+(i+1),document.getElementById("nodeID"+cell.id+"Outputnumber"+(i+1)).value);
+                    applyButtonLabels.onclick = function () {
+                        for (var i = 0; i < numOfOutputs; i++) {
+                            value.setAttribute("Outputnumber" + (i + 1), document.getElementById("nodeID" + cell.id + "Outputnumber" + (i + 1)).value);
                         }
                         graph.getModel().setValue(cell, value);
                     };
@@ -333,12 +322,12 @@ FormatBP.prototype.refresh = function() {
             //add the DIV to cont
             cont.appendChild(generalDIV);
 
-        }else if(getshape(cell.getStyle())=="startnode"){
-            var dlg = new StartNodeForm(ui,cell)
+        } else if (getshape(cell.getStyle()) == "startnode") {
+            var dlg = new StartNodeForm(ui, cell);
             var cont = document.getElementsByClassName("geFormatContainer")[0];
-            cont.style.width="22%";
-            var startnodeDIV =document.createElement('div');
-            startnodeDIV.style.marginLeft="10px";
+            cont.style.width = "22%";
+            var startnodeDIV = document.createElement('div');
+            startnodeDIV.style.marginLeft = "10px";
             //cont.style.borderLeftStyle="solid"
             var textnode = document.createElement("p");
             textnode.innerHTML = '<font size="3">Start Node</font>';
@@ -347,9 +336,7 @@ FormatBP.prototype.refresh = function() {
             dlg.init();
 
             cont.appendChild(startnodeDIV);
-        }
-        /*mxUtils.write(label2, mxResources.get('text'));
-        div.appendChild(dlg.container);
+        };
 
 
     }
