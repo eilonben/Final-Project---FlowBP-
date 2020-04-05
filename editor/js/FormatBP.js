@@ -18,6 +18,32 @@ function deletePrevLabels(cell, value, graph) {
     }
 }
 
+function removeEdges(cell, numOfOutputs, graphModel) {
+    var outEdges = getOutEdges(cell);
+    graphModel.beginUpdate();
+    try {
+    for (let i = outEdges.length-1; i >numOfOutputs-1  ; i--) {
+            graphModel.remove(outEdges[i],true);
+    }
+    }finally {
+        graphModel.endUpdate();
+    }
+};
+
+function updateEdgesLabels(cell, numOfOutputs, graphModel) {
+    var outEdges = getOutEdges(cell);
+    graphModel.beginUpdate();
+    try {
+    for (let i = 0; i < outEdges.length ; i++) {
+        var value = graphModel.getValue(outEdges[i]);
+        value.setAttribute('label',cell.getAttribute('Outputnumber'+ (outEdges[i].getAttribute('labelNum'))));
+        graphModel.setValue(outEdges[i],value);
+    }
+    }finally {
+        graphModel.endUpdate();
+    }
+}
+
 FormatBP.prototype.refresh = function() {
 
 
@@ -132,8 +158,6 @@ FormatBP.prototype.refresh = function() {
             }
         });
 
-        var idx = 0;
-
         label.style.backgroundColor = this.inactiveTabBackgroundColor;
         label.style.borderLeftWidth = '1px';
         label.style.width = (containsLabel) ? '50%' : '33.3%';
@@ -164,7 +188,7 @@ FormatBP.prototype.refresh = function() {
         var cell = graph.getSelectionCell() || graph.getModel().getRoot();
         var graph = ui.editor.graph;
         var value = graph.getModel().getValue(cell);
-        graph.getModel().getCell()
+
         if (!mxUtils.isNode(value)) {
             var doc = mxUtils.createXmlDocument();
             var obj = doc.createElement('object');
@@ -172,20 +196,7 @@ FormatBP.prototype.refresh = function() {
             value = obj;
         }
         if (graph.getModel().isEdge(cell)) {
-            /*         var legal = checkLegal(cell.source);
-                     if (legal) {
 
-                         graph.getModel().beginUpdate();
-                         try {
-
-                             updateEdgeLabels(cell);
-
-                         }finally {
-                             graph.getModel().endUpdate();
-                         }
-                     }else{
-                         //TODO-remove edge
-                     }*/
 
         } else if (getshape(cell.getStyle()) == "bsync") {
             if (cell != null) {
@@ -269,6 +280,7 @@ FormatBP.prototype.refresh = function() {
             }
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
+                removeEdges(cell,NumberOfOutPutBox.value, graph.getModel());
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
                 graph.getModel().setValue(cell, value);
@@ -309,6 +321,7 @@ FormatBP.prototype.refresh = function() {
                         for (var i = 0; i < numOfOutputs; i++) {
                             value.setAttribute("Outputnumber" + (i + 1), document.getElementById("nodeID" + cell.id + "Outputnumber" + (i + 1)).value);
                         }
+                        updateEdgesLabels(cell,NumberOfOutPutBox.value,graph.getModel());
                         graph.getModel().setValue(cell, value);
                     };
                 }

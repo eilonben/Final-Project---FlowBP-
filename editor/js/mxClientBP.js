@@ -27,24 +27,26 @@ function getNumOfOutEdges(source){
     return result;
 };
 
-function findCurrLabel(source) {
-    var allLabel = []
-    for (var i =0 ; i<source.getAttribute('numberOfOutputs');i++)
-        allLabel.push(source.getAttribute('Outputnumber'+(i+1)));
-
-    for(var i=0 ; i<source.getEdgeCount() ; i++){
-        if (isOutEdge(source,source.edges[i])  ) {
-            var index = allLabel.indexOf(source.edges[i].value);
-            if (index >= 0)
-                allLabel[index] = true;
-        }
+function getOutEdges(source) {
+    var outEdges = []
+    for (let i = 0; i < source.getEdgeCount(); i++) {
+        if (isOutEdge(source, source.edges[i]))
+            outEdges.push(source.edges[i])
     }
-    var minIndex=0;
-    for(var i=0 ;i<allLabel.length;i++ )
-        if(allLabel[i]!=true) {
-            minIndex = i;
-            break;
-        }
+    outEdges.sort((edge)=>edge.getAttribute('labelNum'));
+    return outEdges;
+}
+
+function findCurrLabel(source) {
+    if(getNumOfOutEdges(source)==0)
+        return 1;
+    var outEdges = getOutEdges(source);
+    outEdges = outEdges.map((edge)=>edge.getAttribute('labelNum'));
+    outEdges.sort();
+    var minIndex=1;
+    for(var i=0 ;i<outEdges.length;i++ )
+        if(outEdges[i]==minIndex)
+            minIndex++;
     return minIndex;
 };
 
@@ -55,17 +57,38 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
     edge.setId(id);
     edge.setEdge(true);
     edge.geometry.relative = true;
+
+    //check basic legal Edge
+    if(source!=null && ( target ==null || getshape(target.getStyle())=="startnode"))
+        return null;
+
+    //cases by nodes
+
     if(source!=null && getshape(source.getStyle())=="general" ){
         var numberOfOutEdges = getNumOfOutEdges(source);
-        if(numberOfOutEdges >= source.getAttribute('numberOfOutputs',1)|| target ==null || getshape(target.getStyle())=="startnode")
+        if(numberOfOutEdges >= source.getAttribute('numberOfOutputs',1))
             return null;
         var indexLabel =findCurrLabel(source);
-        var label = source.getAttribute('Outputnumber'+(indexLabel+1));
-        edge.setAttribute('labelNum',indexLabel);
+        var label = source.getAttribute('Outputnumber'+(indexLabel),' ');
 
-       var tt=  edge.getAttribute('labelNum');
-        edge.setValue(label);
+        var doc = mxUtils.createXmlDocument();
+        var obj = doc.createElement('object');
+        obj.setAttribute('label','');
+        var value = obj;
 
+        value.setAttribute('labelNum',indexLabel);
+        value.setAttribute('label',label);
+        edge.setValue(value);
+
+    }else if(source!=null && getshape(source.getStyle())=="bsync" ){
+        var numberOfOutEdges = getNumOfOutEdges(source);
+        if(numberOfOutEdges >= 1)
+            return null;
+
+    }if(source!=null && getshape(source.getStyle())=="startnode" ){
+    var numberOfOutEdges = getNumOfOutEdges(source);
+    if(numberOfOutEdges >= 1)
+        return null;
     }
     return edge;
 };
