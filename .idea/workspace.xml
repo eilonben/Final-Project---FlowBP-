@@ -20,11 +20,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/editor/js/mxClientBP.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="383">
-              <caret line="85" column="24" lean-forward="true" selection-start-line="85" selection-start-column="24" selection-end-line="85" selection-end-column="24" />
+            <state relative-caret-position="1037">
+              <caret line="66" column="67" selection-start-line="66" selection-start-column="52" selection-end-line="66" selection-end-column="67" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -35,7 +35,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/editor/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="254">
+            <state relative-caret-position="1037">
               <caret line="61" column="53" selection-start-line="61" selection-start-column="43" selection-end-line="61" selection-end-column="53" />
             </state>
           </provider>
@@ -44,8 +44,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/editor/js/EditorUiBP.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="39" lean-forward="true" selection-start-line="39" selection-end-line="39" />
+            <state relative-caret-position="408">
+              <caret line="39" selection-start-line="39" selection-end-line="39" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -53,11 +53,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/editor/js/FormatBP.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="173">
-              <caret line="337" column="58" selection-start-line="337" selection-start-column="49" selection-end-line="337" selection-end-column="58" />
+            <state relative-caret-position="199">
+              <caret line="340" column="62" selection-start-line="340" selection-start-column="62" selection-end-line="340" selection-end-column="62" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="728467">
+              <caret line="42851" selection-start-line="42851" selection-end-line="42851" />
             </state>
           </provider>
         </entry>
@@ -73,10 +82,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>mxclient</find>
-      <find>mxg</find>
-      <find>.prototype.init</find>
-      <find>EdgeLabels</find>
       <find>.prototype.createe</find>
       <find>mxGraph.</find>
       <find>mxGraph.prototype.init</find>
@@ -88,7 +93,6 @@
       <find>mxGraph.prototype.initz</find>
       <find>updateEdgeLabels</find>
       <find>checkLegal</find>
-      <find>numberOfOutputs</find>
       <find>removeCell</find>
       <find>mxGraph.proto</find>
       <find>mxGraph.prototype.insertEdge</find>
@@ -103,6 +107,11 @@
       <find>deletePrevLabels</find>
       <find>getOutEdges</find>
       <find>idx</find>
+      <find>updateEdgesLabels</find>
+      <find>createLabels</find>
+      <find>graph.getModel().setValue(</find>
+      <find>findCurrLabel</find>
+      <find>numberOfOutputs</find>
     </findStrings>
     <dirStrings>
       <dir>C:\Users\gilad\Desktop\FLOW-BP\FlowBP\editor</dir>
@@ -128,8 +137,8 @@
         <option value="$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js" />
         <option value="$PROJECT_DIR$/editor/js/ActionsBP.js" />
         <option value="$PROJECT_DIR$/editor/js/mxCellBP.js" />
-        <option value="$PROJECT_DIR$/editor/js/FormatBP.js" />
         <option value="$PROJECT_DIR$/editor/js/mxClientBP.js" />
+        <option value="$PROJECT_DIR$/editor/js/FormatBP.js" />
       </list>
     </option>
   </component>
@@ -143,6 +152,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -161,11 +171,28 @@
               <item name="editor" type="462c0819:PsiDirectoryNode" />
               <item name="js" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="FlowBP" type="b2602c69:ProjectViewProjectNode" />
+              <item name="FlowBP" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="FlowBP" type="b2602c69:ProjectViewProjectNode" />
+              <item name="FlowBP" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+              <item name="mxgraph" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="FlowBP" type="b2602c69:ProjectViewProjectNode" />
+              <item name="FlowBP" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+              <item name="mxgraph" type="462c0819:PsiDirectoryNode" />
+              <item name="javascript" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -229,11 +256,13 @@
       <workItem from="1586074843535" duration="531000" />
       <workItem from="1586080192769" duration="64000" />
       <workItem from="1586080269363" duration="12994000" />
+      <workItem from="1586124497590" duration="3185000" />
+      <workItem from="1586167352921" duration="33000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="51105000" />
+    <option name="totallyTimeSpent" value="54323000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
@@ -273,20 +302,17 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/editor/js/FormatBP.js</url>
           <line>25</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/editor/js/FormatBP.js</url>
           <line>34</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="29" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/editor/js/FormatBP.js</url>
-          <line>323</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="31" />
+          <line>318</line>
+          <option name="timeStamp" value="32" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -444,13 +470,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/editor/js/mxCellBP.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="2" selection-start-line="9" selection-start-column="2" selection-end-line="9" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/mxCellBP.js" />
     <entry file="file://$PROJECT_DIR$/editor/js/InitBP.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="442">
@@ -536,10 +556,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/editor/js/EditorUiBP.js">
+    <entry file="file://$PROJECT_DIR$/editor/js/mxClientBP.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="39" lean-forward="true" selection-start-line="39" selection-end-line="39" />
+        <state relative-caret-position="1037">
+          <caret line="66" column="67" selection-start-line="66" selection-start-column="52" selection-end-line="66" selection-end-column="67" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
@@ -548,32 +568,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/editor/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="254">
+        <state relative-caret-position="1037">
           <caret line="61" column="53" selection-start-line="61" selection-start-column="43" selection-end-line="61" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/EditorUiBP.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="39" selection-start-line="39" selection-end-line="39" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="141">
+        <state relative-caret-position="728467">
           <caret line="42851" selection-start-line="42851" selection-end-line="42851" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/editor/js/FormatBP.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="337" column="58" selection-start-line="337" selection-start-column="49" selection-end-line="337" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/editor/js/mxClientBP.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="383">
-          <caret line="85" column="24" lean-forward="true" selection-start-line="85" selection-start-column="24" selection-end-line="85" selection-end-column="24" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
+        <state relative-caret-position="199">
+          <caret line="340" column="62" selection-start-line="340" selection-start-column="62" selection-end-line="340" selection-end-column="62" />
         </state>
       </provider>
     </entry>

@@ -12,7 +12,7 @@ function removeAttribute (cell,name) {
 };
 
 function deletePrevLabels(cell, value, graph) {
-    var prevAmount =cell.getAttribute('numberOfOutputs');
+    var prevAmount =cell.getAttribute('numberOfOutputs',1);
     for (let i = prevAmount; i >value ; i--) {
         removeAttribute(cell,'Outputnumber'+i);
     }
@@ -272,6 +272,8 @@ FormatBP.prototype.refresh = function() {
             var AreaNumberOfOutPutText = document.createElement("p");
             var NumberOfOutPutBox = document.createElement("INPUT");
             NumberOfOutPutBox.setAttribute("type", "number");
+            NumberOfOutPutBox.setAttribute("max", 6);
+            NumberOfOutPutBox.setAttribute("min", 0);
             if (undefined != value.getAttribute("numberOfOutputs")) {
                 NumberOfOutPutBox.setAttribute("value", value.getAttribute("numberOfOutputs"));
             } else {
@@ -317,6 +319,7 @@ FormatBP.prototype.refresh = function() {
                 if (numOfOutputs >= 1) {
                     var applyButtonLabels = createApplyButton();
                     InnerDIVOutputLabel.appendChild(applyButtonLabels);
+
                     applyButtonLabels.onclick = function () {
                         for (var i = 0; i < numOfOutputs; i++) {
                             value.setAttribute("Outputnumber" + (i + 1), document.getElementById("nodeID" + cell.id + "Outputnumber" + (i + 1)).value);
@@ -329,7 +332,7 @@ FormatBP.prototype.refresh = function() {
             };
 
 
-            createLabels(value.getAttribute("numberOfOutputs"));
+            createLabels(value.getAttribute("numberOfOutputs",1));
             generalDIV.appendChild(OutputLabelDIV);
 
             //add the DIV to cont

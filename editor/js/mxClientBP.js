@@ -42,7 +42,6 @@ function findCurrLabel(source) {
         return 1;
     var outEdges = getOutEdges(source);
     outEdges = outEdges.map((edge)=>edge.getAttribute('labelNum'));
-    outEdges.sort();
     var minIndex=1;
     for(var i=0 ;i<outEdges.length;i++ )
         if(outEdges[i]==minIndex)
@@ -63,7 +62,6 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
         return null;
 
     //cases by nodes
-
     if(source!=null && getshape(source.getStyle())=="general" ){
         var numberOfOutEdges = getNumOfOutEdges(source);
         if(numberOfOutEdges >= source.getAttribute('numberOfOutputs',1))
@@ -85,10 +83,10 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
         if(numberOfOutEdges >= 1)
             return null;
 
-    }if(source!=null && getshape(source.getStyle())=="startnode" ){
-    var numberOfOutEdges = getNumOfOutEdges(source);
-    if(numberOfOutEdges >= 1)
-        return null;
+    }else if(source!=null && getshape(source.getStyle())=="startnode" ){
+        var numberOfOutEdges = getNumOfOutEdges(source);
+        if(numberOfOutEdges >= 1)
+            return null;
     }
     return edge;
 };
