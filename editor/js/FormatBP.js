@@ -182,6 +182,7 @@ FormatBP.prototype.refresh = function() {
             newButton.appendChild(document.createTextNode("Apply"));
             newButton.id = "nodeTitleButton";
             newButton.style.marginLeft = "10px";
+            newButton.style.cursor = "pointer";
             return newButton;
         };
 
@@ -237,6 +238,7 @@ FormatBP.prototype.refresh = function() {
                 etd.showDialog(dlg.container, 520, 420, true, true);
                 dlg.init();
             };
+            popUPbutton.className = 'geBtn gePrimaryBtn';
             generalDIV.appendChild(popUPbutton);
 
             //Node title - <not made change>
@@ -333,10 +335,12 @@ FormatBP.prototype.refresh = function() {
 
 
             createLabels(value.getAttribute("numberOfOutputs",1));
+
             generalDIV.appendChild(OutputLabelDIV);
 
             //add the DIV to cont
             cont.appendChild(generalDIV);
+            graph.getModel().setValue(cell, value);
 
         } else if (getshape(cell.getStyle()) == "startnode") {
             var dlg = new StartNodeForm(ui, cell);
@@ -356,6 +360,7 @@ FormatBP.prototype.refresh = function() {
 
 
     }
+
 };
 
 FormatBP.prototype.constructor = Format;
