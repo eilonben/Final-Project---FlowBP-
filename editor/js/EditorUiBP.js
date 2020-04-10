@@ -20,13 +20,14 @@ function EditorUiBP(editor, container, lightbox) {
     // new ActionsBP(this.actions);
 };
 
+EditorUiBP.prototype = Object.create(EditorUi.prototype);
 
 EditorUiBP.prototype.createHoverIcons = function()
 {
     return new HoverIconsBP(this.editor.graph);
 };
 
-EditorUiBP.prototype = Object.create(EditorUi.prototype);
+
 
 EditorUiBP.prototype.createFormat = function(container)
 {
