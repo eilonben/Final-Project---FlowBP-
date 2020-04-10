@@ -2,7 +2,6 @@
 
 	<shape name="StartNode" h="50" w="50" aspect="variable" strokewidth="inherit">
 		<connections>
-			<constraint x="0" y="0.5" perimeter="0" name="W" />
 			<constraint x="1" y="0.5" perimeter="0" name="E" />
 		</connections>
 		<background>
@@ -21,7 +20,6 @@
 
 	<shape name="BSync" h="25" w="100" aspect="variable" strokewidth="inherit">
 		<connections>
-			<constraint x="0" y="0.5" perimeter="0" name="W" />
 			<constraint x="1" y="0.5" perimeter="0" name="E" />
 		</connections>
 		<background>
@@ -41,7 +39,6 @@
 
 	<shape name="General" h="25" w="100" aspect="variable" strokewidth="inherit">
 		<connections>
-			<constraint x="0" y="0.5" perimeter="0" name="W" />
 			<constraint x="1" y="0.5" perimeter="0" name="E" />
 		</connections>
 		<background>
