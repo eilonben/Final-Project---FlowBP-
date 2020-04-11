@@ -22,6 +22,7 @@ function EditorUiBP(editor, container, lightbox) {
 
 EditorUiBP.prototype = Object.create(EditorUi.prototype);
 
+
 EditorUiBP.prototype.createHoverIcons = function()
 {
     return new HoverIconsBP(this.editor.graph);

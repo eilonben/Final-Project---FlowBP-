@@ -42315,6 +42315,7 @@ function mxCell(value, geometry, style)
 	this.value = value;
 	this.setGeometry(geometry);
 	this.setStyle(style);
+
 	
 	if (this.onInit != null)
 	{
@@ -42328,6 +42329,9 @@ function mxCell(value, geometry, style)
  * Holds the Id. Default is null.
  */
 mxCell.prototype.id = null;
+
+
+mxCell.prototype.constraints = [];
 
 /**
  * Variable: value
@@ -43261,7 +43265,8 @@ mxGeometry.prototype.swap = function()
  * isSource - Boolean that specifies if the source or target point
  * should be returned.
  */
-mxGeometry.prototype.getTerminalPoint = function(isSource)
+mxGeometry.prototy
+pe.getTerminalPoint = function(isSource)
 {
 	return (isSource) ? this.sourcePoint : this.targetPoint;
 };

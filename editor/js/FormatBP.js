@@ -270,6 +270,8 @@ FormatBP.prototype.refresh = function() {
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
+                var constraint_for_hadas = graph.getConnection
+                var edge_for_hadas = graph.edgeState;
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
                 graph.getModel().setValue(cell, value);
                 createLabels(NumberOfOutPutBox.value);

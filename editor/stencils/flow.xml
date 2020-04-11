@@ -2,7 +2,9 @@
 
 	<shape name="StartNode" h="50" w="50" aspect="variable" strokewidth="inherit">
 		<connections>
+			<constraint x="1" y="0.75" perimeter="0" name="E" />
 			<constraint x="1" y="0.5" perimeter="0" name="E" />
+			<constraint x="1" y="0.25" perimeter="0" name="E" />
 		</connections>
 		<background>
 			<path>
