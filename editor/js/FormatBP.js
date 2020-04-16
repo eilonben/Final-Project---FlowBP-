@@ -20,7 +20,6 @@ function deletePrevLabels(cell, value, graph) {
 
 function adjustConnectionConstraint(cell, connection_number,){
     cell.new_constraints = [];
-
     var interval = 1 / (connection_number + 1);
     for(var i = 1; i <= connection_number ; i++)
         cell.new_constraints.push(new mxConnectionConstraint(new mxPoint(1, interval*i), true));

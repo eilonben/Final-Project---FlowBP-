@@ -2,17 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="10fde910-9628-4f91-b30b-518d15ec472d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/editor/js/EditorBP.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/editor/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/js/EditorUiBP.js" beforeDir="false" afterPath="$PROJECT_DIR$/editor/js/EditorUiBP.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/editor/js/FormatBP.js" beforeDir="false" afterPath="$PROJECT_DIR$/editor/js/FormatBP.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/js/GraphBP.js" beforeDir="false" afterPath="$PROJECT_DIR$/editor/js/GraphBP.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/js/SidebarBP.js" beforeDir="false" afterPath="$PROJECT_DIR$/editor/js/SidebarBP.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/js/mxClientBP.js" beforeDir="false" afterPath="$PROJECT_DIR$/editor/js/mxClientBP.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/stencils/flow.xml" beforeDir="false" afterPath="$PROJECT_DIR$/editor/stencils/flow.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/editor/viewer.html" beforeDir="false" afterPath="$PROJECT_DIR$/editor/viewer.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -53,7 +43,7 @@
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="HTML" value="14" />
-          <entry key="JavaScript" value="66" />
+          <entry key="JavaScript" value="67" />
           <entry key="PLAIN_TEXT" value="1" />
           <entry key="UML" value="1" />
           <entry key="XML" value="3" />
@@ -72,14 +62,23 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/editor/js/mxClientBP.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8">
-              <caret line="84" lean-forward="true" selection-start-line="84" selection-end-line="84" />
+            <state relative-caret-position="858">
+              <caret line="88" column="16" lean-forward="true" selection-start-line="88" selection-start-column="16" selection-end-line="88" selection-end-column="16" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/editor/js/FormatBP.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="94">
+              <caret line="279" column="32" selection-start-line="279" selection-start-column="16" selection-end-line="279" selection-end-column="32" />
             </state>
           </provider>
         </entry>
@@ -149,12 +148,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>terminal</find>
-      <find>onnectionConstraints</find>
-      <find>mxRectangle</find>
-      <find>setterminalpoin</find>
-      <find>Constraints</find>
-      <find>mxGraph.prototype.getAllConnectionConstraints =</find>
       <find>mxGraph.prototype.getAllConnectionConstraints = function(terminal, source)</find>
       <find>ConnectionConstraints</find>
       <find>mxcell</find>
@@ -179,6 +172,12 @@
       <find>prototype.checkConstraints</find>
       <find>this.connect(source, target, me.getEvent(), me.getCell());</find>
       <find>checkConstraints</find>
+      <find>new_constraints</find>
+      <find>for</find>
+      <find>for(</find>
+      <find>for (</find>
+      <find>apply</find>
+      <find>click</find>
     </findStrings>
     <dirStrings>
       <dir>C:\Users\gilad\Desktop\FLOW-BP\FlowBP\editor</dir>
@@ -204,7 +203,6 @@
         <option value="$PROJECT_DIR$/editor/stencils/flow.xml" />
         <option value="$PROJECT_DIR$/editor/viewer.html" />
         <option value="$PROJECT_DIR$/editor/js/EditorUiBP.js" />
-        <option value="$PROJECT_DIR$/editor/js/FormatBP.js" />
         <option value="$PROJECT_DIR$/editor/js/GraphBP.js" />
         <option value="$PROJECT_DIR$/editor/index.html" />
         <option value="$PROJECT_DIR$/editor/js/SidebarBP.js" />
@@ -212,6 +210,7 @@
         <option value="$PROJECT_DIR$/resources/mxgraph/javascript/src/js/handler/mxConnectionHandler.js" />
         <option value="$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js" />
         <option value="$PROJECT_DIR$/editor/js/mxClientBP.js" />
+        <option value="$PROJECT_DIR$/editor/js/FormatBP.js" />
       </list>
     </option>
   </component>
@@ -380,12 +379,12 @@
       <workItem from="1586825966392" duration="3195000" />
       <workItem from="1587036105636" duration="6054000" />
       <workItem from="1587045540915" duration="773000" />
-      <workItem from="1587047515539" duration="14027000" />
+      <workItem from="1587047515539" duration="16431000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="115872000" />
+    <option name="totallyTimeSpent" value="118276000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -402,11 +401,11 @@
     <layout>
       <window_info id="Structure" order="0" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="1" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="2" visible="true" weight="0.23036304" />
+      <window_info active="true" content_ui="combo" id="Project" order="2" visible="true" weight="0.23036304" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.41058657" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32761088" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49932885" visible="true" weight="0.33619457" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49932885" visible="true" weight="0.33619457" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32907802" />
@@ -440,18 +439,6 @@
           <line>1759</line>
           <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="116" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/editor/js/mxClientBP.js</url>
-          <line>87</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="118" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/editor/js/mxClientBP.js</url>
-          <line>86</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="119" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js</url>
@@ -819,13 +806,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/editor/js/FormatBP.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="353">
-          <caret line="356" selection-start-line="356" selection-end-line="356" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/editor/js/EditorUiBP.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-544">
@@ -882,11 +862,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/editor/js/mxClientBP.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8">
-          <caret line="84" lean-forward="true" selection-start-line="84" selection-end-line="84" />
+        <state relative-caret-position="858">
+          <caret line="88" column="16" lean-forward="true" selection-start-line="88" selection-start-column="16" selection-end-line="88" selection-end-column="16" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/FormatBP.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="94">
+          <caret line="279" column="32" selection-start-line="279" selection-start-column="16" selection-end-line="279" selection-end-column="32" />
         </state>
       </provider>
     </entry>
