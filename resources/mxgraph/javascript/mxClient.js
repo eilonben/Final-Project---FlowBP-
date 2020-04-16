@@ -43265,8 +43265,7 @@ mxGeometry.prototype.swap = function()
  * isSource - Boolean that specifies if the source or target point
  * should be returned.
  */
-mxGeometry.prototy
-pe.getTerminalPoint = function(isSource)
+mxGeometry.prototype.getTerminalPoint = function(isSource)
 {
 	return (isSource) ? this.sourcePoint : this.targetPoint;
 };

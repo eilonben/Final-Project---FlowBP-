@@ -1,16 +1,10 @@
+// Duplicate HoverIconsBP is designed to erase the "Connect and Duplicate" arrows and leave only the right one.
 
 HoverIconsBP = function(graph)
 {
     HoverIcons.call(this,graph);
 };
 HoverIconsBP.prototype = Object.create(HoverIcons.prototype);
-
-// HoverIconsBP.prototype = new HoverIcons();
-// HoverIconsBP.prototype.constructor = HoverIconsBP;
-//
-// mxRectangle.prototype = new mxPoint();
-// mxRectangle.prototype.constructor = mxRectangle;
-
 
 HoverIconsBP.prototype.repaint = function()
 {
@@ -154,163 +148,22 @@ HoverIconsBP.prototype.repaint = function()
 
 
 
-// HoverIcons.prototype.init = function()
-// {
-//     // this.arrowUp = this.createArrow(this.triangleUp, mxResources.get('plusTooltip'));
-//     this.arrowRight = this.createArrow(this.triangleRight, mxResources.get('plusTooltip'));
-//     // this.arrowDown = this.createArrow(this.triangleDown, mxResources.get('plusTooltip'));
-//     // this.arrowLeft = this.createArrow(this.triangleLeft, mxResources.get('plusTooltip'));
-//
-//     this.elts = [this.arrowRight];
-//     // this.elts = [this.arrowUp, this.arrowRight, this.arrowDown, this.arrowLeft];
-//
-//     this.resetHandler = mxUtils.bind(this, function()
-//     {
-//         this.reset();
-//     });
-//
-//     this.repaintHandler = mxUtils.bind(this, function()
-//     {
-//         this.repaint();
-//     });
-//
-//     this.graph.selectionModel.addListener(mxEvent.CHANGE, this.resetHandler);
-//     this.graph.model.addListener(mxEvent.CHANGE, this.repaintHandler);
-//     this.graph.view.addListener(mxEvent.SCALE_AND_TRANSLATE, this.repaintHandler);
-//     this.graph.view.addListener(mxEvent.TRANSLATE, this.repaintHandler);
-//     this.graph.view.addListener(mxEvent.SCALE, this.repaintHandler);
-//     this.graph.view.addListener(mxEvent.DOWN, this.repaintHandler);
-//     this.graph.view.addListener(mxEvent.UP, this.repaintHandler);
-//     this.graph.addListener(mxEvent.ROOT, this.repaintHandler);
-//     this.graph.addListener(mxEvent.ESCAPE, this.resetHandler);
-//     mxEvent.addListener(this.graph.container, 'scroll', this.resetHandler);
-//
-//     // Resets the mouse point on escape
-//     this.graph.addListener(mxEvent.ESCAPE, mxUtils.bind(this, function()
-//     {
-//         this.mouseDownPoint = null;
-//     }));
-//
-//     // Removes hover icons if mouse leaves the container
-//     mxEvent.addListener(this.graph.container, 'mouseleave',  mxUtils.bind(this, function(evt)
-//     {
-//         // Workaround for IE11 firing mouseleave for touch in diagram
-//         if (evt.relatedTarget != null && mxEvent.getSource(evt) == this.graph.container)
-//         {
-//             this.setDisplay('none');
-//         }
-//     }));
-//
-//     // Resets current state when in-place editor starts
-//     this.graph.addListener(mxEvent.START_EDITING, mxUtils.bind(this, function(evt)
-//     {
-//         this.reset();
-//     }));
-//
-//     // Resets current state after update of selection state for touch events
-//     var graphClick = this.graph.click;
-//     this.graph.click = mxUtils.bind(this, function(me)
-//     {
-//         graphClick.apply(this.graph, arguments);
-//
-//         if (this.currentState != null && !this.graph.isCellSelected(this.currentState.cell) &&
-//             mxEvent.isTouchEvent(me.getEvent()) && !this.graph.model.isVertex(me.getCell()))
-//         {
-//             this.reset();
-//         }
-//     });
-//
-//     // Checks if connection handler was active in mouse move
-//     // as workaround for possible double connection inserted
-//     var connectionHandlerActive = false;
-//
-//     // Implements a listener for hover and click handling
-//     this.graph.addMouseListener(
-//         {
-//             mouseDown: mxUtils.bind(this, function(sender, me)
-//             {
-//                 connectionHandlerActive = false;
-//                 var evt = me.getEvent();
-//
-//                 if (this.isResetEvent(evt))
-//                 {
-//                     this.reset();
-//                 }
-//                 else if (!this.isActive())
-//                 {
-//                     var state = this.getState(me.getState());
-//
-//                     if (state != null || !mxEvent.isTouchEvent(evt))
-//                     {
-//                         this.update(state);
-//                     }
-//                 }
-//
-//                 this.setDisplay('none');
-//             }),
-//             mouseMove: mxUtils.bind(this, function(sender, me)
-//             {
-//                 var evt = me.getEvent();
-//
-//                 if (this.isResetEvent(evt))
-//                 {
-//                     this.reset();
-//                 }
-//                 else if (!this.graph.isMouseDown && !mxEvent.isTouchEvent(evt))
-//                 {
-//                     this.update(this.getState(me.getState()),
-//                         me.getGraphX(), me.getGraphY());
-//                 }
-//
-//                 if (this.graph.connectionHandler != null &&
-//                     this.graph.connectionHandler.shape != null)
-//                 {
-//                     connectionHandlerActive = true;
-//                 }
-//             }),
-//             mouseUp: mxUtils.bind(this, function(sender, me)
-//             {
-//                 var evt = me.getEvent();
-//                 var pt = mxUtils.convertPoint(this.graph.container,
-//                     mxEvent.getClientX(evt), mxEvent.getClientY(evt))
-//
-//                 if (this.isResetEvent(evt))
-//                 {
-//                     this.reset();
-//                 }
-//                 else if (this.isActive() && !connectionHandlerActive &&
-//                     this.mouseDownPoint != null)
-//                 {
-//                     this.click(this.currentState, this.getDirection(), me);
-//                 }
-//                 else if (this.isActive())
-//                 {
-//                     // Selects target vertex after drag and clone if not only new edge was inserted
-//                     if (this.graph.getSelectionCount() != 1 || !this.graph.model.isEdge(
-//                         this.graph.getSelectionCell()))
-//                     {
-//                         this.update(this.getState(this.graph.view.getState(
-//                             this.graph.getCellAt(me.getGraphX(), me.getGraphY()))));
-//                     }
-//                     else
-//                     {
-//                         this.reset();
-//                     }
-//                 }
-//                 else if (mxEvent.isTouchEvent(evt) || (this.bbox != null &&
-//                     mxUtils.contains(this.bbox, me.getGraphX(), me.getGraphY())))
-//                 {
-//                     // Shows existing hover icons if inside bounding box
-//                     this.setDisplay('');
-//                     this.repaint();
-//                 }
-//                 else if (!mxEvent.isTouchEvent(evt))
-//                 {
-//                     this.reset();
-//                 }
-//
-//                 connectionHandlerActive = false;
-//                 this.resetActiveArrow();
-//             })
-//         });
-// };
+// Duplicate GraphBP is designed to adjust connections point According to the number of outgoing arrows.
+
+GraphBP = function(container, model, renderHint, stylesheet, themes, standalone)
+{
+    Graph.call(this, container, model, renderHint, stylesheet, themes, standalone);
+};
+
+GraphBP.prototype = Object.create(Graph.prototype);
+
+
+GraphBP.prototype.getAllConnectionConstraints = function(terminal, source){
+     if (terminal != null && terminal.cell.new_constraints != null)
+     {
+             return terminal.cell.new_constraints;
+     }
+     return Graph.prototype.getAllConnectionConstraints(terminal, source)
+}
+
+// GraphBP.prototype = Object.create(Graph.prototype);

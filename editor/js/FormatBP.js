@@ -18,6 +18,15 @@ function deletePrevLabels(cell, value, graph) {
     }
 }
 
+function adjustConnectionConstraint(cell, connection_number,){
+    cell.new_constraints = [];
+
+    var interval = 1 / (connection_number + 1);
+    for(var i = 1; i <= connection_number ; i++)
+        cell.new_constraints.push(new mxConnectionConstraint(new mxPoint(1, interval*i), true));
+
+}
+
 FormatBP.prototype.refresh = function() {
 
 
@@ -270,11 +279,12 @@ FormatBP.prototype.refresh = function() {
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
-                var constraint_for_hadas = graph.getConnection
-                var edge_for_hadas = graph.edgeState;
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
+                adjustConnectionConstraint(cell,parseInt(NumberOfOutPutBox.value))
                 graph.getModel().setValue(cell, value);
                 createLabels(NumberOfOutPutBox.value);
+
+
             };
             AreaNumberOfOutPutText.appendChild(NumberOfOutPutBox);
             AreaNumberOfOutPutText.appendChild(NumberOfOutPutButton);
@@ -344,4 +354,4 @@ FormatBP.prototype.refresh = function() {
     }
 };
 
-FormatBP.prototype.constructor = Format;
+// FormatBP.prototype.constructor = Format;

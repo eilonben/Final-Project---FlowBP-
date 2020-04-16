@@ -69,5 +69,88 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
     }
     return edge;
 };
+mxGraph.prototype.createConnectionHandler = function()
+{
+    return new mxConnectionHandlerBP(this);
+};
+
+
+function mxConnectionHandlerBP(graph, factoryMethod){
+    mxConnectionHandler.call(this,graph, factoryMethod);
+};
+
+
+mxConnectionHandlerBP.prototype = Object.create(mxConnectionHandler.prototype);
+
+
+mxConnectionHandlerBP.prototype.checkLeftConstraints = function(c1, c2) {
+    if(c2.point.x != null)
+        return c2.point.x < 0.02;
+    return true;
+}
+
+mxConnectionHandlerBP.prototype.mouseUp = function(sender, me)
+{
+    if (!me.isConsumed() && this.isConnecting())
+    {
+        if (this.waypointsEnabled && !this.isStopEvent(me))
+        {
+            this.addWaypointForEvent(me);
+            me.consume();
+
+            return;
+        }
+
+        var c1 = this.sourceConstraint;
+        var c2 = this.constraintHandler.currentConstraint;
+
+        var source = (this.previous != null) ? this.previous.cell : null;
+        var target = null;
+
+        if (this.constraintHandler.currentConstraint != null &&
+            this.constraintHandler.currentFocus != null)
+        {
+            target = this.constraintHandler.currentFocus.cell;
+        }
+
+        if (target == null && this.currentState != null)
+        {
+            target = this.currentState.cell;
+        }
+
+        // Inserts the edge if no validation error exists and if constraints differ
+        if (this.error == null && this.checkLeftConstraints(c1, c2) && (source == null || target == null ||
+            source != target || this.checkConstraints(c1, c2)))
+        {
+            this.connect(source, target, me.getEvent(), me.getCell());
+        }
+        else
+        {
+            // Selects the source terminal for self-references
+            if (this.previous != null && this.marker.validState != null &&
+                this.previous.cell == this.marker.validState.cell)
+            {
+                this.graph.selectCellForEvent(this.marker.source, me.getEvent());
+            }
+
+            // Displays the error message if it is not an empty string,
+            // for empty error messages, the event is silently dropped
+            if (this.error != null && this.error.length > 0)
+            {
+                this.graph.validationAlert(this.error);
+            }
+        }
+
+        // Redraws the connect icons and resets the handler state
+        this.destroyIcons();
+        me.consume();
+    }
+
+    if (this.first != null)
+    {
+        this.reset();
+    }
+};
+
 
 //mxGraphBP.prototype.constructor = mxGraph;
