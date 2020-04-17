@@ -1,6 +1,6 @@
 window.sbs = {
     stages: [],
-    curStage: 0
+    curStage: -1
 };
 
 window.bpEngine = {
@@ -149,9 +149,24 @@ function startRunning(model) {
     window.bpEngine.BThreads = [];
 }
 
-function getStage() {
-    return window.sbs.curStage < window.sbs.stages.length ? window.sbs.stages[window.sbs.curStage++] : -1
+function getNextStage() {
+    if(window.sbs.curStage < window.sbs.stages.length - 1)
+        return window.sbs.stages[++window.sbs.curStage]
+    return window.sbs.stages[window.sbs.curStage = window.sbs.stages.length - 1]
 }
+
+function getPrevStage() {
+    if(window.sbs.curStage > 0)
+        return window.sbs.stages[--window.sbs.curStage]
+    return window.sbs.stages[window.sbs.curStage = 0]
+}
+
+function initSBS() {
+    window.sbs.stages = []
+    window.sbs.curStage = -1
+}
+
+
 // function f1(){}
 // function f2(){}
 // function f3(){}
