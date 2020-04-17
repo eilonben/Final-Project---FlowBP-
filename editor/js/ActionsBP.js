@@ -119,7 +119,8 @@ ActionsBP.prototype.init = function(actions) {
         graph.getModel().endUpdate();
 
         editor.undoManager.indexOfNextAdd = lastUndo;
-        for (let i = lastUndo + 1; i < editor.undoManager.history.length; i++) {
+        var numOfNewUndos = editor.undoManager.history.length - lastUndo;
+        while(numOfNewUndos-- > 0) {
             editor.undoManager.history.pop();
         }
 
