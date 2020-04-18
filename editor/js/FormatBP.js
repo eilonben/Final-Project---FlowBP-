@@ -43,7 +43,7 @@ function getValueByKey(style, key) {
 
 
 function removeEdges(cell, numOfOutputs, graphModel) {
-    //the first time pressed apply or no need to delete edges - no need to erase edges
+    //the first time pressed apply or no need to delete edges
     if(cell.new_constraints == null || numOfOutputs >= cell.new_constraints.length)
         return;
     var outEdges = getOutEdges(cell);
@@ -52,8 +52,8 @@ function removeEdges(cell, numOfOutputs, graphModel) {
     try {
         for (let i = 0; i <  outEdges.length; i++) {
             //
-            var currentEdge = outEdges[i].style;
-            var oldY = getValueByKey(currentEdge,"exitY");
+            var currentEdgeStyle = outEdges[i].style;
+            var oldY = getValueByKey(currentEdgeStyle,"exitY");
             var constraintNumber = Math.ceil(oldY * (oldNumOfOutput +1));
             //check if edge should erase
             if(constraintNumber > numOfOutputs)
@@ -61,10 +61,8 @@ function removeEdges(cell, numOfOutputs, graphModel) {
             else{
             //    relocate edge exit location of edge
                 var newY = constraintNumber * (1/(numOfOutputs+1))
-                var new_style = mxUtils.setStyle(currentEdge, 'exitY', newY);
+                var new_style = mxUtils.setStyle(currentEdgeStyle, 'exitY', newY);
                 graphModel.setStyle(outEdges[i], new_style);
-
-
             }
         }
     } finally {
@@ -335,7 +333,7 @@ FormatBP.prototype.refresh = function() {
             }
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
-                removeEdges(cell,NumberOfOutPutBox.value, graph.getModel());
+                removeEdges(cell,parseInt(NumberOfOutPutBox.value), graph.getModel());
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
                 adjustConnectionConstraint(cell,parseInt(NumberOfOutPutBox.value))
