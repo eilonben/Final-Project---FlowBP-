@@ -42330,9 +42330,6 @@ function mxCell(value, geometry, style)
  */
 mxCell.prototype.id = null;
 
-
-mxCell.prototype.constraints = [];
-
 /**
  * Variable: value
  *
