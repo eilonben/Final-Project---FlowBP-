@@ -107,6 +107,10 @@ ToolbarBP.prototype.init = function () {
     var insertMenu = this.addMenu('', mxResources.get('insert') + ' (' + mxResources.get('doubleClickTooltip') + ')', true, 'insert', null, true);
     this.addDropDownArrow(insertMenu, 'geSprite-plus', 38, 48, -4, -3, 36, -8);
 
+    var elts = this.addItems(['-', 'debug_sbs', 'next_sbs', 'back_sbs', 'stop_sbs']);
+    //elts[1].setAttribute('title', mxResources.get('runNextSBS') + ' (' + this.editorUi.actions.get('runNextSBS').shortcut+ ')');
+    //elts[2].setAttribute('title', mxResources.get('runPrevSBS') + ' (' + this.editorUi.actions.get('runPrevSBS').shortcut+ ')');
+
     var elts = this.addItems(['-', 'runModel']);
     elts[1].setAttribute('title','Execute');
 };
