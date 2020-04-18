@@ -1,3 +1,8 @@
+window.sbs = {
+    stages: [],
+    curStage: -1
+};
+
 window.bpEngine = {
     BThreads: [],
 
@@ -108,14 +113,16 @@ function* runInNewBT(c, payload, bpEngine, model) {
             yield JSON.parse(c.getAttribute("sync"));
             curr["selected"] = window.eventSelected;
         }
-        yield* goToFollowers(c, cloned, this, bpEngine, model);
+
+        window.sbs.stages.push(c.id);
+
+        yield* goToFollowers(c, cloned, this, bpEngine,model);
     }());
 };
 
 function getshape(str) {
     var arr = str.split(";");
     return arr[0].split("=")[1].split(".")[1];
-
 }
 
 function* runInSameBT(c, payload, ths, bpEngine, model) {
@@ -129,7 +136,9 @@ function* runInSameBT(c, payload, ths, bpEngine, model) {
         curr["selected"] = window.eventSelected;
     }
 
-    yield* goToFollowers(c, curr, ths, bpEngine, model);
+    window.sbs.stages.push(c.id);
+
+    yield *goToFollowers(c, curr, ths, bpEngine,model);
 };
 
 function startRunning(model) {
@@ -151,6 +160,24 @@ function startRunning(model) {
     window.bpEngine.run().next();
     window.bpEngine.BThreads = [];
 }
+
+function getNextStage() {
+    if(window.sbs.curStage < window.sbs.stages.length - 1)
+        return window.sbs.stages[++window.sbs.curStage]
+    return window.sbs.stages[window.sbs.curStage = window.sbs.stages.length - 1]
+}
+
+function getPrevStage() {
+    if(window.sbs.curStage > 0)
+        return window.sbs.stages[--window.sbs.curStage]
+    return window.sbs.stages[window.sbs.curStage = 0]
+}
+
+function initSBS() {
+    window.sbs.stages = []
+    window.sbs.curStage = -1
+}
+
 
 // function f1(){}
 // function f2(){}

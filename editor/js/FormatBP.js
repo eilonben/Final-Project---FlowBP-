@@ -42,9 +42,9 @@ function getValueByKey(style, key) {
 };
 
 
-function removeEdges(cell, numOfOutputs, graphModel) {
-    //the first time pressed apply or no need to delete edges
-    if(cell.new_constraints == null || numOfOutputs >= cell.new_constraints.length)
+function adjustEdges(cell, numOfOutputs, graphModel) {
+    //the first time pressed apply
+    if(cell.new_constraints == null)
         return;
     var outEdges = getOutEdges(cell);
     var oldNumOfOutput = cell.new_constraints.length;
@@ -333,7 +333,7 @@ FormatBP.prototype.refresh = function() {
             }
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
-                removeEdges(cell,parseInt(NumberOfOutPutBox.value), graph.getModel());
+                adjustEdges(cell,parseInt(NumberOfOutPutBox.value), graph.getModel());
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
                 adjustConnectionConstraint(cell,parseInt(NumberOfOutPutBox.value))
