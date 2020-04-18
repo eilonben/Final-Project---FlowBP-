@@ -1,10 +1,3 @@
-FormatBP = function(editorUi, container)
-{
-    Format.call(this,editorUi,container);
-};
-
-FormatBP.prototype = Object.create(Format.prototype);
-
 function removeAttribute (cell,name) {
     var userObject = cell.getValue();
     if (userObject != null && userObject.nodeType == mxConstants.NODETYPE_ELEMENT)
@@ -18,14 +11,61 @@ function deletePrevLabels(cell, value, graph) {
     }
 }
 
-function removeEdges(cell, numOfOutputs, graphModel) {
+function adjustConnectionConstraint(cell, connection_number){
+    cell.new_constraints = [];
+    var interval = 1 / (connection_number + 1);
+    for(var i = 1; i <= connection_number ; i++)
+        cell.new_constraints.push(new mxConnectionConstraint(new mxPoint(1, interval*i), true));
+
+}
+
+function getMapStyle(style) {
+    var result = new Map();
+
+    if (style != null) {
+        var pairs = style.split(';');
+
+        for (var i = 0; i < pairs.length; i++) {
+            var pair = pairs[i].split('=');
+            if (pair.length == 2)
+                result.set(pair[0], pair[1])
+        }
+    }
+
+    return result;
+};
+
+function getValueByKey(style, key) {
+    var map = getMapStyle(style);
+    return map.get(key);
+
+};
+
+
+function adjustEdges(cell, numOfOutputs, graphModel) {
+    //the first time pressed apply
+    if(cell.new_constraints == null)
+        return;
     var outEdges = getOutEdges(cell);
+    var oldNumOfOutput = cell.new_constraints.length;
     graphModel.beginUpdate();
     try {
-    for (let i = outEdges.length-1; i >numOfOutputs-1  ; i--) {
-            graphModel.remove(outEdges[i],true);
-    }
-    }finally {
+        for (let i = 0; i <  outEdges.length; i++) {
+            //
+            var currentEdgeStyle = outEdges[i].style;
+            var oldY = getValueByKey(currentEdgeStyle,"exitY");
+            var constraintNumber = Math.ceil(oldY * (oldNumOfOutput +1));
+            //check if edge should erase
+            if(constraintNumber > numOfOutputs)
+                graphModel.remove(outEdges[i],true);
+            else{
+            //    relocate edge exit location of edge
+                var newY = constraintNumber * (1/(numOfOutputs+1))
+                var new_style = mxUtils.setStyle(currentEdgeStyle, 'exitY', newY);
+                graphModel.setStyle(outEdges[i], new_style);
+            }
+        }
+    } finally {
         graphModel.endUpdate();
     }
 };
@@ -34,15 +74,24 @@ function updateEdgesLabels(cell, numOfOutputs, graphModel) {
     var outEdges = getOutEdges(cell);
     graphModel.beginUpdate();
     try {
-    for (let i = 0; i < outEdges.length ; i++) {
-        var value = graphModel.getValue(outEdges[i]);
-        value.setAttribute('label',cell.getAttribute('Outputnumber'+ (outEdges[i].getAttribute('labelNum'))));
-        graphModel.setValue(outEdges[i],value);
-    }
+        for (let i = 0; i < outEdges.length ; i++) {
+            var value = graphModel.getValue(outEdges[i]);
+            value.setAttribute('label',cell.getAttribute('Outputnumber'+ (outEdges[i].getAttribute('labelNum'))));
+            graphModel.setValue(outEdges[i],value);
+        }
     }finally {
         graphModel.endUpdate();
     }
 }
+
+
+
+FormatBP = function(editorUi, container)
+{
+    Format.call(this,editorUi,container);
+};
+
+FormatBP.prototype = Object.create(Format.prototype);
 
 FormatBP.prototype.refresh = function() {
 
@@ -284,11 +333,14 @@ FormatBP.prototype.refresh = function() {
             }
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
-                removeEdges(cell,NumberOfOutPutBox.value, graph.getModel());
+                adjustEdges(cell,parseInt(NumberOfOutPutBox.value), graph.getModel());
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
+                adjustConnectionConstraint(cell,parseInt(NumberOfOutPutBox.value))
                 graph.getModel().setValue(cell, value);
                 createLabels(NumberOfOutPutBox.value);
+
+
             };
             AreaNumberOfOutPutText.appendChild(NumberOfOutPutBox);
             AreaNumberOfOutPutText.appendChild(NumberOfOutPutButton);
@@ -333,7 +385,6 @@ FormatBP.prototype.refresh = function() {
                 OutputLabelDIV.appendChild(InnerDIVOutputLabel);
             };
 
-
             createLabels(value.getAttribute("numberOfOutputs",1));
 
             generalDIV.appendChild(OutputLabelDIV);
@@ -363,4 +414,4 @@ FormatBP.prototype.refresh = function() {
 
 };
 
-FormatBP.prototype.constructor = Format;
+// FormatBP.prototype.constructor = Format;

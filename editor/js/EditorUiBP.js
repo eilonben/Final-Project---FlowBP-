@@ -22,6 +22,7 @@ function EditorUiBP(editor, container, lightbox) {
 
 EditorUiBP.prototype = Object.create(EditorUi.prototype);
 
+
 EditorUiBP.prototype.createHoverIcons = function()
 {
     return new HoverIconsBP(this.editor.graph);
@@ -47,7 +48,30 @@ EditorUiBP.prototype.createSidebar = function(container)
 };
 
 
-EditorUiBP.prototype.constructor = EditorUi;
+/**
+ * Creates a temporary graph instance for rendering off-screen content.
+ */
+EditorUiBP.prototype.createTemporaryGraph = function(stylesheet)
+{
+    var graph = new GraphBP(document.createElement('div'), null, null, stylesheet);
+    graph.resetViewOnRootChange = false;
+    graph.setConnectable(false);
+    graph.gridEnabled = false;
+    graph.autoScroll = false;
+    graph.setTooltips(false);
+    graph.setEnabled(false);
+
+    // Container must be in the DOM for correct HTML rendering
+    graph.container.style.visibility = 'hidden';
+    graph.container.style.position = 'absolute';
+    graph.container.style.overflow = 'hidden';
+    graph.container.style.height = '1px';
+    graph.container.style.width = '1px';
+
+    return graph;
+};
+
+// EditorUiBP.prototype.constructor = EditorUi;
 
 EditorUiBP.prototype.disableActionsForDebugging = function (bool) {
 
