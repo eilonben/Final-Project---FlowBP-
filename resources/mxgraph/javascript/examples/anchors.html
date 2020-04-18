@@ -1,8 +1,7 @@
-<!--
-  Copyright (c) 2006-2013, JGraph Ltd
-
-  Anchors example for mxGraph. This example demonstrates defining
-  fixed connection points for all shapes.
+!--
+Copyright (c) 2006-2013, JGraph Ltd
+Anchors example for mxGraph. This example demonstrates defining
+fixed connection points for all shapes.
 -->
 <html>
 <head>
@@ -39,17 +38,17 @@
 
 		// Defines the default constraints for all shapes
 		mxShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.25, 0), true),
-										 new mxConnectionConstraint(new mxPoint(0.5, 0), true),
-										 new mxConnectionConstraint(new mxPoint(0.75, 0), true),
-		        	              		 new mxConnectionConstraint(new mxPoint(0, 0.25), true),
-		        	              		 new mxConnectionConstraint(new mxPoint(0, 0.5), true),
-		        	              		 new mxConnectionConstraint(new mxPoint(0, 0.75), true),
-		        	            		 new mxConnectionConstraint(new mxPoint(1, 0.25), true),
-		        	            		 new mxConnectionConstraint(new mxPoint(1, 0.5), true),
-		        	            		 new mxConnectionConstraint(new mxPoint(1, 0.75), true),
-		        	            		 new mxConnectionConstraint(new mxPoint(0.25, 1), true),
-		        	            		 new mxConnectionConstraint(new mxPoint(0.5, 1), true),
-		        	            		 new mxConnectionConstraint(new mxPoint(0.75, 1), true)];
+			new mxConnectionConstraint(new mxPoint(0.5, 0), true),
+			new mxConnectionConstraint(new mxPoint(0.75, 0), true),
+			new mxConnectionConstraint(new mxPoint(0, 0.25), true),
+			new mxConnectionConstraint(new mxPoint(0, 0.5), true),
+			new mxConnectionConstraint(new mxPoint(0, 0.75), true),
+			new mxConnectionConstraint(new mxPoint(1, 0.25), true),
+			new mxConnectionConstraint(new mxPoint(1, 0.5), true),
+			new mxConnectionConstraint(new mxPoint(1, 0.75), true),
+			new mxConnectionConstraint(new mxPoint(0.25, 1), true),
+			new mxConnectionConstraint(new mxPoint(0.5, 1), true),
+			new mxConnectionConstraint(new mxPoint(0.75, 1), true)];
 
 		// Edges have no connection points
 		mxPolyline.prototype.constraints = null;
@@ -113,9 +112,9 @@
 <!-- Page passes the container for the graph to the program -->
 <body onload="main(document.getElementById('graphContainer'))">
 
-	<!-- Creates a container for the graph with a grid wallpaper -->
-	<div id="graphContainer"
-		style="position:relative;overflow:hidden;width:321px;height:241px;background:url('editors/images/grid.gif');cursor:default;">
-	</div>
+<!-- Creates a container for the graph with a grid wallpaper -->
+<div id="graphContainer"
+	 style="position:relative;overflow:hidden;width:321px;height:241px;background:url('editors/images/grid.gif');cursor:default;">
+</div>
 </body>
 </html>

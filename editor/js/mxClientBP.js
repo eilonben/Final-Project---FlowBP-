@@ -32,16 +32,25 @@ function getNumOfOutEdges(source){
 
 function findCurrLabel(source, state) {
     //there is only one constraint point
-    if(source.new_constraints == null || state == null)
-        return 0;
+    if(source.new_constraints == null)
+        return 1;
     //search for the source constraint of the edge
     var index = 0;
-    for(; index<source.new_constraints.length; index++){
+    for(; index <= source.new_constraints.length; index++){
         var constraint = source.new_constraints[index];
         if(constraint.point.x == state.exitX && constraint.point.y == state.exitY)
             break;
     }
-    return index;
+    return index+1;
+}
+function getOutEdges(source) {
+    var outEdges = [];
+    for (let i = 0; i < source.getEdgeCount(); i++) {
+        if (isOutEdge(source, source.edges[i]))
+            outEdges.push(source.edges[i])
+    }
+    outEdges.sort((edge)=>edge.getAttribute('labelNum'));
+    return outEdges;
 }
 
 
@@ -52,14 +61,37 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
     edge.setId(id);
     edge.setEdge(true);
     edge.geometry.relative = true;
+
+    //check basic legal Edge
+    if(source!=null && ( target ==null || getshape(target.getStyle())=="startnode"))
+        return null;
+
+    //cases by nodes
     if(source!=null && getshape(source.getStyle())=="general" ){
+        var numberOfOutEdges = getNumOfOutEdges(source);
+        // if(numberOfOutEdges >= source.getAttribute('numberOfOutputs',1))
+        //     return null;
         var indexLabel =findCurrLabel(source, state);
-        var label = source.getAttribute('Outputnumber'+(indexLabel+1));
-        edge.setAttribute('labelNum',indexLabel);
+        var label = source.getAttribute('Outputnumber'+(indexLabel),' ');
 
-        var tt=  edge.getAttribute('labelNum');
-        edge.setValue(label);
+        var doc = mxUtils.createXmlDocument();
+        var obj = doc.createElement('object');
+        obj.setAttribute('label','');
+        var value = obj;
 
+        value.setAttribute('labelNum',indexLabel);
+        value.setAttribute('label',label);
+        edge.setValue(value);
+
+    }else if(source!=null && getshape(source.getStyle())=="bsync" ){
+        var numberOfOutEdges = getNumOfOutEdges(source);
+        if(numberOfOutEdges >= 1)
+            return null;
+
+    }else if(source!=null && getshape(source.getStyle())=="startnode" ){
+        var numberOfOutEdges = getNumOfOutEdges(source);
+        if(numberOfOutEdges >= 1)
+            return null;
     }
     return edge;
 };
