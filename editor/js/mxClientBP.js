@@ -113,8 +113,8 @@ mxConnectionHandlerBP.prototype = Object.create(mxConnectionHandler.prototype);
 
 
 mxConnectionHandlerBP.prototype.checkLeftConstraints = function(c1, c2) {
-    if(c2.point.x != null)
-        return c2.point.x <= 0.03;
+    if(c2 != null && c2.point != null)
+        return ((c2.point.x <= 0.03) || (c2.point.y < 0.95 && c2.point.y > 0.05));
     return true;
 };
 
