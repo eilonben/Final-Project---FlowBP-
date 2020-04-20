@@ -59,9 +59,9 @@ var BSyncForm = function(editorUi,cell)
             linkInput[lbl].value = value.getAttribute(lbl);
     }
 
-    addSec("Request:");
-    addSec("Wait:");
-    addSec("Block:");
+    addSec("Request");
+    addSec("Wait");
+    addSec("Block");
 
 
     row = document.createElement('tr');
@@ -96,10 +96,10 @@ var BSyncForm = function(editorUi,cell)
             // code += "});";
             //
             // value.setAttribute("code", code);
-            value.setAttribute("sync", "{\"request\":["+linkInput["Request:"].value+"], \"wait\":["+linkInput["Wait:"].value+"],\"block\":["+linkInput["Block:"].value+"]}");
-            value.setAttribute("Request:", linkInput["Request:"].value);
-            value.setAttribute("Wait:", linkInput["Wait:"].value);
-            value.setAttribute("Block:", linkInput["Block:"].value);
+            value.setAttribute("sync", "{\"request\":["+linkInput["Request"].value+"], \"wait\":["+linkInput["Wait"].value+"],\"block\":["+linkInput["Block"].value+"]}");
+            value.setAttribute("Request", linkInput["Request"].value);
+            value.setAttribute("Wait", linkInput["Wait"].value);
+            value.setAttribute("Block", linkInput["Block"].value);
             graph.getModel().setValue(cell, value);
 
             editorUi.hideDialog();
