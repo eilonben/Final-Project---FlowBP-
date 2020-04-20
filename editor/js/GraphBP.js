@@ -1,4 +1,4 @@
-// Duplicate HoverIconsBP is designed to erase the "Connect and Duplicate" arrows and leave only the right one.
+// Duplicate HoverIconsBP is designed to erase the "Connect and Duplicate" arrows
 
 HoverIconsBP = function(graph)
 {
@@ -52,80 +52,80 @@ HoverIconsBP.prototype.repaint = function()
             }
 
             // Positions arrows avoid collisions with rotation handle
-            var positionArrow = mxUtils.bind(this, function(arrow, x, y)
-            {
-                if (rotationBbox != null)
-                {
-                    var bbox = new mxRectangle(x, y, arrow.clientWidth, arrow.clientHeight);
+            // var positionArrow = mxUtils.bind(this, function(arrow, x, y)
+            // {
+            //     if (rotationBbox != null)
+            //     {
+            //         var bbox = new mxRectangle(x, y, arrow.clientWidth, arrow.clientHeight);
+            //
+            //         if (mxUtils.intersects(bbox, rotationBbox)) {
+            //             if (arrow == this.arrowRight) {
+            //                 x += rotationBbox.x + rotationBbox.width - bbox.x;
+            //             }
+            //
+            //         }
+            //     }
+            //
+            //     arrow.style.left = x + 'px';
+            //     arrow.style.top = y + 'px';
+            //     mxUtils.setOpacity(arrow, this.inactiveOpacity);
+            // });
+            //
+            // positionArrow(this.arrowRight, Math.round(bds.x + bds.width - this.tolerance),
+            //     Math.round(this.currentState.getCenterY() - this.triangleRight.height / 2 - this.tolerance));
+            //
 
-                    if (mxUtils.intersects(bbox, rotationBbox)) {
-                        if (arrow == this.arrowRight) {
-                            x += rotationBbox.x + rotationBbox.width - bbox.x;
-                        }
+            // if (this.checkCollisions)
+            // {
+            //     var right = this.graph.getCellAt(bds.x + bds.width +
+            //         this.triangleRight.width / 2, this.currentState.getCenterY());
+            //     var left = this.graph.getCellAt(bds.x - this.triangleLeft.width / 2, this.currentState.getCenterY());
+            //     var top = this.graph.getCellAt(this.currentState.getCenterX(), bds.y - this.triangleUp.height / 2);
+            //     var bottom = this.graph.getCellAt(this.currentState.getCenterX(), bds.y + bds.height + this.triangleDown.height / 2);
+            //
+            //     // Shows hover icons large cell is behind all directions of current cell
+            //     if (right != null && right == left && left == top && top == bottom)
+            //     {
+            //         right = null;
+            //         left = null;
+            //         top = null;
+            //         bottom = null;
+            //     }
+            //
+            //     var currentGeo = this.graph.getCellGeometry(this.currentState.cell);
+            //
+            //     var checkCollision = mxUtils.bind(this, function(cell, arrow)
+            //     {
+            //         var geo = this.graph.model.isVertex(cell) && this.graph.getCellGeometry(cell);
+            //
+            //         // Ignores collision if vertex is more than 3 times the size of this vertex
+            //         if (cell != null && !this.graph.model.isAncestor(cell, this.currentState.cell) &&
+            //             !this.graph.isSwimlane(cell) && (geo == null || currentGeo == null ||
+            //                 (geo.height < 3 * currentGeo.height && geo.width < 3 * currentGeo.width)))
+            //         {
+            //             arrow.style.visibility = 'hidden';
+            //         }
+            //         else
+            //         {
+            //             arrow.style.visibility = 'visible';
+            //         }
+            //     });
+            //
+            //     checkCollision(right, this.arrowRight);
+            // }
+            // else
+            // {
+            //     this.arrowRight.style.visibility = 'visible';
+            // }
 
-                    }
-                }
-
-                arrow.style.left = x + 'px';
-                arrow.style.top = y + 'px';
-                mxUtils.setOpacity(arrow, this.inactiveOpacity);
-            });
-
-            positionArrow(this.arrowRight, Math.round(bds.x + bds.width - this.tolerance),
-                Math.round(this.currentState.getCenterY() - this.triangleRight.height / 2 - this.tolerance));
-
-
-            if (this.checkCollisions)
-            {
-                var right = this.graph.getCellAt(bds.x + bds.width +
-                    this.triangleRight.width / 2, this.currentState.getCenterY());
-                var left = this.graph.getCellAt(bds.x - this.triangleLeft.width / 2, this.currentState.getCenterY());
-                var top = this.graph.getCellAt(this.currentState.getCenterX(), bds.y - this.triangleUp.height / 2);
-                var bottom = this.graph.getCellAt(this.currentState.getCenterX(), bds.y + bds.height + this.triangleDown.height / 2);
-
-                // Shows hover icons large cell is behind all directions of current cell
-                if (right != null && right == left && left == top && top == bottom)
-                {
-                    right = null;
-                    left = null;
-                    top = null;
-                    bottom = null;
-                }
-
-                var currentGeo = this.graph.getCellGeometry(this.currentState.cell);
-
-                var checkCollision = mxUtils.bind(this, function(cell, arrow)
-                {
-                    var geo = this.graph.model.isVertex(cell) && this.graph.getCellGeometry(cell);
-
-                    // Ignores collision if vertex is more than 3 times the size of this vertex
-                    if (cell != null && !this.graph.model.isAncestor(cell, this.currentState.cell) &&
-                        !this.graph.isSwimlane(cell) && (geo == null || currentGeo == null ||
-                            (geo.height < 3 * currentGeo.height && geo.width < 3 * currentGeo.width)))
-                    {
-                        arrow.style.visibility = 'hidden';
-                    }
-                    else
-                    {
-                        arrow.style.visibility = 'visible';
-                    }
-                });
-
-                checkCollision(right, this.arrowRight);
-            }
-            else
-            {
-                this.arrowRight.style.visibility = 'visible';
-            }
-
-            if (this.graph.tooltipHandler.isEnabled())
-            {
-                this.arrowRight.setAttribute('title', mxResources.get('plusTooltip'));
-            }
-            else
-            {
-                this.arrowRight.removeAttribute('title');
-            }
+            // if (this.graph.tooltipHandler.isEnabled())
+            // {
+            //     this.arrowRight.setAttribute('title', mxResources.get('plusTooltip'));
+            // }
+            // else
+            // {
+            //     this.arrowRight.removeAttribute('title');
+            // }
         }
         else
         {

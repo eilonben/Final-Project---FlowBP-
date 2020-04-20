@@ -52,16 +52,14 @@ function adjustEdges(cell, numOfOutputs, graphModel) {
     try {
         for (let i = 0; i <  outEdges.length; i++) {
             // get old location of edge
-            var currentEdgeStyle = outEdges[i].style;
-            var oldY = getValueByKey(currentEdgeStyle,"exitY");
-            var constraintNumber = Math.ceil(oldY * (oldNumOfOutput +1));
+            var constraintNumber = parseInt(outEdges[i].getAttribute('labelNum'));
             //check if edge should erase
             if(constraintNumber > numOfOutputs)
                 graphModel.remove(outEdges[i],true);
             else{
             //    relocate edge exit location of edge
                 var newY = constraintNumber * (1/(numOfOutputs+1))
-                var new_style = mxUtils.setStyle(currentEdgeStyle, 'exitY', newY);
+                var new_style = mxUtils.setStyle(outEdges[i].style, 'exitY', newY);
                 graphModel.setStyle(outEdges[i], new_style);
             }
         }
