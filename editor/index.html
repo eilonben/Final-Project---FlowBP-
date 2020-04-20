@@ -59,7 +59,9 @@
 	<script type="text/javascript" src="../resources/mxgraph/javascript/examples/grapheditor/www/js/Format.js"></script>
 	<script type="text/javascript" src="../resources/mxgraph/javascript/examples/grapheditor/www/js/Toolbar.js"></script>
 	<script type="text/javascript" src="../resources/mxgraph/javascript/examples/grapheditor/www/js/Dialogs.js"></script>
+	<script type="text/javascript" src="js/GraphBP.js"></script>
 	<script type="text/javascript" src="js/EditorUiBP.js"></script>
+	<script type="text/javascript" src="js/EditorBP.js"></script>
 	<script type="text/javascript" src="js/FormatBP.js"></script>
 	<script type="text/javascript" src="js/SidebarBP.js"></script>
 	<script type="text/javascript" src="js/ToolbarBP.js"></script>
@@ -111,7 +113,7 @@
             themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement();
 
             // Main
-            new EditorUiBP(new Editor(urlParams['chrome'] == '0', themes));
+            new EditorUiBP(new EditorBP(urlParams['chrome'] == '0', themes));
         }, function()
         {
             document.body.innerHTML = '<center style="margin-top:10%;">Error loading resource files. Please check browser console.</center>';

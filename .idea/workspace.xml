@@ -3,8 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="10fde910-9628-4f91-b30b-518d15ec472d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/editor/js/mxClientBP.js" beforeDir="false" afterPath="$PROJECT_DIR$/editor/js/mxClientBP.js" afterDir="false" />
+=======
       <change beforePath="$PROJECT_DIR$/resources/mxgraph/javascript/examples/anchors.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/mxgraph/javascript/examples/anchors.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/mxgraph/javascript/examples/portrefs.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/mxgraph/javascript/examples/portrefs.html" afterDir="false" />
+>>>>>>> master
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -18,25 +22,97 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/FlowBP$index_html.dat" NAME="index.html Coverage Results" MODIFIED="1585915180644" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="WipCoverageRunner" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="-1564174700">
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="HTML" value="14" />
+          <entry key="JavaScript" value="1759" />
+          <entry key="XML" value="13" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.closed" value="8" />
+          <entry key="project.open.time.14" value="2" />
+          <entry key="project.open.time.15" value="1" />
+          <entry key="project.open.time.16" value="2" />
+          <entry key="project.open.time.19" value="1" />
+          <entry key="project.open.time.20" value="1" />
+          <entry key="project.open.time.28" value="1" />
+          <entry key="project.open.time.29" value="1" />
+          <entry key="project.open.time.4" value="1" />
+          <entry key="project.open.time.73" value="1" />
+          <entry key="project.opened" value="11" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="HTML" value="15" />
+          <entry key="JavaScript" value="67" />
+          <entry key="PLAIN_TEXT" value="1" />
+          <entry key="UML" value="1" />
+          <entry key="XML" value="3" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/editor/js/mxClientBP.js">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+            <state relative-caret-position="111">
+              <caret line="54" column="64" selection-start-line="54" selection-start-column="64" selection-end-line="54" selection-end-column="64" />
+=======
             <state relative-caret-position="128">
               <caret line="68" column="37" selection-start-line="68" selection-start-column="24" selection-end-line="68" selection-end-column="37" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
+>>>>>>> master
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/editor/js/FormatBP.js">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+            <state relative-caret-position="213">
+              <caret line="29" lean-forward="true" selection-start-line="29" selection-end-line="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="121">
+              <caret line="85572" column="20" selection-start-line="85572" selection-start-column="20" selection-end-line="85572" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/graph_parse/rungraph.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1938">
+              <caret line="114" column="9" selection-start-line="114" selection-start-column="9" selection-end-line="114" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/editor/js/EditorUiBP.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="17" column="12" selection-start-line="17" selection-start-column="12" selection-end-line="17" selection-end-column="12" />
+=======
             <state relative-caret-position="338">
               <caret line="324" column="61" lean-forward="true" selection-start-line="324" selection-start-column="61" selection-end-line="324" selection-end-column="61" />
+>>>>>>> master
             </state>
           </provider>
         </entry>
@@ -52,6 +128,38 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
+<<<<<<< HEAD
+      <find>Graph.prototype.getAllConnectionConstraints</find>
+      <find>adjustConnectionConstraint</find>
+      <find>shapes</find>
+      <find>new edge</find>
+      <find>insert</find>
+      <find>createEdge</find>
+      <find>createEdgeState</find>
+      <find>connect edge</find>
+      <find>edge</find>
+      <find>insertedge</find>
+      <find>insertEdge</find>
+      <find>checkConstraints = function(c1, c2)</find>
+      <find>prototype.checkConstraints = function(c1, c2)</find>
+      <find>hadas</find>
+      <find>mxGraphBP</find>
+      <find>mxConnectionHandler.prototype.mouseUp = function(sender, me)</find>
+      <find>mxconn</find>
+      <find>createConnectionHandler</find>
+      <find>prototype.checkConstraints</find>
+      <find>this.connect(source, target, me.getEvent(), me.getCell());</find>
+      <find>checkConstraints</find>
+      <find>new_constraints</find>
+      <find>for</find>
+      <find>for(</find>
+      <find>for (</find>
+      <find>apply</find>
+      <find>click</find>
+      <find>min</find>
+      <find>findCurrLabel(</find>
+      <find>connection</find>
+=======
       <find>removeCell</find>
       <find>mxGraph.proto</find>
       <find>mxGraph.prototype.insertEdge</find>
@@ -82,14 +190,19 @@
       <find>createHandler</find>
       <find>beginUpdate</find>
       <find>value</find>
+>>>>>>> master
     </findStrings>
     <dirStrings>
       <dir>C:\Users\gilad\Desktop\FLOW-BP\FlowBP\editor</dir>
       <dir>C:\Users\gilad\Desktop\FLOW-BP\FlowBP\resources\mxgraph\javascript\examples\grapheditor\www\js</dir>
       <dir>C:\Users\gilad\Desktop\FLOW-BP\FlowBP\resources\mxgraph\javascript\examples\grapheditor\www</dir>
+<<<<<<< HEAD
+      <dir>C:\hadas\semester_8\Final\FlowBP\resources\mxgraph\javascript\src\js\view</dir>
+=======
       <dir>C:\Users\gilad\Desktop\FLOW-BP\FlowBP\resources\mxgraph\javascript\examples\grapheditor</dir>
       <dir>C:\Users\gilad\Desktop\FLOW-BP\FlowBP\resources\mxgraph\javascript\examples</dir>
       <dir>C:\Users\gilad\Desktop\FLOW-BP\FlowBP\resources\mxgraph</dir>
+>>>>>>> master
     </dirStrings>
   </component>
   <component name="Git.Settings">
@@ -100,10 +213,25 @@
       <list>
         <option value="$PROJECT_DIR$/editor/js/InitBP.js" />
         <option value="$PROJECT_DIR$/editor/open.html" />
-        <option value="$PROJECT_DIR$/editor/viewer.html" />
         <option value="$PROJECT_DIR$/resources/mxgraph/javascript/examples/scrollbars.html" />
+        <option value="$PROJECT_DIR$/editor/js/ActionsBP.js" />
+        <option value="$PROJECT_DIR$/resources/mxgraph/javascript/examples/grapheditor/www/js/Sidebar.js" />
+        <option value="$PROJECT_DIR$/editor/js/Graph.js" />
         <option value="$PROJECT_DIR$/resources/mxgraph/javascript/examples/grapheditor/www/js/EditorUi.js" />
+        <option value="$PROJECT_DIR$/resources/mxgraph/javascript/examples/grapheditor/www/js/Graph.js" />
+        <option value="$PROJECT_DIR$/editor/stencils/flow.xml" />
+        <option value="$PROJECT_DIR$/editor/viewer.html" />
+        <option value="$PROJECT_DIR$/editor/js/EditorUiBP.js" />
+        <option value="$PROJECT_DIR$/editor/js/GraphBP.js" />
         <option value="$PROJECT_DIR$/editor/index.html" />
+<<<<<<< HEAD
+        <option value="$PROJECT_DIR$/editor/js/SidebarBP.js" />
+        <option value="$PROJECT_DIR$/editor/js/EditorBP.js" />
+        <option value="$PROJECT_DIR$/resources/mxgraph/javascript/src/js/handler/mxConnectionHandler.js" />
+        <option value="$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js" />
+        <option value="$PROJECT_DIR$/editor/js/FormatBP.js" />
+        <option value="$PROJECT_DIR$/editor/js/mxClientBP.js" />
+=======
         <option value="$PROJECT_DIR$/editor/js/ActionsBP.js" />
         <option value="$PROJECT_DIR$/editor/js/mxCellBP.js" />
         <option value="$PROJECT_DIR$/editor/js/mxClientBP.js" />
@@ -112,13 +240,21 @@
         <option value="$PROJECT_DIR$/editor/js/FormatBP.js" />
         <option value="$PROJECT_DIR$/resources/mxgraph/javascript/examples/anchors.html" />
         <option value="$PROJECT_DIR$/resources/mxgraph/javascript/examples/portrefs.html" />
+>>>>>>> master
       </list>
     </option>
   </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="950" />
-    <option name="width" value="980" />
-    <option name="height" value="1040" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1382" />
+    <option name="height" value="744" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -146,6 +282,18 @@
             <path>
               <item name="FlowBP" type="b2602c69:ProjectViewProjectNode" />
               <item name="FlowBP" type="462c0819:PsiDirectoryNode" />
+              <item name="editor" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="FlowBP" type="b2602c69:ProjectViewProjectNode" />
+              <item name="FlowBP" type="462c0819:PsiDirectoryNode" />
+              <item name="editor" type="462c0819:PsiDirectoryNode" />
+              <item name="stencils" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="FlowBP" type="b2602c69:ProjectViewProjectNode" />
+              <item name="FlowBP" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -153,6 +301,7 @@
               <item name="FlowBP" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
               <item name="mxgraph" type="462c0819:PsiDirectoryNode" />
+<<<<<<< HEAD
             </path>
             <path>
               <item name="FlowBP" type="b2602c69:ProjectViewProjectNode" />
@@ -166,6 +315,8 @@
               <item name="FlowBP" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
               <item name="mxgraph" type="462c0819:PsiDirectoryNode" />
+=======
+>>>>>>> master
               <item name="javascript" type="462c0819:PsiDirectoryNode" />
               <item name="examples" type="462c0819:PsiDirectoryNode" />
             </path>
@@ -195,27 +346,51 @@
     </option>
   </component>
   <component name="RunManager" selected="JavaScript Debug.index.html">
+<<<<<<< HEAD
+    <configuration name="anchors.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/FlowBP/resources/mxgraph/javascript/examples/anchors.html">
+=======
     <configuration name="anchors.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/FlowBP/resources/mxgraph/javascript/examples/anchors.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
     <configuration name="index.html (1)" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/FlowBP/resources/mxgraph/javascript/index.html" useBuiltInWebServerPort="true">
+>>>>>>> master
       <method v="2" />
     </configuration>
-    <configuration name="index.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/FlowBP/editor/index.html" useBuiltInWebServerPort="true">
+    <configuration name="index.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/FlowBP/editor/index.html">
       <method v="2" />
     </configuration>
-    <configuration name="labels.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/FlowBP/resources/mxgraph/javascript/examples/labels.html" useBuiltInWebServerPort="true">
+    <configuration name="labels.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/FlowBP/resources/mxgraph/javascript/examples/labels.html">
       <method v="2" />
     </configuration>
+<<<<<<< HEAD
+    <configuration name="GraphBP.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" nameIsGenerated="true" path-to-js-file="GraphBP.js" working-dir="$PROJECT_DIR$/editor/js">
+=======
     <configuration name="portrefs.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/FlowBP/resources/mxgraph/javascript/examples/portrefs.html" useBuiltInWebServerPort="true">
+>>>>>>> master
       <method v="2" />
     </configuration>
+    <configuration name="mxClient.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" nameIsGenerated="true" path-to-js-file="mxClient.js" working-dir="$PROJECT_DIR$/resources/mxgraph/javascript">
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="JavaScript Debug.index.html" />
+      <item itemvalue="JavaScript Debug.labels.html" />
+      <item itemvalue="Node.js.GraphBP.js" />
+      <item itemvalue="JavaScript Debug.anchors.html" />
+      <item itemvalue="Node.js.mxClient.js" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="JavaScript Debug.index.html" />
+<<<<<<< HEAD
+        <item itemvalue="Node.js.mxClient.js" />
+        <item itemvalue="JavaScript Debug.anchors.html" />
+        <item itemvalue="Node.js.GraphBP.js" />
+=======
         <item itemvalue="JavaScript Debug.index.html (1)" />
         <item itemvalue="JavaScript Debug.portrefs.html" />
         <item itemvalue="JavaScript Debug.anchors.html" />
+>>>>>>> master
         <item itemvalue="JavaScript Debug.labels.html" />
       </list>
     </recent_temporary>
@@ -239,6 +414,19 @@
       <workItem from="1586009155826" duration="1279000" />
       <workItem from="1586023121475" duration="9786000" />
       <workItem from="1586074843535" duration="531000" />
+<<<<<<< HEAD
+      <workItem from="1586305697012" duration="1896000" />
+      <workItem from="1586379292037" duration="7924000" />
+      <workItem from="1586528512040" duration="2673000" />
+      <workItem from="1586534955406" duration="14112000" />
+      <workItem from="1586629059017" duration="717000" />
+      <workItem from="1586816039704" duration="6345000" />
+      <workItem from="1586823560376" duration="1618000" />
+      <workItem from="1586825966392" duration="3195000" />
+      <workItem from="1587036105636" duration="6054000" />
+      <workItem from="1587045540915" duration="773000" />
+      <workItem from="1587047515539" duration="16431000" />
+=======
       <workItem from="1586080192769" duration="64000" />
       <workItem from="1586080269363" duration="12994000" />
       <workItem from="1586124497590" duration="3185000" />
@@ -251,48 +439,120 @@
       <workItem from="1587117920472" duration="748000" />
       <workItem from="1587119028862" duration="349000" />
       <workItem from="1587124894401" duration="94000" />
+>>>>>>> master
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
+    <option name="totallyTimeSpent" value="119025000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+=======
     <option name="totallyTimeSpent" value="64845000" />
+>>>>>>> master
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25313947" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info id="Structure" order="0" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="1" side_tool="true" />
+      <window_info active="true" content_ui="combo" id="Project" order="2" visible="true" weight="0.23036304" />
       <window_info anchor="bottom" id="Message" order="0" />
+<<<<<<< HEAD
+      <window_info anchor="bottom" id="Find" order="1" weight="0.41058657" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32761088" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49932885" visible="true" weight="0.33619457" />
+=======
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.3286119" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49932885" weight="0.32577905" />
+>>>>>>> master
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32907802" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info anchor="bottom" id="Terminal" order="9" />
+      <window_info anchor="bottom" id="Version Control" order="8" weight="0.32904148" />
+      <window_info anchor="bottom" id="Terminal" order="9" weight="0.32907802" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50067115" side_tool="true" weight="0.39943343" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Coverage" order="3" side_tool="true" weight="0.3295302" />
     </layout>
+    <layout-to-restore>
+      <window_info id="Structure" order="0" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="1" side_tool="true" />
+      <window_info content_ui="combo" id="Project" order="2" visible="true" weight="0.23036304" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.41058657" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32761088" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49932885" weight="0.33619457" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32907802" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" weight="0.32904148" />
+      <window_info anchor="bottom" id="Terminal" order="9" weight="0.32907802" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50067115" side_tool="true" weight="0.39943343" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Coverage" order="3" side_tool="true" weight="0.3295302" />
+    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/grapheditor/www/js/EditorUi.js</url>
-          <line>476</line>
-          <option name="timeStamp" value="2" />
+          <url>file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/handler/mxConnectionHandler.js</url>
+          <line>1750</line>
+          <option name="timeStamp" value="106" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/view/mxGraph.js</url>
+          <line>1759</line>
+          <option name="timeStamp" value="116" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js</url>
+          <line>56172</line>
+          <option name="timeStamp" value="121" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/handler/mxConnectionHandler.js</url>
+          <line>1709</line>
+          <option name="timeStamp" value="122" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js</url>
+          <line>74727</line>
+          <option name="timeStamp" value="123" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js</url>
+          <line>74770</line>
+          <option name="timeStamp" value="125" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+<<<<<<< HEAD
+          <url>file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/handler/mxConnectionHandler.js</url>
+          <line>1752</line>
+          <option name="timeStamp" value="126" />
+=======
           <url>file://$PROJECT_DIR$/editor/js/FormatBP.js</url>
           <line>325</line>
           <option name="timeStamp" value="34" />
@@ -306,54 +566,94 @@
           <url>file://$PROJECT_DIR$/editor/js/FormatBP.js</url>
           <line>278</line>
           <option name="timeStamp" value="39" />
+>>>>>>> master
         </line-breakpoint>
       </breakpoints>
+      <breakpoints-dialog>
+        <breakpoints-dialog />
+      </breakpoints-dialog>
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
       <expression>
+<<<<<<< HEAD
+        <expression-string>this</expression-string>
+=======
         <expression-string>cell.getAttribute(&quot;numberOfOutputs&quot;)</expression-string>
+>>>>>>> master
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
+<<<<<<< HEAD
+        <expression-string>connectionHandler</expression-string>
+=======
         <expression-string>value.getAttribute(&quot;numberOfOutputs&quot;)</expression-string>
+>>>>>>> master
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
+<<<<<<< HEAD
+        <expression-string>mxConnectionHandler</expression-string>
+=======
         <expression-string>state.cell</expression-string>
+>>>>>>> master
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
+<<<<<<< HEAD
+        <expression-string>c2</expression-string>
+=======
         <expression-string>state</expression-string>
+>>>>>>> master
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
+<<<<<<< HEAD
+        <expression-string>mxConnectionHandler.prototype.checkConstraints</expression-string>
+=======
         <expression-string>cell.getAttribute('Outputnumber')</expression-string>
+>>>>>>> master
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
+<<<<<<< HEAD
+        <expression-string>this.constraintHandler</expression-string>
+=======
         <expression-string>cell.getAttribute('Outputnumber'+0)</expression-string>
+>>>>>>> master
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
+<<<<<<< HEAD
+        <expression-string>this.constraintHandler.currentConstraint.point.x</expression-string>
+=======
         <expression-string>cell.getAttribute('Outputnumber'+ (outEdges[0].getAttribute('labelNum')-1))</expression-string>
+>>>>>>> master
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
+<<<<<<< HEAD
+        <expression-string>this.constraintHandler.currentConstraint</expression-string>
+=======
         <expression-string>cell.getAttribute('Outputnumber'+ (outEdges[0].getAttribute('labelNum')))</expression-string>
+>>>>>>> master
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
+<<<<<<< HEAD
+        <expression-string>target</expression-string>
+=======
         <expression-string>cell.getAttribute('Outputnumber'+ (outEdges[i].getAttribute('labelNum')))</expression-string>
+>>>>>>> master
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -370,40 +670,6 @@
     <entry file="file://$PROJECT_DIR$/editor/echotest.html">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/editor/viewer.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="17" column="24" selection-start-line="17" selection-start-column="24" selection-end-line="17" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/scrollbars.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="117" column="21" lean-forward="true" selection-start-line="117" selection-start-column="21" selection-end-line="117" selection-end-column="21" />
-          <folding>
-            <element signature="n#style#0;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/view/mxGraph.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="226">
-          <caret line="4474" selection-start-line="4474" selection-end-line="4474" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/handler/mxConnectionHandler.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="128" column="59" lean-forward="true" selection-start-line="128" selection-start-column="59" selection-end-line="128" selection-end-column="59" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/labels.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="116">
@@ -411,6 +677,75 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/graph_parse/rungraph.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1938">
+          <caret line="114" column="9" selection-start-line="114" selection-start-column="9" selection-end-line="114" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/InitBP.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="26" column="42" selection-start-line="26" selection-start-column="42" selection-end-line="26" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/model/mxGraphModel.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="1698" selection-start-line="1698" selection-end-line="1698" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/util/mxMouseEvent.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="180" selection-start-line="180" selection-end-line="180" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external/lib.es5.d.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="1273" column="4" selection-start-line="1273" selection-start-column="4" selection-end-line="1273" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external/lib.dom.d.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="4772" column="4" selection-start-line="4772" selection-start-column="4" selection-end-line="4772" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+<<<<<<< HEAD
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/dynamicstyle.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1581">
+          <caret line="93" column="20" selection-start-line="93" selection-start-column="20" selection-end-line="93" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/resources/grapheditor.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="228" column="11" selection-start-line="228" selection-end-line="228" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/grapheditor/www/js/Actions.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="856" column="22" selection-start-line="856" selection-start-column="22" selection-end-line="856" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/dynamictoolbar.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="122" column="67" selection-start-line="122" selection-start-column="67" selection-end-line="122" selection-end-column="67" />
+=======
     <entry file="file://$PROJECT_DIR$/editor/js/ToolbarBP.js">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -418,11 +753,112 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="175">
           <caret line="112" column="9" selection-start-line="112" selection-start-column="9" selection-end-line="112" selection-end-column="9" />
+>>>>>>> master
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/view/mxCellRenderer.js">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="119">
+          <caret line="7" column="2" lean-forward="true" selection-start-line="7" selection-start-column="2" selection-end-line="7" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="uml://JavaScript-modules-diagram/C:/hadas/semester_8/Final/FlowBP/resources/mxgraph/javascript/examples/grapheditor/www/js/Graph.js">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>JavaScript-modules-diagram</ID>
+          <OriginalElement>$PROJECT_DIR$/resources/mxgraph/javascript/examples/grapheditor/www/js/Graph.js</OriginalElement>
+          <nodes />
+          <notes />
+          <edges />
+          <settings layout="Hierarchic Group" zoom="1.0" x="581.0" y="188.0" />
+          <SelectedNodes />
+          <Categories>
+            <Category>All</Category>
+          </Categories>
+          <SCOPE>All</SCOPE>
+          <VISIBILITY>Details</VISIBILITY>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/grapheditor/www/js/Shapes.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/DialogsBP.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-765" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/ActionsBP.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="7" column="23" selection-start-line="7" selection-start-column="23" selection-end-line="7" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/codemirror/addon/merge/merge.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="149">
+          <caret line="272" column="58" selection-start-line="272" selection-start-column="58" selection-end-line="272" selection-end-column="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/ToolbarBP.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="106" column="13" selection-start-line="106" selection-start-column="13" selection-end-line="106" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/io/mxCodec.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="73">
+          <caret line="506" column="4" lean-forward="true" selection-start-line="506" selection-start-column="4" selection-end-line="506" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/util/mxRectangle.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="293">
+          <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/stencils.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2945">
+          <caret line="177" column="47" selection-start-line="177" selection-start-column="35" selection-end-line="177" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/model/mxGeometry.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="31">
+          <caret line="209" selection-start-line="209" selection-end-line="209" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/anchors.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="92">
+          <caret line="22" column="8" selection-start-line="22" selection-start-column="8" selection-end-line="37" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/stencils/flow.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="21" selection-start-line="3" selection-start-column="21" selection-end-line="3" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/viewer.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="146">
+          <caret line="15" column="30" selection-start-line="15" selection-start-column="30" selection-end-line="15" selection-end-column="30" />
+=======
         <state relative-caret-position="132">
           <caret line="213" selection-start-line="213" selection-end-line="213" />
         </state>
@@ -499,11 +935,65 @@
             <element signature="n#style#0;n#pre#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#blockquote#0;n#!!top" expanded="true" />
           </folding>
+>>>>>>> master
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/grapheditor/www/js/EditorUi.js">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="10098">
+          <caret line="2366" column="1" lean-forward="true" selection-start-line="2366" selection-start-column="1" selection-end-line="2366" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/grapheditor/www/js/Editor.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="8" column="17" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/grapheditor/www/js/Sidebar.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="551">
+          <caret line="267" column="38" selection-start-line="267" selection-start-column="38" selection-end-line="267" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/SidebarBP.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-597">
+          <caret line="2" column="11" lean-forward="true" selection-start-line="2" selection-start-column="11" selection-end-line="2" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1016">
+          <caret line="115" column="33" lean-forward="true" selection-start-line="115" selection-start-column="33" selection-end-line="115" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/orthogonal.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="76" column="40" selection-start-line="76" selection-start-column="40" selection-end-line="76" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/scrollbars.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="345" column="16" selection-start-line="345" selection-start-column="16" selection-end-line="345" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/view/mxCellRenderer.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22814">
+          <caret line="1342" column="58" selection-start-line="1342" selection-start-column="52" selection-end-line="1342" selection-end-column="58" />
+=======
         <state relative-caret-position="136">
           <caret line="8" column="4" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
         </state>
@@ -566,21 +1056,82 @@
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
+>>>>>>> master
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/anchors.html">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="17">
+          <caret line="649" selection-start-line="649" selection-end-line="649" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/fixedpoints.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="47" column="33" lean-forward="true" selection-start-line="47" selection-end-line="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/util/mxEffects.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.min.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="121">
+          <caret line="1487" column="30" selection-start-line="1487" selection-start-column="30" selection-end-line="1487" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="http://localhost:63342/FlowBP/editor/js/FormatBP.js">
+      <provider selected="true" editor-type-id="httpFileEditor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/EditorBP.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" column="3" lean-forward="true" selection-start-line="10" selection-start-column="3" selection-end-line="10" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/EditorUiBP.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="17" column="12" selection-start-line="17" selection-start-column="12" selection-end-line="17" selection-end-column="12" />
+=======
         <state relative-caret-position="2023">
           <caret line="119" column="7" selection-start-line="119" selection-start-column="7" selection-end-line="119" selection-end-column="7" />
           <folding>
             <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
+>>>>>>> master
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/examples/portrefs.html">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="382">
+          <caret line="169" column="4" selection-start-line="169" selection-start-column="4" selection-end-line="169" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="http://localhost:63342/FlowBP/resources/mxgraph/javascript/mxClient.js">
+      <provider selected="true" editor-type-id="httpFileEditor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/GraphBP.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="263">
+          <caret line="165" column="55" selection-start-line="165" selection-start-column="28" selection-end-line="165" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/view/mxGraph.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36">
+          <caret line="1757" column="15" lean-forward="true" selection-start-line="1757" selection-start-column="15" selection-end-line="1757" selection-end-column="15" />
+=======
         <state relative-caret-position="3536">
           <caret line="208" column="47" selection-start-line="208" selection-start-column="47" selection-end-line="208" selection-end-column="47" />
           <folding>
@@ -607,11 +1158,23 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
           <caret line="7" column="23" selection-start-line="7" selection-start-column="23" selection-end-line="7" selection-end-column="23" />
+>>>>>>> master
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/mxClient.js">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="121">
+          <caret line="85572" column="20" selection-start-line="85572" selection-start-column="20" selection-end-line="85572" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/mxgraph/javascript/src/js/handler/mxConnectionHandler.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="1711" column="16" selection-start-line="1711" selection-start-column="16" selection-end-line="1711" selection-end-column="16" />
+=======
         <state relative-caret-position="40681">
           <caret line="2393" column="40" selection-start-line="2393" selection-start-column="40" selection-end-line="2393" selection-end-column="40" />
         </state>
@@ -624,13 +1187,26 @@
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
+>>>>>>> master
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/editor/js/FormatBP.js">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="213">
+          <caret line="29" lean-forward="true" selection-start-line="29" selection-end-line="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/editor/js/mxClientBP.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="111">
+          <caret line="54" column="64" selection-start-line="54" selection-start-column="64" selection-end-line="54" selection-end-column="64" />
+=======
         <state relative-caret-position="338">
           <caret line="324" column="61" lean-forward="true" selection-start-line="324" selection-start-column="61" selection-end-line="324" selection-end-column="61" />
+>>>>>>> master
         </state>
       </provider>
     </entry>
