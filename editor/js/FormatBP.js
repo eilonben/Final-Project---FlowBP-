@@ -94,7 +94,17 @@ FormatBP = function(editorUi, container)
 FormatBP.prototype = Object.create(Format.prototype);
 
 FormatBP.prototype.refresh = function() {
-
+    /*var a= document.getElementsByClassName("geSprite geSprite-runmodel");
+    var b =a[0].parentElement;
+  //  a[0].style = "background-image:url(/resources/mxgraph/javascript/examples/images/close.png)";
+    a[0].remove();
+    var img = document.createElement("IMG");
+    b.className="geSprite";
+    b.innerHTML ="<input type=image id=myimag src=resources/mxgraph/javascript/examples/grapheditor/www/images/help.png />";
+   // b.style='background-image:url(/resources/mxgraph/javascript/examples/images/close.png)';
+    //img.src ='resources//mxgraph//javascript//examples//grapheditor//www//imges//help.png';
+   // a[0]=img;
+    //b.appendChild(img);*/
 
     // Performance tweak: No refresh needed if not visible
     if (this.container.style.width == '0px')
