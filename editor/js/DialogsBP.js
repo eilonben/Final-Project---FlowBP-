@@ -49,7 +49,7 @@ var BSyncForm = function(editorUi,cell)
         linkInput[lbl].style.width = '300px';
         linkInput[lbl].style.backgroundRepeat = 'no-repeat';
         linkInput[lbl].style.backgroundPosition = '100% 50%';
-        linkInput[lbl].style.paddingRight = '14px';
+        linkInput[lbl].style.paddingRight = '0px';
         td.appendChild(linkInput[lbl]);
         row.appendChild(td);
 
@@ -68,7 +68,7 @@ var BSyncForm = function(editorUi,cell)
     td = document.createElement('td');
     td.style.paddingTop = '14px';
     td.style.whiteSpace = 'nowrap';
-    td.setAttribute('align', 'right');
+    td.setAttribute('align', 'left');
 //
 
     /*var cancelBtn = mxUtils.button(mxResources.get('cancel'), function()
@@ -88,14 +88,6 @@ var BSyncForm = function(editorUi,cell)
 
         var genericBtn = mxUtils.button(mxResources.get('apply'), function()
         {
-            // var code = "bp.sync({";
-            // code += "request:" + linkInput["Request:"].value;
-            // code += ",waitFor:" + linkInput["Wait:"].value;
-            // code += ",block:" + linkInput["Block:"].value;
-            //
-            // code += "});";
-            //
-            // value.setAttribute("code", code);
             value.setAttribute("sync", "{\"request\":["+linkInput["Request"].value+"], \"wait\":["+linkInput["Wait"].value+"],\"block\":["+linkInput["Block"].value+"]}");
             value.setAttribute("Request", linkInput["Request"].value);
             value.setAttribute("Wait", linkInput["Wait"].value);
@@ -209,7 +201,7 @@ var CodeEditorDialog = function(editorUi,cell)
     {
         editorUi.hideDialog();
     });
-    cancelBtn.className = 'geBtn';
+    cancelBtn.className = 'geBtn gePrimaryBtn';
 
     if (editorUi.editor.cancelFirst)
     {

@@ -253,11 +253,12 @@ FormatBP.prototype.refresh = function() {
                 var cont = document.getElementsByClassName("geFormatContainer")[0];
                 cont.style.width = "22%";
                 var bsyncDIV = document.createElement('div');
-                bsyncDIV.style.marginLeft = "10px";
+                bsyncDIV.style.marginLeft = "2%";
                 var textnode = document.createElement("p");
                 textnode.innerHTML = '<font size="3">BSync Node</font>';
                 bsyncDIV.appendChild(textnode);
                 bsyncDIV.appendChild(dlg.container);
+                bsyncDIV.style.display="auto";
                 dlg.init();
 
 
