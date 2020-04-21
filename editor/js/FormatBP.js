@@ -43,25 +43,23 @@ function getValueByKey(style, key) {
 
 
 function adjustEdges(cell, numOfOutputs, graphModel) {
-    //the first time pressed apply
-    if(cell.new_constraints == null)
-        return;
+    var oldNumOfOutput = 1;
+    if(cell.new_constraints != null)
+        oldNumOfOutput = cell.new_constraints.length;
+    //need to adjust old arrows to new location
     var outEdges = getOutEdges(cell);
-    var oldNumOfOutput = cell.new_constraints.length;
     graphModel.beginUpdate();
     try {
         for (let i = 0; i <  outEdges.length; i++) {
-            //
-            var currentEdgeStyle = outEdges[i].style;
-            var oldY = getValueByKey(currentEdgeStyle,"exitY");
-            var constraintNumber = Math.ceil(oldY * (oldNumOfOutput +1));
+            // get old location of edge
+            var constraintNumber = parseInt(outEdges[i].getAttribute('labelNum'));
             //check if edge should erase
             if(constraintNumber > numOfOutputs)
                 graphModel.remove(outEdges[i],true);
             else{
             //    relocate edge exit location of edge
                 var newY = constraintNumber * (1/(numOfOutputs+1))
-                var new_style = mxUtils.setStyle(currentEdgeStyle, 'exitY', newY);
+                var new_style = mxUtils.setStyle(outEdges[i].style, 'exitY', newY);
                 graphModel.setStyle(outEdges[i], new_style);
             }
         }
