@@ -1,6 +1,6 @@
 window.sbs = {
-    stages: [],
-    curStage: -1
+    curStage: -1,
+    scenarios: {}
 };
 
 window.bpEngine = {
@@ -72,12 +72,11 @@ function getRandomItem(set) {
     return items[Math.floor(Math.random() * items.length)];
 }
 
-function* goToFollowers(c, payload, ths, bpEngine, model) {
+function* goToFollowers(c, payload, ths, bpEngine, model, scen) {
     var edg = model.getEdges(c, false, true, true);
     if (payload.forward !== undefined) {
         edg = edg.filter(n => Object.keys(payload.forward).indexOf("" + n.getAttribute("name")) !== -1);
     }
-
 
     if (edg.length > 0) {
         // Run extra followers in new threads
@@ -96,7 +95,7 @@ function* goToFollowers(c, payload, ths, bpEngine, model) {
             var nextPayload = ((payload.forward == undefined) ? payload : payload.forward[edg[0].getAttribute("name")]);
             payload.forward = undefined;
 
-            yield* runInSameBT(edg[0].getTerminal(false), nextPayload, ths, bpEngine, model);
+            yield* runInSameBT(edg[0].getTerminal(false), nextPayload, ths, bpEngine, model, scen);
         }
     }
 }
@@ -114,9 +113,11 @@ function* runInNewBT(c, payload, bpEngine, model) {
             curr["selected"] = window.eventSelected;
         }
 
-        window.sbs.stages.push(c.id);
+        c.setAttribute("scenarioID", c.id);
+        window.sbs.scenarios[c.id] = [];
+        window.sbs.scenarios[c.id].push(c.id);
 
-        yield* goToFollowers(c, cloned, this, bpEngine,model);
+        yield* goToFollowers(c, cloned, this, bpEngine, model, c.id);
     }());
 };
 
@@ -125,7 +126,7 @@ function getshape(str) {
     return arr[0].split("=")[1].split(".")[1];
 }
 
-function* runInSameBT(c, payload, ths, bpEngine, model) {
+function* runInSameBT(c, payload, ths, bpEngine, model, scen) {
     var curr = JSON.parse(JSON.stringify(payload));
     if (c.getAttribute("code") !== undefined) {
         eval('var func = function(curr) {' + c.getAttribute("code") + '}');
@@ -136,14 +137,17 @@ function* runInSameBT(c, payload, ths, bpEngine, model) {
         curr["selected"] = window.eventSelected;
     }
 
-    window.sbs.stages.push(c.id);
+    c.setAttribute("scenarioID", scen);
+    window.sbs.scenarios[scen].push(c.id);
+    //window.sbs.stages.push(c.id);
 
-    yield *goToFollowers(c, curr, ths, bpEngine,model);
+    yield *goToFollowers(c, curr, ths, bpEngine,model, scen);
 };
 
 function startRunning(model) {
 // Start the context nodes
     var cells = model.cells;
+    fixValues(Object.values(cells));
     var arr = Object.keys(cells).map(function (key) {
         return cells[key]
     });
@@ -162,15 +166,41 @@ function startRunning(model) {
 }
 
 function getNextStage() {
-    if(window.sbs.curStage < window.sbs.stages.length - 1)
-        return window.sbs.stages[++window.sbs.curStage]
-    return window.sbs.stages[window.sbs.curStage = window.sbs.stages.length - 1]
+    let scens = Object.values(window.sbs.scenarios)
+    const lengths = scens.map(x => x.length);
+    var res = [[], []]
+
+    if(window.sbs.curStage + 1 < Math.max(...lengths))
+        window.sbs.curStage++;
+
+
+    for(let i = 0; i < scens.length; i++){
+        let cur = scens[i];
+        if(window.sbs.curStage < cur.length)
+            res[0].push(cur[window.sbs.curStage])
+        if(window.sbs.curStage > 0 && window.sbs.curStage - 1 < cur.length)
+            res[1].push(cur[window.sbs.curStage - 1])
+    }
+
+    return res;
 }
 
 function getPrevStage() {
+    var res = [[], []]
+    let scens = Object.values(window.sbs.scenarios)
+
     if(window.sbs.curStage > 0)
-        return window.sbs.stages[--window.sbs.curStage]
-    return window.sbs.stages[window.sbs.curStage = 0]
+        window.sbs.curStage--;
+
+    for(let i = 0; i < scens.length; i++){
+        let cur = scens[i];
+        if(window.sbs.curStage < cur.length)
+            res[0].push(cur[window.sbs.curStage])
+        if(window.sbs.curStage + 1 < cur.length)
+            res[1].push(cur[window.sbs.curStage + 1])
+    }
+
+    return res;
 }
 
 function initSBS() {
@@ -178,6 +208,24 @@ function initSBS() {
     window.sbs.curStage = -1
 }
 
+function fixValues(cells) {
+    for(let i = 0; i < cells.length; i++)
+    {
+        let c = cells[i];
+        let value = c.getValue();
+
+        // Converts the value to an XML node
+        if (value == "")
+        {
+            var doc = mxUtils.createXmlDocument();
+            var obj = doc.createElement('object');
+            obj.setAttribute('label', value || '');
+            value = obj;
+        }
+
+        c.setValue(value);
+    }
+}
 
 // function f1(){}
 // function f2(){}

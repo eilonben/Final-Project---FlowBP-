@@ -42,19 +42,19 @@ ActionsBP.prototype.init = function(actions) {
 
         var stage = getNextStage();
 
-        var cell = mod.getCell(stage);
-        var style = cell.getStyle();
-        style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
-        mod.setStyle(cell, style);
+        //updateStageVis(stage);
+        for (let i = 0; i < stage[0].length; i++) {
+            var cell = mod.getCell(stage[0][i]);
+            var style = cell.getStyle();
+            style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
+            mod.setStyle(cell, style);
+        }
 
-        var edges = mod.getIncomingEdges(cell);
-        for(let i = 0; i < edges.length; i++){
-            var parent = edges[i].source
-            style = parent.getStyle();
-            if (style !== undefined) {
-                style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
-                mod.setStyle(parent, style);
-            }
+        for (let i = 0; i < stage[1].length; i++) {
+            var cell = mod.getCell(stage[1][i]);
+            var style = cell.getStyle();
+            style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
+            mod.setStyle(cell, style);
         }
 
         graph.getModel().endUpdate();
@@ -69,19 +69,18 @@ ActionsBP.prototype.init = function(actions) {
 
         var stage = getPrevStage();
 
-        var cell = mod.getCell(stage);
-        var style = cell.getStyle();
-        style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
-        mod.setStyle(cell, style);
+        for (let i = 0; i < stage[0].length; i++) {
+            var cell = mod.getCell(stage[0][i]);
+            var style = cell.getStyle();
+            style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
+            mod.setStyle(cell, style);
+        }
 
-        var edges = mod.getOutgoingEdges(cell);
-        for (let i = 0; i < edges.length; i++) {
-            var child = edges[i].target
-            style = child.getStyle();
-            if (style !== undefined) {
-                style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
-                mod.setStyle(child, style);
-            }
+        for (let i = 0; i < stage[1].length; i++) {
+            var cell = mod.getCell(stage[1][i]);
+            var style = cell.getStyle();
+            style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
+            mod.setStyle(cell, style);
         }
 
         graph.getModel().endUpdate();
