@@ -258,7 +258,7 @@ FormatBP.prototype.refresh = function() {
                 textnode.innerHTML = '<font size="3">BSync Node</font>';
                 bsyncDIV.appendChild(textnode);
                 bsyncDIV.appendChild(dlg.container);
-                bsyncDIV.style.display="auto";
+
                 dlg.init();
 
 
@@ -269,8 +269,7 @@ FormatBP.prototype.refresh = function() {
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
             var generalDIV = document.createElement('div');
-            generalDIV.style.marginLeft = "10px";
-
+            generalDIV.style.marginLeft = "3%";
             //Title
             var textnode = document.createElement("p");
             textnode.innerHTML = '<font size="3">General Node</font>';
@@ -387,7 +386,6 @@ FormatBP.prototype.refresh = function() {
             createLabels(value.getAttribute("numberOfOutputs",1));
 
             generalDIV.appendChild(OutputLabelDIV);
-
             //add the DIV to cont
             cont.appendChild(generalDIV);
             graph.getModel().setValue(cell, value);
@@ -398,7 +396,6 @@ FormatBP.prototype.refresh = function() {
             cont.style.width = "22%";
             var startnodeDIV = document.createElement('div');
             startnodeDIV.style.marginLeft = "10px";
-            //cont.style.borderLeftStyle="solid"
             var textnode = document.createElement("p");
             textnode.innerHTML = '<font size="3">Start Node</font>';
             startnodeDIV.appendChild(textnode);
