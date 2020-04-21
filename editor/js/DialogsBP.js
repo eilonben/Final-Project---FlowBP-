@@ -205,7 +205,7 @@ var CodeEditorDialog = function(editorUi,cell)
     td.style.whiteSpace = 'nowrap';
     td.setAttribute('align', 'right');
 
-    /*var cancelBtn = mxUtils.button(mxResources.get('cancel'), function()
+    var cancelBtn = mxUtils.button(mxResources.get('cancel'), function()
     {
         editorUi.hideDialog();
     });
@@ -214,7 +214,7 @@ var CodeEditorDialog = function(editorUi,cell)
     if (editorUi.editor.cancelFirst)
     {
         td.appendChild(cancelBtn);
-    }*/
+    }
 
 
 
