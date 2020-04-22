@@ -134,6 +134,32 @@ mxConnectionHandlerBP.prototype.insertEdge = function(parent, id, value, source,
 };
 
 
+function addEntryPerimeter(edge) {
+    return edge.style+="entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;"
+}
+
+function checkAndFixBorder(edge) {
+    var styles = edge.style.split(";");
+    styles=styles.map(x=>x.split("="));
+    var stylesDic={};
+    function toDictionary(style,val) {
+        stylesDic[style]=val;
+    }
+
+    for (let i = 0; i < styles.length; i++) {
+        toDictionary(styles[i][0],styles[i][1])
+    }
+    stylesDic["entryX"]="0";
+    if (stylesDic["entryY"]>"0.98" || stylesDic["entryY"]<"0.02")
+        stylesDic["entryY"]= "0.5";
+    var newStyle="";
+    for (var key in stylesDic) {
+        newStyle+=key+"="+stylesDic[key]+";";
+    }
+    edge.style=newStyle;
+
+}
+
 //this is for labels per constraint point
 mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarget)
 {
@@ -198,23 +224,23 @@ mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarg
             // the new edge into the graph
             var value = null;
             var style = null;
-            var state = null;
 
             if (this.edgeState != null)
             {
                 value = this.edgeState.cell.value;
                 style = this.edgeState.cell.style;
-                state = this.edgeState.style;
             }
 
-            edge = this.insertEdge(parent, null, value, source, target, style, state);
+            edge = this.insertEdge(parent, null, value, source, target, style);
 
             if (edge != null)
             {
                 // Updates the connection constraints
                 this.graph.setConnectionConstraint(edge, source, true, this.sourceConstraint);
                 this.graph.setConnectionConstraint(edge, target, false, this.constraintHandler.currentConstraint);
-
+                if(!edge.style.includes("entryPerimeter"))
+                    edge.style+=addEntryPerimeter(edge);
+                checkAndFixBorder(edge);
                 // Uses geometry of the preview edge state
                 if (this.edgeState != null)
                 {
@@ -300,69 +326,11 @@ mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarg
 };
 
 
-mxConnectionHandlerBP.prototype.mouseUp = function(sender, me)
+
+mxGraph.prototype.setCellStyles = function(key, value, cells)
 {
-    if (!me.isConsumed() && this.isConnecting())
-    {
-        if (this.waypointsEnabled && !this.isStopEvent(me))
-        {
-            this.addWaypointForEvent(me);
-            me.consume();
-
-            return;
-        }
-
-        var c1 = this.sourceConstraint;
-        var c2 = this.constraintHandler.currentConstraint;
-
-        var source = (this.previous != null) ? this.previous.cell : null;
-        var target = null;
-
-        if (this.constraintHandler.currentConstraint != null &&
-            this.constraintHandler.currentFocus != null)
-        {
-            target = this.constraintHandler.currentFocus.cell;
-        }
-
-        if (target == null && this.currentState != null)
-        {
-            target = this.currentState.cell;
-        }
-
-        // Inserts the edge if no validation error exists and if constraints differ
-        if (this.error == null && this.checkLeftConstraints(c1, c2) && (source == null || target == null ||
-            source != target || this.checkConstraints(c1, c2)))
-        {
-            this.connect(source, target, me.getEvent(), me.getCell());
-
-        }
-        else
-        {
-            // Selects the source terminal for self-references
-            if (this.previous != null && this.marker.validState != null &&
-                this.previous.cell == this.marker.validState.cell)
-            {
-                this.graph.selectCellForEvent(this.marker.source, me.getEvent());
-            }
-
-            // Displays the error message if it is not an empty string,
-            // for empty error messages, the event is silently dropped
-            if (this.error != null && this.error.length > 0)
-            {
-                this.graph.validationAlert(this.error);
-            }
-        }
-
-        // Redraws the connect icons and resets the handler state
-        this.destroyIcons();
-        me.consume();
-    }
-
-    if (this.first != null)
-    {
-        this.reset();
-    }
+    cells = cells || this.getSelectionCells();
+    mxUtils.setCellStyles(this.model, cells, key, value);
 };
-
 
 //mxGraphBP.prototype.constructor = mxGraph;
