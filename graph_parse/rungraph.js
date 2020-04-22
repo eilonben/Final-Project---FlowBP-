@@ -1,4 +1,5 @@
 window.sbs = {
+    time: 0,
     curStage: -1,
     scenarios: {}
 };
@@ -29,6 +30,7 @@ window.bpEngine = {
                     bt.stmt = fixStmt(bt.iterator.next().value)
                 }
             })
+            fixStages();
         }
     }
 }
@@ -72,7 +74,7 @@ function getRandomItem(set) {
     return items[Math.floor(Math.random() * items.length)];
 }
 
-function* goToFollowers(c, payload, ths, bpEngine, model, scen) {
+function* goToFollowers(c, payload, ths, bpEngine, model, scen, curTime) {
     var edg = model.getEdges(c, false, true, true);
     if (payload.forward !== undefined) {
         edg = edg.filter(n => Object.keys(payload.forward).indexOf("" + n.getAttribute("name")) !== -1);
@@ -86,7 +88,7 @@ function* goToFollowers(c, payload, ths, bpEngine, model, scen) {
                 var nextPayload = ((payload.forward == undefined) ? payload : payload.forward[edg[i].getAttribute("name")]);
                 payload.forward = undefined;
 
-                yield* runInNewBT(target, nextPayload, bpEngine);
+                yield* runInNewBT(target, nextPayload, bpEngine, curTime);
             }
         }
 
@@ -100,7 +102,7 @@ function* goToFollowers(c, payload, ths, bpEngine, model, scen) {
     }
 }
 
-function* runInNewBT(c, payload, bpEngine, model) {
+function* runInNewBT(c, payload, bpEngine, model, curTime) {
     // Cloning - Is this the right way?
     var cloned = JSON.parse(JSON.stringify(payload));
     window.bpEngine.registerBThread(function* () {
@@ -115,9 +117,11 @@ function* runInNewBT(c, payload, bpEngine, model) {
 
         c.setAttribute("scenarioID", c.id);
         window.sbs.scenarios[c.id] = [];
+        for(let i = 0; i < window.sbs.time + curTime - 1; i++)
+            window.sbs.scenarios[c.id].push(-1);
         window.sbs.scenarios[c.id].push(c.id);
 
-        yield* goToFollowers(c, cloned, this, bpEngine, model, c.id);
+        yield* goToFollowers(c, cloned, this, bpEngine, model, c.id, curTime + 1);
     }());
 };
 
@@ -139,7 +143,6 @@ function* runInSameBT(c, payload, ths, bpEngine, model, scen) {
 
     c.setAttribute("scenarioID", scen);
     window.sbs.scenarios[scen].push(c.id);
-    //window.sbs.stages.push(c.id);
 
     yield *goToFollowers(c, curr, ths, bpEngine,model, scen);
 };
@@ -159,53 +162,79 @@ function startRunning(model) {
         let payload = {};
         if (startNds[i].getAttribute("payload") !== undefined)
             payload = JSON.parse(startNds[i].getAttribute("payload"))
-        runInNewBT(startNds[i], payload, bpEngine, model).next();
+        runInNewBT(startNds[i], payload, bpEngine, model, 0).next();
     }
     window.bpEngine.run().next();
     window.bpEngine.BThreads = [];
 }
 
 function getNextStage() {
-    let scens = Object.values(window.sbs.scenarios)
-    const lengths = scens.map(x => x.length);
     var res = [[], []]
 
-    if(window.sbs.curStage + 1 < Math.max(...lengths))
+    if(window.sbs.curStage < window.sbs.time - 1) {
         window.sbs.curStage++;
 
-
-    for(let i = 0; i < scens.length; i++){
-        let cur = scens[i];
-        if(window.sbs.curStage < cur.length)
-            res[0].push(cur[window.sbs.curStage])
-        if(window.sbs.curStage > 0 && window.sbs.curStage - 1 < cur.length)
-            res[1].push(cur[window.sbs.curStage - 1])
+        var scens = Object.values(window.sbs.scenarios)
+        for (let i = 0; i < scens.length; i++) {
+            let cur = scens[i];
+            if (cur[window.sbs.curStage] != -1) {
+                res[0].push(cur[window.sbs.curStage])
+                let last = getLast(cur, window.sbs.curStage)
+                if (last != -1)
+                    res[1].push(last)
+            }
+        }
     }
-
     return res;
 }
 
 function getPrevStage() {
     var res = [[], []]
-    let scens = Object.values(window.sbs.scenarios)
 
-    if(window.sbs.curStage > 0)
+    if(window.sbs.curStage > 0) {
         window.sbs.curStage--;
 
-    for(let i = 0; i < scens.length; i++){
-        let cur = scens[i];
-        if(window.sbs.curStage < cur.length)
-            res[0].push(cur[window.sbs.curStage])
-        if(window.sbs.curStage + 1 < cur.length)
-            res[1].push(cur[window.sbs.curStage + 1])
+        let scens = Object.values(window.sbs.scenarios)
+        for (let i = 0; i < scens.length; i++) {
+            let cur = scens[i];
+            if (cur[window.sbs.curStage] != -1) {
+                res[0].push(cur[window.sbs.curStage])
+                let next = getNext(cur, window.sbs.curStage)
+                if (next != -1)
+                    res[1].push(next)
+            }
+            else{
+                let last = getLast(cur, window.sbs.curStage)
+                if (last != -1)
+                    res[0].push(last)
+                let next = getNext(cur, window.sbs.curStage)
+                if (next != -1)
+                    res[1].push(next)
+            }
+        }
     }
 
     return res;
 }
 
 function initSBS() {
-    window.sbs.stages = []
+    window.sbs.scenarios = {}
     window.sbs.curStage = -1
+    window.sbs.time = 0
+}
+
+function getLast(cur, curStage){
+    while (--curStage >= 0)
+        if(cur[curStage] != -1)
+            return cur[curStage]
+    return -1;
+}
+
+function getNext(cur, curStage){
+    while (++curStage < cur.length)
+        if(cur[curStage] != -1)
+            return cur[curStage]
+    return -1;
 }
 
 function fixValues(cells) {
@@ -226,6 +255,20 @@ function fixValues(cells) {
         c.setValue(value);
     }
 }
+
+function fixStages() {
+    let scens = Object.values(window.sbs.scenarios)
+    const lengths = scens.map(x => x.length);
+    let curTime = Math.max(...lengths)
+    for(let i = 0; i < scens.length; i++)
+    {
+        let curScen = scens[i];
+        for (let j = 0; j < curTime - curScen.length; j++)
+            curScen.push(-1);
+    }
+    window.sbs.time = curTime
+}
+
 
 // function f1(){}
 // function f2(){}
