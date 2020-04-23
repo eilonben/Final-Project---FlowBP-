@@ -149,6 +149,8 @@ function* runInSameBT(c, payload, ths, bpEngine, model, scen) {
 
 function startRunning(model) {
 // Start the context nodes
+    initSBS();
+
     var cells = model.cells;
     fixValues(Object.values(cells));
     var arr = Object.keys(cells).map(function (key) {
@@ -168,52 +170,23 @@ function startRunning(model) {
     window.bpEngine.BThreads = [];
 }
 
-function getNextStage() {
-    var res = [[], []]
+function getProgramRecord() {
+    var res = []
 
-    if(window.sbs.curStage < window.sbs.time - 1) {
+    while(window.sbs.curStage < window.sbs.time - 1) {
         window.sbs.curStage++;
 
+        var curStage = []
         var scens = Object.values(window.sbs.scenarios)
         for (let i = 0; i < scens.length; i++) {
             let cur = scens[i];
             if (cur[window.sbs.curStage] != -1) {
-                res[0].push(cur[window.sbs.curStage])
-                let last = getLast(cur, window.sbs.curStage)
-                if (last != -1)
-                    res[1].push(last)
+                curStage.push(cur[window.sbs.curStage])
             }
         }
+
+        res.push(curStage)
     }
-    return res;
-}
-
-function getPrevStage() {
-    var res = [[], []]
-
-    if(window.sbs.curStage > 0) {
-        window.sbs.curStage--;
-
-        let scens = Object.values(window.sbs.scenarios)
-        for (let i = 0; i < scens.length; i++) {
-            let cur = scens[i];
-            if (cur[window.sbs.curStage] != -1) {
-                res[0].push(cur[window.sbs.curStage])
-                let next = getNext(cur, window.sbs.curStage)
-                if (next != -1)
-                    res[1].push(next)
-            }
-            else{
-                let last = getLast(cur, window.sbs.curStage)
-                if (last != -1)
-                    res[0].push(last)
-                let next = getNext(cur, window.sbs.curStage)
-                if (next != -1)
-                    res[1].push(next)
-            }
-        }
-    }
-
     return res;
 }
 
@@ -221,20 +194,6 @@ function initSBS() {
     window.sbs.scenarios = {}
     window.sbs.curStage = -1
     window.sbs.time = 0
-}
-
-function getLast(cur, curStage){
-    while (--curStage >= 0)
-        if(cur[curStage] != -1)
-            return cur[curStage]
-    return -1;
-}
-
-function getNext(cur, curStage){
-    while (++curStage < cur.length)
-        if(cur[curStage] != -1)
-            return cur[curStage]
-    return -1;
 }
 
 function fixValues(cells) {
