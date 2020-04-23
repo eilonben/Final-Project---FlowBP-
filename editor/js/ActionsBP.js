@@ -6,6 +6,7 @@ ActionsBP.prototype.init = function(actions) {
     var ui = actions.editorUi;
     var editor = ui.editor;
     var graph = editor.graph;
+
     var lastUndo = 0;
 
     actions.addAction('editCode', function () {
@@ -19,6 +20,9 @@ ActionsBP.prototype.init = function(actions) {
     });
 
     actions.addAction('runModel', function() {
+        var cells = graph.getModel().cells;
+        fixValues(Object.values(cells));
+
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
         parse_graph(code);
@@ -78,6 +82,9 @@ ActionsBP.prototype.init = function(actions) {
 
      actions.addAction('debug_sbs', function() {
 
+         var cells = graph.getModel().cells;
+         fixValues(Object.values(cells));
+
          lastUndo = editor.undoManager.indexOfNextAdd + 1;
 
          var mod = graph.getModel()
@@ -88,17 +95,22 @@ ActionsBP.prototype.init = function(actions) {
          parse_graph(code);
 
          // coloring
-         var recoed = getProgramRecord();
+         var record = getProgramRecord();
 
-         for (let i = 0; i < recoed.length; i++) {
+         for (let i = 0; i < record.length; i++) {
              graph.model.beginUpdate();
 
-             var curRec = recoed[i];
+             var curRec = record[i];
              for (let j = 0; j < curRec.length; j++) {
-                 var cell = mod.getCell(curRec[j]);
-                 var style = cell.getStyle();
+                 var cell = mod.getCell(curRec[j][0]);
+                 var val = cell.clone().getValue();
+                 val.setAttribute('Payload', curRec[j][1]);
+                 // indicator
+                 var style = cell.getStyle()
                  style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
                  mod.setStyle(cell, style);
+                 ////////////
+                 mod.setValue(cell, val);
              }
 
              graph.model.endUpdate();
@@ -133,4 +145,23 @@ function lockLayer(mod, lock) {
             mod.setStyle(layer, style);
         }
     });
+}
+
+function fixValues(cells) {
+    for(let i = 0; i < cells.length; i++)
+    {
+        let c = cells[i];
+        let value = c.getValue();
+
+        // Converts the value to an XML node
+        if (value == "")
+        {
+            var doc = mxUtils.createXmlDocument();
+            var obj = doc.createElement('object');
+            obj.setAttribute('label', value || '');
+            value = obj;
+        }
+
+        c.setValue(value);
+    }
 }

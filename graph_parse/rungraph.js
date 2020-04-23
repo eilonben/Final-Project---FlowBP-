@@ -119,7 +119,7 @@ function* runInNewBT(c, payload, bpEngine, model, curTime) {
         window.sbs.scenarios[c.id] = [];
         for(let i = 0; i < window.sbs.time + curTime - 1; i++)
             window.sbs.scenarios[c.id].push(-1);
-        window.sbs.scenarios[c.id].push(c.id);
+        window.sbs.scenarios[c.id].push([c.id, cloned]);
 
         yield* goToFollowers(c, cloned, this, bpEngine, model, c.id, curTime + 1);
     }());
@@ -142,7 +142,7 @@ function* runInSameBT(c, payload, ths, bpEngine, model, scen) {
     }
 
     c.setAttribute("scenarioID", scen);
-    window.sbs.scenarios[scen].push(c.id);
+    window.sbs.scenarios[scen].push([c.id, curr]);
 
     yield *goToFollowers(c, curr, ths, bpEngine,model, scen);
 };
@@ -152,7 +152,6 @@ function startRunning(model) {
     initSBS();
 
     var cells = model.cells;
-    fixValues(Object.values(cells));
     var arr = Object.keys(cells).map(function (key) {
         return cells[key]
     });
@@ -180,7 +179,7 @@ function getProgramRecord() {
         var scens = Object.values(window.sbs.scenarios)
         for (let i = 0; i < scens.length; i++) {
             let cur = scens[i];
-            if (cur[window.sbs.curStage] != -1) {
+            if (cur[window.sbs.curStage][0] != -1) {
                 curStage.push(cur[window.sbs.curStage])
             }
         }
@@ -194,25 +193,6 @@ function initSBS() {
     window.sbs.scenarios = {}
     window.sbs.curStage = -1
     window.sbs.time = 0
-}
-
-function fixValues(cells) {
-    for(let i = 0; i < cells.length; i++)
-    {
-        let c = cells[i];
-        let value = c.getValue();
-
-        // Converts the value to an XML node
-        if (value == "")
-        {
-            var doc = mxUtils.createXmlDocument();
-            var obj = doc.createElement('object');
-            obj.setAttribute('label', value || '');
-            value = obj;
-        }
-
-        c.setValue(value);
-    }
 }
 
 function fixStages() {
