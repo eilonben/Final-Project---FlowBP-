@@ -461,7 +461,13 @@ FormatBP.prototype.refresh = function () {
                     applyButtonLabels.onclick = function () {
                         var Payloads = [];
                         for (var i = 0; i < numOfPayloads; i++) {
-                            Payloads.push((document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value));
+                            let payloadValue = document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value;
+                            if(payloadValue === "" || payloadValue === undefined || payloadValue ===null){
+                                Payloads.push("{}");
+                            }
+                            else {
+                                Payloads.push((document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value));
+                            }
                         }
                         value.setAttribute("Payloads", JSON.stringify(Payloads));
                         updateEdgesLabels(cell, NumberOfPayloadsBox.value, graph.getModel());

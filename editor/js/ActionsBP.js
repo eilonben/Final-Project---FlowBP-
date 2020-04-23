@@ -1,6 +1,6 @@
 function ActionsBP(actions) {
     this.init(actions);
-};
+}
 
 ActionsBP.prototype.init = function(actions) {
     var ui = actions.editorUi;
