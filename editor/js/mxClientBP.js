@@ -322,6 +322,4 @@ mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarg
         }
 };
 
-
-
 //mxGraphBP.prototype.constructor = mxGraph;
