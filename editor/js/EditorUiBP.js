@@ -17,7 +17,7 @@
 
 function EditorUiBP(editor, container, lightbox) {
     EditorUi.call(this,editor, container, lightbox);
-    // new ActionsBP(this.actions);
+
 };
 
 EditorUiBP.prototype = Object.create(EditorUi.prototype);

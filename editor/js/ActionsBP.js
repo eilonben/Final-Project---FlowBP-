@@ -8,6 +8,7 @@ ActionsBP.prototype.init = function(actions) {
     var graph = editor.graph;
     var lastUndo = 0;
 
+
     actions.addAction('editCode', function () {
         var cell = graph.getSelectionCell() || graph.getModel().getRoot();
 
@@ -154,4 +155,7 @@ ActionsBP.prototype.init = function(actions) {
          ui.noUndo();
 
      }, null, null);
+
+   
+
 };
