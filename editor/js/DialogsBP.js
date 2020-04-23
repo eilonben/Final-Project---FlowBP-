@@ -134,7 +134,7 @@ var CodeEditorDialog = function(editorUi,cell)
     td = document.createElement('td');
     td.style.fontSize = '10pt';
     td.style.width = '100px';
-    mxUtils.write(td, "Code Editor");
+    mxUtils.write(td, "Code Editor: GeneralBlockFunction(Payloads){");
 
     row.appendChild(td);
     tbody.appendChild(row);
@@ -195,9 +195,10 @@ var CodeEditorDialog = function(editorUi,cell)
     if (editorUi.editor.cancelFirst)
     {
         td.appendChild(cancelBtn);
-    }
-
-
+    }*/
+    td = document.createElement('td');
+    mxUtils.write(td, "}");
+    
 
     {
         var genericBtn = mxUtils.button(mxResources.get('apply'), function()
