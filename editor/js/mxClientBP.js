@@ -324,10 +324,4 @@ mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarg
 
 
 
-mxGraph.prototype.setCellStyles = function(key, value, cells)
-{
-    cells = cells || this.getSelectionCells();
-    mxUtils.setCellStyles(this.model, cells, key, value);
-};
-
 //mxGraphBP.prototype.constructor = mxGraph;
