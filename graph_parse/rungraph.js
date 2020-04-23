@@ -72,11 +72,11 @@ function getRandomItem(set) {
     return items[Math.floor(Math.random() * items.length)];
 }
 
-function* goToFollowers(c, payload, ths, bpEngine, model) {
+function* goToFollowers(c, payload, ths, bpEngine, model,outputs) {
     var edg = model.getEdges(c, false, true, true);
-    if (payload.forward !== undefined) {
-        edg = edg.filter(n => Object.keys(payload.forward).indexOf("" + n.getAttribute("name")) !== -1);
-    }
+    // if (payload.forward !== undefined) {
+    //     edg = edg.filter(n => Object.keys(payload.forward).indexOf("" + n.getAttribute("name")) !== -1);
+    // }
 
 
     if (edg.length > 0) {
@@ -101,13 +101,14 @@ function* goToFollowers(c, payload, ths, bpEngine, model) {
     }
 }
 
-function* runInNewBT(c, payload, bpEngine, model) {
+function* runInNewBT(c, payloads, bpEngine, model) {
     // Cloning - Is this the right way?
-    var cloned = JSON.parse(JSON.stringify(payload));
+    let outputs = [];
+    var cloned = JSON.parse(JSON.stringify(payloads));
     window.bpEngine.registerBThread(function* () {
         if (c.getAttribute("code") !== undefined) {
-            eval('var func = function(curr) {' + c.getAttribute("code") + '}');
-            func(curr);
+            eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
+            outputs = func(cloned);
         }
         if (c.getAttribute("sync") !== undefined) {
             yield JSON.parse(c.getAttribute("sync"));
@@ -116,8 +117,9 @@ function* runInNewBT(c, payload, bpEngine, model) {
 
         window.sbs.stages.push(c.id);
 
-        yield* goToFollowers(c, cloned, this, bpEngine,model);
+        yield* goToFollowers(c, cloned, this, bpEngine,model,outputs);
     }());
+
 };
 
 function getshape(str) {
@@ -125,10 +127,10 @@ function getshape(str) {
     return arr[0].split("=")[1].split(".")[1];
 }
 
-function* runInSameBT(c, payload, ths, bpEngine, model) {
-    var curr = JSON.parse(JSON.stringify(payload));
+function* runInSameBT(c, payloads, ths, bpEngine, model) {
+    var curr = JSON.parse(JSON.stringify(payloads));
     if (c.getAttribute("code") !== undefined) {
-        eval('var func = function(curr) {' + c.getAttribute("code") + '}');
+        eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
         func(curr);
     }
     if (c.getAttribute("sync") !== undefined) {
@@ -152,10 +154,10 @@ function startRunning(model) {
             return cell.getStyle() !== undefined && getshape(cell.getStyle()) === "startnode";
         });
     for (var i = 0; i < startNds.length; i++) {
-        let payload = {};
-        if (startNds[i].getAttribute("payload") !== undefined)
-            payload = JSON.parse(startNds[i].getAttribute("payload"))
-        runInNewBT(startNds[i], payload, bpEngine, model).next();
+        let payloads = [{}];
+        if (startNds[i].getAttribute("Payloads") !== undefined)
+            payloads = (JSON.parse(startNds[i].getAttribute("Payloads")));
+        runInNewBT(startNds[i], payloads, bpEngine, model).next();
     }
     window.bpEngine.run().next();
     window.bpEngine.BThreads = [];
