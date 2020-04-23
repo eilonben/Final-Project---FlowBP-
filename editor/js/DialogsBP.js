@@ -49,7 +49,7 @@ var BSyncForm = function(editorUi,cell)
         linkInput[lbl].style.width = '300px';
         linkInput[lbl].style.backgroundRepeat = 'no-repeat';
         linkInput[lbl].style.backgroundPosition = '100% 50%';
-        linkInput[lbl].style.paddingRight = '14px';
+        linkInput[lbl].style.paddingRight = '0px';
         td.appendChild(linkInput[lbl]);
         row.appendChild(td);
 
@@ -68,35 +68,13 @@ var BSyncForm = function(editorUi,cell)
     td = document.createElement('td');
     td.style.paddingTop = '14px';
     td.style.whiteSpace = 'nowrap';
-    td.setAttribute('align', 'right');
-//
-
-    /*var cancelBtn = mxUtils.button(mxResources.get('cancel'), function()
-    {
-        editorUi.hideDialog();
-    });
-    cancelBtn.className = 'geBtn';
-//
-    if (editorUi.editor.cancelFirst)
-    {
-        td.appendChild(cancelBtn);
-    }*/
-
-
+    td.setAttribute('align', 'left');
 
     {
 
         var genericBtn = mxUtils.button(mxResources.get('apply'), function()
         {
-            // var code = "bp.sync({";
-            // code += "request:" + linkInput["Request:"].value;
-            // code += ",waitFor:" + linkInput["Wait:"].value;
-            // code += ",block:" + linkInput["Block:"].value;
-            //
-            // code += "});";
-            //
-            // value.setAttribute("code", code);
-            value.setAttribute("sync", "{\"request\":["+linkInput["Request"].value+"], \"wait\":["+linkInput["Wait"].value+"],\"block\":["+linkInput["Block"].value+"]}");
+            value.setAttribute("sync", "{\"request\":[\""+linkInput["Request"].value+"\"], \"wait\":[\""+linkInput["Wait"].value+"\"],\"block\":[\""+linkInput["Block"].value+"\"]}");
             value.setAttribute("Request", linkInput["Request"].value);
             value.setAttribute("Wait", linkInput["Wait"].value);
             value.setAttribute("Block", linkInput["Block"].value);
@@ -205,16 +183,16 @@ var CodeEditorDialog = function(editorUi,cell)
     td.style.whiteSpace = 'nowrap';
     td.setAttribute('align', 'right');
 
-    /*var cancelBtn = mxUtils.button(mxResources.get('cancel'), function()
+    var cancelBtn = mxUtils.button(mxResources.get('cancel'), function()
     {
         editorUi.hideDialog();
     });
-    cancelBtn.className = 'geBtn';
+    cancelBtn.className = 'geBtn gePrimaryBtn';
 
     if (editorUi.editor.cancelFirst)
     {
         td.appendChild(cancelBtn);
-    }*/
+    }
 
 
 
@@ -287,7 +265,7 @@ var StartNodeForm = function (editorUi, cell) {
     input.style.width = '300px';
     input.style.backgroundRepeat = 'no-repeat';
     input.style.backgroundPosition = '100% 50%';
-    input.style.paddingRight = '14px';
+    input.style.paddingRight = '0px';
     td.appendChild(input);
     row.appendChild(td);
 
