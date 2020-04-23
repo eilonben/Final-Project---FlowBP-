@@ -74,7 +74,10 @@ var BSyncForm = function(editorUi,cell)
 
         var genericBtn = mxUtils.button(mxResources.get('apply'), function()
         {
-            value.setAttribute("sync", "{\"request\":[\""+linkInput["Request"].value+"\"], \"wait\":[\""+linkInput["Wait"].value+"\"],\"block\":[\""+linkInput["Block"].value+"\"]}");
+            var lst = ["Request","Wait","Block"];
+            lst.map(x=>{if (linkInput[x].value.length != 0) linkInput[x].value= "\""+linkInput[x].value+"\"" });
+            value.setAttribute("sync", "{\"request\":["+linkInput["Request"].value+"], \"wait\":["+linkInput["Wait"].value+"],\"block\":["+linkInput["Block"].value+"]}");
+            lst.map(x=>{if (linkInput[x].value.length != 0) linkInput[x].value= linkInput[x].value.replace(/\"/g,'') });
             value.setAttribute("Request", linkInput["Request"].value);
             value.setAttribute("Wait", linkInput["Wait"].value);
             value.setAttribute("Block", linkInput["Block"].value);
