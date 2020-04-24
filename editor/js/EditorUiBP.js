@@ -110,3 +110,15 @@ EditorUiBP.prototype.endDebugging = function () {
 EditorUiBP.prototype.noUndo = function () {
     this.actions.get('undo').setEnabled(false);
 }
+
+EditorUiBP.prototype.saveFile = function(forceDialog)
+{
+    if (!forceDialog && this.editor.filename != null)  // save ..
+    {
+        this.save(this.editor.getOrCreateFilename());
+    }
+    else    //save as ..
+    {
+        ExportDialog.saveLocalFile(this, mxUtils.getXml(this.editor.getGraphXml()), this.editor.getOrCreateFilename(), "xml");
+    }
+};

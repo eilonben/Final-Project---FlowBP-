@@ -81,7 +81,11 @@ var BSyncForm = function(editorUi,cell)
             value.setAttribute("Request", linkInput["Request"].value);
             value.setAttribute("Wait", linkInput["Wait"].value);
             value.setAttribute("Block", linkInput["Block"].value);
+            // value.setAttribute("label","request: "+linkInput["Request"].value+"\nwait: "+linkInput["Wait"].value+"\nblock: "+linkInput["Block"].value);
             graph.getModel().setValue(cell, value);
+            // graph.updateCellSize(cell, true);
+
+
 
             editorUi.hideDialog();
         });
@@ -305,7 +309,7 @@ table.appendChild(tbody);
 this.container = table;
 };
 
-
+//for export & save as..  actions
 ExportDialog.saveLocalFile = function(editorUi, data, filename, format)
 {
 

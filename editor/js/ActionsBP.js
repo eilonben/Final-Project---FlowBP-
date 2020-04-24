@@ -156,6 +156,4 @@ ActionsBP.prototype.init = function(actions) {
 
      }, null, null);
 
-   
-
 };
