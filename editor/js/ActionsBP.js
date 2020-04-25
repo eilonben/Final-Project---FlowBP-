@@ -44,11 +44,15 @@ ActionsBP.prototype.init = function(actions) {
         graph.getModel().beginUpdate();
 
         ui.redo();
-        ui.disableActionsForDebugging(false);
-
         graph.clearSelection()
+        ui.noUndoRedo();
 
         graph.getModel().endUpdate();
+
+        if(lastUndo + 1 == editor.undoManager.indexOfNextAdd)
+            ui.enableBackSBS(true);
+        else if(editor.undoManager.indexOfNextAdd == editor.undoManager.history.length)
+            ui.enableNextSBS(false);
     }, false, null);
 
     actions.addAction('back_sbs', function() {
@@ -57,11 +61,15 @@ ActionsBP.prototype.init = function(actions) {
             graph.getModel().beginUpdate();
 
             ui.undo();
-            ui.disableActionsForDebugging(false);
-
             graph.clearSelection()
+            ui.noUndoRedo();
 
             graph.getModel().endUpdate();
+
+            if (editor.undoManager.indexOfNextAdd == lastUndo)
+                ui.enableBackSBS(false);
+            else if(editor.undoManager.indexOfNextAdd + 1 == editor.undoManager.history.length)
+                ui.enableNextSBS(true);
         }
     }, false, null);
 
@@ -74,9 +82,9 @@ ActionsBP.prototype.init = function(actions) {
             editor.undoManager.history.pop()
         }
 
-        ui.endDebugging();
-
         graph.clearSelection()
+
+        ui.endDebugging();
 
     }, false, null);
 
@@ -118,6 +126,7 @@ ActionsBP.prototype.init = function(actions) {
          //
 
          let numOfUndos = editor.undoManager.indexOfNextAdd - lastUndo
+
          for (let i = 0; i < numOfUndos; i++) {
              graph.model.beginUpdate();
 
@@ -126,11 +135,12 @@ ActionsBP.prototype.init = function(actions) {
              graph.model.endUpdate();
          }
 
+         graph.clearSelection()
+
          ui.startDebugging();
 
-         ui.noUndo();
-
-         graph.clearSelection()
+         if(numOfUndos == 0)
+             ui.enableNextSBS(false);
 
      }, null, null);
 };
