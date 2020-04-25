@@ -1,6 +1,7 @@
 window.sbs = {
-    stages: [],
-    curStage: -1
+    time: 0,
+    curStage: -1,
+    scenarios: {}
 };
 
 window.bpEngine = {
@@ -29,6 +30,7 @@ window.bpEngine = {
                     bt.stmt = fixStmt(bt.iterator.next().value)
                 }
             })
+            fixStages();
         }
     }
 };
@@ -72,6 +74,7 @@ function getRandomItem(set) {
     return items[Math.floor(Math.random() * items.length)];
 }
 
+function* goToFollowers(c, payload, ths, bpEngine, model, scen, curTime) {
 function* goToFollowers(c, payloads, bpEngine, model,outputs) {
     let edg = model.getEdges(c, false, true, true);
     if (edg.length > 0) {
@@ -85,6 +88,7 @@ function* goToFollowers(c, payloads, bpEngine, model,outputs) {
                     nextPayloads = outputs[edgeLabel];
                 }
                 yield* runInNewBT(target,nextPayloads, bpEngine,model);
+                yield* runInNewBT(target, nextPayload, bpEngine, curTime);
             }
         }
         // Run the first follower in the same thread.
@@ -96,10 +100,12 @@ function* goToFollowers(c, payloads, bpEngine, model,outputs) {
                 nextPayloads = outputs[edgeLabel];
             }
             yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model);
+            yield* runInSameBT(edg[0].getTerminal(false), nextPayload, ths, bpEngine, model, scen);
         }
     }
 }
 
+function* runInNewBT(c, payload, bpEngine, model, curTime) {
 function* runInNewBT(c, payloads, bpEngine, model) {
     // Cloning - Is this the right way?
     let outputs = {};
@@ -113,7 +119,14 @@ function* runInNewBT(c, payloads, bpEngine, model) {
             yield JSON.parse(c.getAttribute("sync"));
             // curr["selected"] = window.eventSelected;
         }
-        window.sbs.stages.push(c.id);
+
+        c.setAttribute("scenarioID", c.id);
+        window.sbs.scenarios[c.id] = [];
+        for(let i = 0; i < window.sbs.time + curTime - 1; i++)
+            window.sbs.scenarios[c.id].push(-1);
+        window.sbs.scenarios[c.id].push([c.id, cloned]);
+
+        yield* goToFollowers(c, cloned, this, bpEngine, model, c.id, curTime + 1);
         yield* goToFollowers(c, cloned, bpEngine,model,outputs);
     }());
 
@@ -127,6 +140,7 @@ function getshape(str) {
 function* runInSameBT(c, payloads, bpEngine, model) {
     let outputs = {};
     let curr = JSON.parse(JSON.stringify(payloads));
+function* runInSameBT(c, payload, ths, bpEngine, model, scen) {
     if (c.getAttribute("code") !== undefined) {
         eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
         outputs = func(curr);
@@ -136,15 +150,18 @@ function* runInSameBT(c, payloads, bpEngine, model) {
         // curr["selected"] = window.eventSelected;
     }
 
-    window.sbs.stages.push(c.id);
+    c.setAttribute("scenarioID", scen);
+    window.sbs.scenarios[scen].push([c.id, curr]);
 
+    yield *goToFollowers(c, curr, ths, bpEngine,model, scen);
     yield *goToFollowers(c, curr,  bpEngine,model,outputs);
-}
 
 function startRunning(model) {
 // Start the context nodes
-    let cells = model.cells;
-    let arr = Object.keys(cells).map(function (key) {
+    initSBS();
+
+    var cells = model.cells;
+    var arr = Object.keys(cells).map(function (key) {
         return cells[key]
     });
     let startNds = model.filterCells(arr,
@@ -156,26 +173,49 @@ function startRunning(model) {
         if (startNds[i].getAttribute("Payloads") !== undefined)
             payloads = (JSON.parse(startNds[i].getAttribute("Payloads")));
         runInNewBT(startNds[i], payloads, bpEngine, model).next();
+        runInNewBT(startNds[i], payload, bpEngine, model, 0).next();
     }
     window.bpEngine.run().next();
     window.bpEngine.BThreads = [];
 }
 
-function getNextStage() {
-    if(window.sbs.curStage < window.sbs.stages.length - 1)
-        return window.sbs.stages[++window.sbs.curStage]
-    return window.sbs.stages[window.sbs.curStage = window.sbs.stages.length - 1]
-}
+function getProgramRecord() {
+    var res = []
 
-function getPrevStage() {
-    if(window.sbs.curStage > 0)
-        return window.sbs.stages[--window.sbs.curStage]
-    return window.sbs.stages[window.sbs.curStage = 0]
+    while(window.sbs.curStage < window.sbs.time - 1) {
+        window.sbs.curStage++;
+
+        var curStage = []
+        var scens = Object.values(window.sbs.scenarios)
+        for (let i = 0; i < scens.length; i++) {
+            let cur = scens[i];
+            if (cur[window.sbs.curStage][0] != -1) {
+                curStage.push(cur[window.sbs.curStage])
+            }
+        }
+
+        res.push(curStage)
+    }
+    return res;
 }
 
 function initSBS() {
-    window.sbs.stages = []
+    window.sbs.scenarios = {}
     window.sbs.curStage = -1
+    window.sbs.time = 0
+}
+
+function fixStages() {
+    let scens = Object.values(window.sbs.scenarios)
+    const lengths = scens.map(x => x.length);
+    let curTime = Math.max(...lengths)
+    for(let i = 0; i < scens.length; i++)
+    {
+        let curScen = scens[i];
+        for (let j = 0; j < curTime - curScen.length; j++)
+            curScen.push(-1);
+    }
+    window.sbs.time = curTime
 }
 
 

@@ -6,6 +6,7 @@ ActionsBP.prototype.init = function(actions) {
     var ui = actions.editorUi;
     var editor = ui.editor;
     var graph = editor.graph;
+
     var lastUndo = 0;
 
     actions.addAction('editCode', function () {
@@ -19,6 +20,9 @@ ActionsBP.prototype.init = function(actions) {
     });
 
     actions.addAction('runModel', function() {
+        var cells = graph.getModel().cells;
+        fixValues(Object.values(cells));
+
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
         parse_graph(code);
@@ -38,120 +42,136 @@ ActionsBP.prototype.init = function(actions) {
 
     actions.addAction('next_sbs', function() {
         graph.getModel().beginUpdate();
-        var mod = graph.getModel();
 
-        var stage = getNextStage();
-
-        var cell = mod.getCell(stage);
-        var style = cell.getStyle();
-        style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
-        mod.setStyle(cell, style);
-
-        var edges = mod.getIncomingEdges(cell);
-        for(let i = 0; i < edges.length; i++){
-            var parent = edges[i].source
-            style = parent.getStyle();
-            if (style !== undefined) {
-                style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
-                mod.setStyle(parent, style);
-            }
-        }
+        ui.redo();
+        graph.clearSelection()
+        ui.noUndoRedo();
 
         graph.getModel().endUpdate();
 
-        ui.noUndo();
-
+        if(lastUndo + 1 == editor.undoManager.indexOfNextAdd)
+            ui.enableBackSBS(true);
+        else if(editor.undoManager.indexOfNextAdd == editor.undoManager.history.length)
+            ui.enableNextSBS(false);
     }, false, null);
 
     actions.addAction('back_sbs', function() {
-        graph.getModel().beginUpdate();
-        var mod = graph.getModel();
 
-        var stage = getPrevStage();
+        if(editor.undoManager.indexOfNextAdd > lastUndo) {
+            graph.getModel().beginUpdate();
 
-        var cell = mod.getCell(stage);
-        var style = cell.getStyle();
-        style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
-        mod.setStyle(cell, style);
+            ui.undo();
+            graph.clearSelection()
+            ui.noUndoRedo();
 
-        var edges = mod.getOutgoingEdges(cell);
-        for (let i = 0; i < edges.length; i++) {
-            var child = edges[i].target
-            style = child.getStyle();
-            if (style !== undefined) {
-                style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
-                mod.setStyle(child, style);
-            }
+            graph.getModel().endUpdate();
+
+            if (editor.undoManager.indexOfNextAdd == lastUndo)
+                ui.enableBackSBS(false);
+            else if(editor.undoManager.indexOfNextAdd + 1 == editor.undoManager.history.length)
+                ui.enableNextSBS(true);
         }
-
-        graph.getModel().endUpdate();
-
-        ui.noUndo();
-
     }, false, null);
 
     actions.addAction('stop_sbs', function() {
 
-        graph.getModel().beginUpdate();
-        initSBS()
-        var mod = graph.getModel();
-        var cells = Object.values(mod.cells);
-
-        for (let i = 0; i < cells.length; i++) {
-            var cell = cells[i]
-            var style = cell.getStyle();
-            if (style !== undefined) {
-                style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
-                mod.setStyle(cell, style);
-            }
+        editor.undoManager.indexOfNextAdd = editor.undoManager.history.length
+        var numOfNewUndos = editor.undoManager.history.length - lastUndo + 1;
+        while(numOfNewUndos-- > 0) {
+            ui.undo()
+            editor.undoManager.history.pop()
         }
 
-        mod.root.children.forEach(layer => {
-            if (mod.isLayer(layer)) {
-                var style = layer.getStyle();
-                style !== undefined ? style = style.replace('locked=1', 'locked=0') : style = 'locked=0';
-                mod.setStyle(layer, style);
-            }
-        });
+        graph.clearSelection()
 
         ui.endDebugging();
-
-        graph.getModel().endUpdate();
-
-        editor.undoManager.indexOfNextAdd = lastUndo;
-        var numOfNewUndos = editor.undoManager.history.length - lastUndo;
-        while(numOfNewUndos-- > 0) {
-            editor.undoManager.history.pop();
-        }
 
     }, false, null);
 
      actions.addAction('debug_sbs', function() {
 
-         lastUndo = editor.undoManager.indexOfNextAdd;
+         var cells = graph.getModel().cells;
+         fixValues(Object.values(cells));
 
-         graph.model.beginUpdate();
+         lastUndo = editor.undoManager.indexOfNextAdd + 1;
+
+         var mod = graph.getModel()
+         lockLayer(mod, true)
 
          var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
          console.log(code);
          parse_graph(code);
 
-         graph.selectionModel.cells = []
+         // coloring
+         var record = getProgramRecord();
 
-         var mod = graph.getModel();
-         mod.root.children.forEach(layer => {
-             if(mod.isLayer(layer)) {
-                 var style = layer.getStyle();
-                 style !== undefined ? style = style.replace('locked=0', 'locked=1') : style = 'locked=1';
-                 mod.setStyle(layer, style);
+         for (let i = 0; i < record.length; i++) {
+             graph.model.beginUpdate();
+
+             var curRec = record[i];
+             for (let j = 0; j < curRec.length; j++) {
+                 var cell = mod.getCell(curRec[j][0]);
+                 var val = cell.clone().getValue();
+                 val.setAttribute('Payload', curRec[j][1]);
+                 // indicator
+                 var style = cell.getStyle()
+                 style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
+                 mod.setStyle(cell, style);
+                 ////////////
+                 mod.setValue(cell, val);
              }
-         });
+
+             graph.model.endUpdate();
+         }
+         //
+
+         let numOfUndos = editor.undoManager.indexOfNextAdd - lastUndo
+
+         for (let i = 0; i < numOfUndos; i++) {
+             graph.model.beginUpdate();
+
+             ui.undo();
+
+             graph.model.endUpdate();
+         }
+
+         graph.clearSelection()
 
          ui.startDebugging();
 
-         graph.model.endUpdate();
-
-         ui.noUndo();
+         if(numOfUndos == 0)
+             ui.enableNextSBS(false);
 
      }, null, null);
 };
+
+function lockLayer(mod, lock) {
+    var locker;
+    lock ? locker = 1 : locker = 0;
+    mod.root.children.forEach(layer => {
+        if(mod.isLayer(layer)) {
+            var style = layer.getStyle();
+            style !== undefined ? style = style.replace('locked=' + locker, 'locked=' + !locker) : style = 'locked=' + locker;
+            mod.setStyle(layer, style);
+        }
+    });
+}
+
+function fixValues(cells) {
+    for(let i = 0; i < cells.length; i++)
+    {
+        let c = cells[i];
+        let value = c.getValue();
+
+        // Converts the value to an XML node
+        if (value == "")
+        {
+            var doc = mxUtils.createXmlDocument();
+            var obj = doc.createElement('object');
+            obj.setAttribute('label', value || '');
+            value = obj;
+        }
+
+        c.setValue(value);
+    }
+}
