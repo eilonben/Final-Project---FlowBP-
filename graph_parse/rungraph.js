@@ -106,8 +106,15 @@ function* runInNewBT(c, payloads, bpEngine, model) {
     let cloned = JSON.parse(JSON.stringify(payloads));
     window.bpEngine.registerBThread(function* () {
         if (c.getAttribute("code") !== undefined) {
+            try{
             eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
-            outputs = func(cloned);
+                outputs=func(cloned)
+            }
+            catch(e){
+                alert.log('There has been an error while executing the JS code on node ' +
+                     c.getId()+": \n" +e+" execution will now terminate.");
+                return;
+            }
         }
         if (c.getAttribute("sync") !== undefined) {
             yield JSON.parse(c.getAttribute("sync"));
@@ -126,19 +133,24 @@ function getshape(str) {
 
 function* runInSameBT(c, payloads, bpEngine, model) {
     let outputs = {};
-    let curr = JSON.parse(JSON.stringify(payloads));
+    let cloned = JSON.parse(JSON.stringify(payloads));
     if (c.getAttribute("code") !== undefined) {
+        try{
         eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
-        outputs = func(curr);
+            outputs=func(cloned)
+        }
+        catch(e){
+            alert('There has been an error while executing the JS code on node ' +
+                c.getId()+": \n" +e+".\n execution will now terminate.");
+            return;
+        }
     }
     if (c.getAttribute("sync") !== undefined) {
         yield JSON.parse(c.getAttribute("sync"));
         // curr["selected"] = window.eventSelected;
     }
-
     window.sbs.stages.push(c.id);
-
-    yield *goToFollowers(c, curr,  bpEngine,model,outputs);
+    yield *goToFollowers(c, cloned,bpEngine,model,outputs);
 }
 
 function startRunning(model) {
