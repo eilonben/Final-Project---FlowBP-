@@ -74,8 +74,7 @@ function getRandomItem(set) {
     return items[Math.floor(Math.random() * items.length)];
 }
 
-function* goToFollowers(c, payload, ths, bpEngine, model, scen, curTime) {
-function* goToFollowers(c, payloads, bpEngine, model,outputs) {
+function* goToFollowers(c, payloads, bpEngine, model, outputs, scen, curTime) {
     let edg = model.getEdges(c, false, true, true);
     if (edg.length > 0) {
         // Run extra followers in new threads
@@ -87,8 +86,7 @@ function* goToFollowers(c, payloads, bpEngine, model,outputs) {
                 if(edgeLabel!==undefined && outputs!==undefined && outputs[edgeLabel]!== undefined){
                     nextPayloads = outputs[edgeLabel];
                 }
-                yield* runInNewBT(target,nextPayloads, bpEngine,model);
-                yield* runInNewBT(target, nextPayload, bpEngine, curTime);
+                yield* runInNewBT(target, nextPayloads, bpEngine, model, curTime);
             }
         }
         // Run the first follower in the same thread.
@@ -99,14 +97,12 @@ function* goToFollowers(c, payloads, bpEngine, model,outputs) {
             if(edgeLabel!==undefined && outputs!==undefined && outputs[edgeLabel]!== undefined){
                 nextPayloads = outputs[edgeLabel];
             }
-            yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model);
-            yield* runInSameBT(edg[0].getTerminal(false), nextPayload, ths, bpEngine, model, scen);
+            yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model, scen);
         }
     }
 }
 
-function* runInNewBT(c, payload, bpEngine, model, curTime) {
-function* runInNewBT(c, payloads, bpEngine, model) {
+function* runInNewBT(c, payloads, bpEngine, model, curTime) {
     // Cloning - Is this the right way?
     let outputs = {};
     let cloned = JSON.parse(JSON.stringify(payloads));
@@ -126,8 +122,7 @@ function* runInNewBT(c, payloads, bpEngine, model) {
             window.sbs.scenarios[c.id].push(-1);
         window.sbs.scenarios[c.id].push([c.id, cloned]);
 
-        yield* goToFollowers(c, cloned, this, bpEngine, model, c.id, curTime + 1);
-        yield* goToFollowers(c, cloned, bpEngine,model,outputs);
+        yield* goToFollowers(c, cloned, bpEngine,model,outputs, c.id, curTime + 1);
     }());
 
 };
@@ -137,10 +132,9 @@ function getshape(str) {
     return arr[0].split("=")[1].split(".")[1];
 }
 
-function* runInSameBT(c, payloads, bpEngine, model) {
+function* runInSameBT(c, payloads, bpEngine, model, scen) {
     let outputs = {};
     let curr = JSON.parse(JSON.stringify(payloads));
-function* runInSameBT(c, payload, ths, bpEngine, model, scen) {
     if (c.getAttribute("code") !== undefined) {
         eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
         outputs = func(curr);
@@ -153,8 +147,8 @@ function* runInSameBT(c, payload, ths, bpEngine, model, scen) {
     c.setAttribute("scenarioID", scen);
     window.sbs.scenarios[scen].push([c.id, curr]);
 
-    yield *goToFollowers(c, curr, ths, bpEngine,model, scen);
-    yield *goToFollowers(c, curr,  bpEngine,model,outputs);
+    yield* goToFollowers(c, curr, bpEngine, model, outputs, scen);
+}
 
 function startRunning(model) {
 // Start the context nodes
@@ -172,8 +166,7 @@ function startRunning(model) {
         let payloads = [{}];
         if (startNds[i].getAttribute("Payloads") !== undefined)
             payloads = (JSON.parse(startNds[i].getAttribute("Payloads")));
-        runInNewBT(startNds[i], payloads, bpEngine, model).next();
-        runInNewBT(startNds[i], payload, bpEngine, model, 0).next();
+        runInNewBT(startNds[i], payloads, bpEngine, model, 0).next();
     }
     window.bpEngine.run().next();
     window.bpEngine.BThreads = [];

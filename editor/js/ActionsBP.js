@@ -112,7 +112,7 @@ ActionsBP.prototype.init = function(actions) {
              for (let j = 0; j < curRec.length; j++) {
                  var cell = mod.getCell(curRec[j][0]);
                  var val = cell.clone().getValue();
-                 val.setAttribute('Payload', curRec[j][1]);
+                 val.setAttribute('Payloads', curRec[j][1]);
                  // indicator
                  var style = cell.getStyle()
                  style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');

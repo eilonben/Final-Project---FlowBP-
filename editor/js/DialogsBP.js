@@ -195,7 +195,7 @@ var CodeEditorDialog = function(editorUi,cell)
     if (editorUi.editor.cancelFirst)
     {
         td.appendChild(cancelBtn);
-    }*/
+    }
     td = document.createElement('td');
     mxUtils.write(td, "}");
     
