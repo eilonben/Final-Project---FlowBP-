@@ -67,31 +67,30 @@ var BSyncForm = function (editorUi, cell) {
     td.style.whiteSpace = 'nowrap';
     td.setAttribute('align', 'left');
 
-    {
-
-        var genericBtn = mxUtils.button(mxResources.get('apply'), function () {
-            var lst = ["Request", "Wait", "Block"];
-            lst.map(x => {
-                if (linkInput[x].value.length != 0) linkInput[x].value = "\"" + linkInput[x].value + "\""
-            });
-            value.setAttribute("sync", "{\"request\":[" + linkInput["Request"].value + "], \"wait\":[" + linkInput["Wait"].value + "],\"block\":[" + linkInput["Block"].value + "]}");
-            lst.map(x => {
-                if (linkInput[x].value.length != 0) linkInput[x].value = linkInput[x].value.replace(/\"/g, '')
-            });
-            value.setAttribute("Request", linkInput["Request"].value);
-            value.setAttribute("Wait", linkInput["Wait"].value);
-            value.setAttribute("Block", linkInput["Block"].value);
-            value.setAttribute("label","request: "+linkInput["Request"].value+"\nwait: "+linkInput["Wait"].value+"\nblock: "+linkInput["Block"].value);
-            graph.getModel().setValue(cell, value);
-            // graph.updateCellSize(cell, true);
-
-
-
-            editorUi.hideDialog();
+    var genericBtn = mxUtils.button(mxResources.get('apply'), function () {
+        var lst = ["Request", "Wait", "Block"];
+        lst.map(x => {
+            if (linkInput[x].value.length != 0) linkInput[x].value = "\"" + linkInput[x].value + "\""
         });
-        genericBtn.className = 'geBtn gePrimaryBtn';
-        td.appendChild(genericBtn);
-    }
+        value.setAttribute("sync", "{\"request\":[" + linkInput["Request"].value + "], \"wait\":[" + linkInput["Wait"].value + "],\"block\":[" + linkInput["Block"].value + "]}");
+        lst.map(x => {
+            if (linkInput[x].value.length != 0) linkInput[x].value = linkInput[x].value.replace(/\"/g, '')
+        });
+        value.setAttribute("Request", linkInput["Request"].value);
+        value.setAttribute("Wait", linkInput["Wait"].value);
+        value.setAttribute("Block", linkInput["Block"].value);
+        value.setAttribute("label","request: "+linkInput["Request"].value+"\nwait: "+linkInput["Wait"].value+"\nblock: "+linkInput["Block"].value);
+        graph.getModel().setValue(cell, value);
+        // graph.updateCellSize(cell, true);
+
+
+
+        editorUi.hideDialog();
+    });
+    genericBtn.className = 'geBtn gePrimaryBtn';
+    td.appendChild(genericBtn);
+
+
 
     if (!editorUi.editor.cancelFirst) {
         td.appendChild(genericBtn);

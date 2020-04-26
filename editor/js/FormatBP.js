@@ -242,7 +242,6 @@ FormatBP.prototype.refresh = function () {
 
 
         } else if (getshape(cell.getStyle()) == "bsync") {
-            if (cell != null) {
                 var dlg = new BSyncForm(ui, cell);
                 //dlg.container.style.width="100%";
                 var cont = document.getElementsByClassName("geFormatContainer")[0];
@@ -253,13 +252,12 @@ FormatBP.prototype.refresh = function () {
                 textnode.innerHTML = '<font size="3">BSync Node</font>';
                 bsyncDIV.appendChild(textnode);
                 bsyncDIV.appendChild(dlg.container);
-
                 dlg.init();
-
-
                 cont.appendChild(bsyncDIV);
+                if (cell.getAttribute('label',undefined)==undefined){
+                    graph.setAttributeForCell(cell,"label","request:\nwait:\nblock:");
+                }
 
-            }
         } else if (getshape(cell.getStyle()) == "general") {
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
