@@ -120,7 +120,7 @@ function* runInNewBT(c, payloads, bpEngine, model, curTime) {
         }
         if (c.getAttribute("sync") !== undefined) {
             yield JSON.parse(c.getAttribute("sync"));
-            // curr["selected"] = window.eventSelected;
+            // cloned["selected"] = window.eventSelected;
         }
 
         c.setAttribute("scenarioID", c.id);
@@ -155,13 +155,13 @@ function* runInSameBT(c, payloads, bpEngine, model, scen) {
     }
     if (c.getAttribute("sync") !== undefined) {
         yield JSON.parse(c.getAttribute("sync"));
-        // curr["selected"] = window.eventSelected;
+        // cloned["selected"] = window.eventSelected;
     }
 
     c.setAttribute("scenarioID", scen);
-    window.sbs.scenarios[scen].push([c.id, curr]);
+    window.sbs.scenarios[scen].push([c.id, cloned]);
 
-    yield* goToFollowers(c, curr, bpEngine, model, outputs, scen);
+    yield* goToFollowers(c, cloned, bpEngine, model, outputs, scen);
 }
 
 function startRunning(model) {
