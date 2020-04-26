@@ -67,27 +67,30 @@ var BSyncForm = function (editorUi, cell) {
     td.style.whiteSpace = 'nowrap';
     td.setAttribute('align', 'left');
 
-    {
-
-        var genericBtn = mxUtils.button(mxResources.get('apply'), function () {
-            var lst = ["Request", "Wait", "Block"];
-            lst.map(x => {
-                if (linkInput[x].value.length != 0) linkInput[x].value = "\"" + linkInput[x].value + "\""
-            });
-            value.setAttribute("sync", "{\"request\":[" + linkInput["Request"].value + "], \"wait\":[" + linkInput["Wait"].value + "],\"block\":[" + linkInput["Block"].value + "]}");
-            lst.map(x => {
-                if (linkInput[x].value.length != 0) linkInput[x].value = linkInput[x].value.replace(/\"/g, '')
-            });
-            value.setAttribute("Request", linkInput["Request"].value);
-            value.setAttribute("Wait", linkInput["Wait"].value);
-            value.setAttribute("Block", linkInput["Block"].value);
-            graph.getModel().setValue(cell, value);
-
-            editorUi.hideDialog();
+    var genericBtn = mxUtils.button(mxResources.get('apply'), function () {
+        var lst = ["Request", "Wait", "Block"];
+        lst.map(x => {
+            if (linkInput[x].value.length != 0) linkInput[x].value = "\"" + linkInput[x].value + "\""
         });
-        genericBtn.className = 'geBtn gePrimaryBtn';
-        td.appendChild(genericBtn);
-    }
+        value.setAttribute("sync", "{\"request\":[" + linkInput["Request"].value + "], \"wait\":[" + linkInput["Wait"].value + "],\"block\":[" + linkInput["Block"].value + "]}");
+        lst.map(x => {
+            if (linkInput[x].value.length != 0) linkInput[x].value = linkInput[x].value.replace(/\"/g, '')
+        });
+        value.setAttribute("Request", linkInput["Request"].value);
+        value.setAttribute("Wait", linkInput["Wait"].value);
+        value.setAttribute("Block", linkInput["Block"].value);
+        value.setAttribute("label","request: "+linkInput["Request"].value+"\nwait: "+linkInput["Wait"].value+"\nblock: "+linkInput["Block"].value);
+        graph.getModel().setValue(cell, value);
+        // graph.updateCellSize(cell, true);
+
+
+
+        editorUi.hideDialog();
+    });
+    genericBtn.className = 'geBtn gePrimaryBtn';
+    td.appendChild(genericBtn);
+
+
 
     if (!editorUi.editor.cancelFirst) {
         td.appendChild(genericBtn);
@@ -305,4 +308,31 @@ var StartNodeForm = function (editorUi, cell) {
     tbody.appendChild(row);
     table.appendChild(tbody);
     this.container = table;
+};
+
+//for export & save as..  actions
+ExportDialog.saveLocalFile = function(editorUi, data, filename, format)
+{
+
+        editorUi.hideDialog();
+        function download(data, filename, type) {
+            var file = new Blob([data], {type: type});
+            if (window.navigator.msSaveOrOpenBlob) // IE10+
+                window.navigator.msSaveOrOpenBlob(file, filename);
+            else { // Others
+                var a = document.createElement("a"),
+                    url = URL.createObjectURL(file);
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(function() {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 0);
+            }
+        }
+        download(data,filename,format);
+
+
 };
