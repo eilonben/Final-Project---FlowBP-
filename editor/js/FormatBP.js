@@ -68,13 +68,13 @@ function adjustEdges(cell, numOfOutputs, graphModel) {
     }
 };
 
-function updateEdgesLabels(cell, numOfOutputs, graphModel) {
+function updateEdgesLabels(cell, numOfOutputs, graphModel, cellValue) {
     var outEdges = getOutEdges(cell);
     graphModel.beginUpdate();
     try {
         for (let i = 0; i < outEdges.length; i++) {
             var value = graphModel.getValue(outEdges[i]);
-            value.setAttribute('label', cell.getAttribute('Outputnumber' + (outEdges[i].getAttribute('labelNum'))));
+            value.setAttribute('label', cellValue.getAttribute('Outputnumber' + (outEdges[i].getAttribute('labelNum'))));
             graphModel.setValue(outEdges[i], value);
         }
     } finally {
@@ -371,7 +371,7 @@ FormatBP.prototype.refresh = function () {
                         for (var i = 0; i < numOfOutputs; i++) {
                             value.setAttribute("Outputnumber" + (i + 1), document.getElementById("nodeID" + cell.id + "Outputnumber" + (i + 1)).value);
                         }
-                        updateEdgesLabels(cell, NumberOfOutPutBox.value, graph.getModel());
+                        updateEdgesLabels(cell, NumberOfOutPutBox.value, graph.getModel(), value);
                         graph.getModel().setValue(cell, value);
                     };
                 }
@@ -383,7 +383,6 @@ FormatBP.prototype.refresh = function () {
             generalDIV.appendChild(OutputLabelDIV);
             //add the DIV to cont
             cont.appendChild(generalDIV);
-            graph.getModel().setValue(cell, value);
 
         } else if (getshape(cell.getStyle()) == "startnode") {
             // var dlg = new StartNodeForm(ui, cell);
@@ -468,7 +467,7 @@ FormatBP.prototype.refresh = function () {
                             }
                         }
                         value.setAttribute("Payloads", JSON.stringify(Payloads));
-                        updateEdgesLabels(cell, NumberOfPayloadsBox.value, graph.getModel());
+                        //updateEdgesLabels(cell, NumberOfPayloadsBox.value, graph.getModel(), value);
                         graph.getModel().setValue(cell, value);
                     };
                 }
@@ -481,7 +480,7 @@ FormatBP.prototype.refresh = function () {
 
 
             cont.appendChild(startnodeDIV);
-            graph.getModel().setValue(cell, value);
+            //graph.getModel().setValue(cell, value);
         }
 
     }
