@@ -254,9 +254,7 @@ FormatBP.prototype.refresh = function () {
                 bsyncDIV.appendChild(dlg.container);
                 dlg.init();
                 cont.appendChild(bsyncDIV);
-                if (cell.getAttribute('label',undefined)==undefined){
-                    graph.setAttributeForCell(cell,"label","request:\nwait:\nblock:");
-                }
+            
 
         } else if (getshape(cell.getStyle()) == "general") {
             var cont = document.getElementsByClassName("geFormatContainer")[0];
