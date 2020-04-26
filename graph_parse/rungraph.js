@@ -97,7 +97,7 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen, curTime) {
             if(edgeLabel!==undefined && outputs!==undefined && outputs[edgeLabel]!== undefined){
                 nextPayloads = outputs[edgeLabel];
             }
-            yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model, scen);
+            yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model, scen, curTime);
         }
     }
 }
@@ -125,8 +125,8 @@ function* runInNewBT(c, payloads, bpEngine, model, curTime) {
 
         c.setAttribute("scenarioID", c.id);
         window.sbs.scenarios[c.id] = [];
-        for(let i = 0; i < window.sbs.time + curTime - 1; i++)
-            window.sbs.scenarios[c.id].push(-1);
+        for(let i = 0; i < curTime; i++)
+            window.sbs.scenarios[c.id].push([-1, null]);
         window.sbs.scenarios[c.id].push([c.id, cloned]);
 
         yield* goToFollowers(c, cloned, bpEngine,model,outputs, c.id, curTime + 1);
@@ -139,7 +139,7 @@ function getshape(str) {
     return arr[0].split("=")[1].split(".")[1];
 }
 
-function* runInSameBT(c, payloads, bpEngine, model, scen) {
+function* runInSameBT(c, payloads, bpEngine, model, scen, curTime) {
     let outputs = {};
     let cloned = JSON.parse(JSON.stringify(payloads));
     if (c.getAttribute("code") !== undefined) {
@@ -161,7 +161,7 @@ function* runInSameBT(c, payloads, bpEngine, model, scen) {
     c.setAttribute("scenarioID", scen);
     window.sbs.scenarios[scen].push([c.id, cloned]);
 
-    yield* goToFollowers(c, cloned, bpEngine, model, outputs, scen);
+    yield* goToFollowers(c, cloned, bpEngine, model, outputs, scen, curTime + 1);
 }
 
 function startRunning(model) {
@@ -220,7 +220,7 @@ function fixStages() {
     {
         let curScen = scens[i];
         for (let j = 0; j < curTime - curScen.length; j++)
-            curScen.push(-1);
+            curScen.push([-1, null]);
     }
     window.sbs.time = curTime
 }
