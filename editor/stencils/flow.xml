@@ -18,7 +18,7 @@
 		</foreground>
 	</shape>
 
-	<shape name="BSync" h="25" w="100" aspect="variable" strokewidth="inherit">
+	<shape name="BSync" h="40" w="100" aspect="variable" strokewidth="inherit">
 		<connections>
 			<constraint x="1" y="0.5" perimeter="0" name="E" />
 		</connections>
@@ -26,8 +26,8 @@
 			<path>
 				<move x="0" y="0" />
 				<line x="100" y="0" />
-				<line x="100" y="25" />
-				<line x="0" y="25" />
+				<line x="100" y="40" />
+				<line x="0" y="40" />
 				<close />
 			</path>
 		</background>

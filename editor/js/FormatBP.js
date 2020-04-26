@@ -68,13 +68,13 @@ function adjustEdges(cell, numOfOutputs, graphModel) {
     }
 };
 
-function updateEdgesLabels(cell, numOfOutputs, graphModel) {
+function updateEdgesLabels(cell, numOfOutputs, graphModel,cellValue) {
     var outEdges = getOutEdges(cell);
     graphModel.beginUpdate();
     try {
         for (let i = 0; i < outEdges.length ; i++) {
             var value = graphModel.getValue(outEdges[i]);
-            value.setAttribute('label',cell.getAttribute('Outputnumber'+ (outEdges[i].getAttribute('labelNum'))));
+            value.setAttribute('label',cellValue.getAttribute('Outputnumber'+ (outEdges[i].getAttribute('labelNum'))));
             graphModel.setValue(outEdges[i],value);
         }
     }finally {
@@ -334,7 +334,7 @@ FormatBP.prototype.refresh = function() {
                 adjustEdges(cell,parseInt(NumberOfOutPutBox.value), graph.getModel());
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
-                adjustConnectionConstraint(cell,parseInt(NumberOfOutPutBox.value))
+                adjustConnectionConstraint(cell,parseInt(NumberOfOutPutBox.value));
                 graph.getModel().setValue(cell, value);
                 createLabels(NumberOfOutPutBox.value);
 
@@ -370,15 +370,14 @@ FormatBP.prototype.refresh = function() {
 
                 if (numOfOutputs >= 1) {
                     var applyButtonLabels = createApplyButton();
-                    InnerDIVOutputLabel.appendChild(applyButtonLabels);
-
                     applyButtonLabels.onclick = function () {
                         for (var i = 0; i < numOfOutputs; i++) {
                             value.setAttribute("Outputnumber" + (i + 1), document.getElementById("nodeID" + cell.id + "Outputnumber" + (i + 1)).value);
                         }
-                        updateEdgesLabels(cell,NumberOfOutPutBox.value,graph.getModel());
+                        updateEdgesLabels(cell,NumberOfOutPutBox.value,graph.getModel(),value);
                         graph.getModel().setValue(cell, value);
                     };
+                    InnerDIVOutputLabel.appendChild(applyButtonLabels);
                 }
                 OutputLabelDIV.appendChild(InnerDIVOutputLabel);
             };
@@ -388,7 +387,7 @@ FormatBP.prototype.refresh = function() {
             generalDIV.appendChild(OutputLabelDIV);
             //add the DIV to cont
             cont.appendChild(generalDIV);
-            graph.getModel().setValue(cell, value);
+
 
         } else if (getshape(cell.getStyle()) == "startnode") {
             var dlg = new StartNodeForm(ui, cell);
