@@ -1,12 +1,10 @@
-var BSyncForm = function(editorUi,cell)
-{
+var BSyncForm = function (editorUi, cell) {
 
     var graph = editorUi.editor.graph;
     var value = graph.getModel().getValue(cell);
 
     // Converts the value to an XML node
-    if (!mxUtils.isNode(value))
-    {
+    if (!mxUtils.isNode(value)) {
         var doc = mxUtils.createXmlDocument();
         var obj = doc.createElement('object');
         obj.setAttribute('label', value || '');
@@ -34,14 +32,13 @@ var BSyncForm = function(editorUi,cell)
     row.appendChild(td);
     tbody.appendChild(row);
 
-    this.init = function()
-    {
+    this.init = function () {
 
     };
 
     var linkInput = {};
 
-    addSec = function(lbl) {
+    addSec = function (lbl) {
         mxUtils.write(td, lbl);
         linkInput[lbl] = document.createElement('input');
         linkInput[lbl].setAttribute('type', 'text');
@@ -55,7 +52,7 @@ var BSyncForm = function(editorUi,cell)
 
         tbody.appendChild(row);
 
-        if(value.getAttribute(lbl) != undefined)
+        if (value.getAttribute(lbl) != undefined)
             linkInput[lbl].value = value.getAttribute(lbl);
     }
 
@@ -72,12 +69,15 @@ var BSyncForm = function(editorUi,cell)
 
     {
 
-        var genericBtn = mxUtils.button(mxResources.get('apply'), function()
-        {
-            var lst = ["Request","Wait","Block"];
-            lst.map(x=>{if (linkInput[x].value.length != 0) linkInput[x].value= "\""+linkInput[x].value+"\"" });
-            value.setAttribute("sync", "{\"request\":["+linkInput["Request"].value+"], \"wait\":["+linkInput["Wait"].value+"],\"block\":["+linkInput["Block"].value+"]}");
-            lst.map(x=>{if (linkInput[x].value.length != 0) linkInput[x].value= linkInput[x].value.replace(/\"/g,'') });
+        var genericBtn = mxUtils.button(mxResources.get('apply'), function () {
+            var lst = ["Request", "Wait", "Block"];
+            lst.map(x => {
+                if (linkInput[x].value.length != 0) linkInput[x].value = "\"" + linkInput[x].value + "\""
+            });
+            value.setAttribute("sync", "{\"request\":[" + linkInput["Request"].value + "], \"wait\":[" + linkInput["Wait"].value + "],\"block\":[" + linkInput["Block"].value + "]}");
+            lst.map(x => {
+                if (linkInput[x].value.length != 0) linkInput[x].value = linkInput[x].value.replace(/\"/g, '')
+            });
             value.setAttribute("Request", linkInput["Request"].value);
             value.setAttribute("Wait", linkInput["Wait"].value);
             value.setAttribute("Block", linkInput["Block"].value);
@@ -93,8 +93,7 @@ var BSyncForm = function(editorUi,cell)
         td.appendChild(genericBtn);
     }
 
-    if (!editorUi.editor.cancelFirst)
-    {
+    if (!editorUi.editor.cancelFirst) {
         td.appendChild(genericBtn);
     }
 
@@ -109,15 +108,13 @@ var BSyncForm = function(editorUi,cell)
 /**
  * Constructs a new code editor dialog.
  */
-var CodeEditorDialog = function(editorUi,cell)
-{
+var CodeEditorDialog = function (editorUi, cell) {
 
     var graph = editorUi.editor.graph;
     var value = graph.getModel().getValue(cell);
 
     // Converts the value to an XML node
-    if (!mxUtils.isNode(value))
-    {
+    if (!mxUtils.isNode(value)) {
         var doc = mxUtils.createXmlDocument();
         var obj = doc.createElement('object');
         obj.setAttribute('label', value || '');
@@ -138,7 +135,7 @@ var CodeEditorDialog = function(editorUi,cell)
     td = document.createElement('td');
     td.style.fontSize = '10pt';
     td.style.width = '100px';
-    mxUtils.write(td, "Code Editor");
+    mxUtils.write(td, "Code Editor: GeneralBlockFunction(Payloads){");
 
     row.appendChild(td);
     tbody.appendChild(row);
@@ -167,8 +164,7 @@ var CodeEditorDialog = function(editorUi,cell)
     this.textarea = nameInput;
 
 
-    this.init = function()
-    {
+    this.init = function () {
         nameInput.focus();
         nameInput.scrollTop = 0;
 
@@ -190,22 +186,29 @@ var CodeEditorDialog = function(editorUi,cell)
     td.style.whiteSpace = 'nowrap';
     td.setAttribute('align', 'right');
 
-    var cancelBtn = mxUtils.button(mxResources.get('cancel'), function()
-    {
+    var cancelBtn = mxUtils.button(mxResources.get('cancel'), function () {
         editorUi.hideDialog();
     });
     cancelBtn.className = 'geBtn gePrimaryBtn';
 
-    if (editorUi.editor.cancelFirst)
-    {
+    if (editorUi.editor.cancelFirst) {
         td.appendChild(cancelBtn);
     }
-
+    td = document.createElement('td');
+    mxUtils.write(td, "}");
 
 
     {
-        var genericBtn = mxUtils.button(mxResources.get('apply'), function()
-        {
+        let genericBtn = mxUtils.button(mxResources.get('apply'), function () {
+
+            try {
+                let syntax = esprima.parseScript(editor.getValue());
+                console.log(JSON.stringify(syntax, null, 4));
+            }
+            catch(error){
+                alert("There has been a syntax error in the javaScript code.\n " + error);
+                return;
+            }
             editorUi.hideDialog();
             value.setAttribute("code", editor.getValue());
             graph.getModel().setValue(cell, value);
@@ -215,8 +218,7 @@ var CodeEditorDialog = function(editorUi,cell)
         td.appendChild(genericBtn);
     }
 
-    if (!editorUi.editor.cancelFirst)
-    {
+    if (!editorUi.editor.cancelFirst) {
         td.appendChild(cancelBtn);
     }
 
@@ -282,31 +284,31 @@ var StartNodeForm = function (editorUi, cell) {
         input.value = value.getAttribute("payload");
 
 
-row = document.createElement('tr');
-td = document.createElement('td');
-td.style.paddingTop = '14px';
-td.style.whiteSpace = 'nowrap';
-td.setAttribute('align', 'left');
-{
+    row = document.createElement('tr');
+    td = document.createElement('td');
+    td.style.paddingTop = '14px';
+    td.style.whiteSpace = 'nowrap';
+    td.setAttribute('align', 'left');
+    {
 
-    var genericBtn = mxUtils.button(mxResources.get('apply'), function () {
-        value.setAttribute("payload", input.value);
-        graph.getModel().setValue(cell, value);
+        var genericBtn = mxUtils.button(mxResources.get('apply'), function () {
+            value.setAttribute("payload", input.value);
+            graph.getModel().setValue(cell, value);
 
-        editorUi.hideDialog();
-    });
-    genericBtn.className = 'geBtn gePrimaryBtn';
-    td.appendChild(genericBtn);
-}
+            editorUi.hideDialog();
+        });
+        genericBtn.className = 'geBtn gePrimaryBtn';
+        td.appendChild(genericBtn);
+    }
 
-if (!editorUi.editor.cancelFirst) {
-    td.appendChild(genericBtn);
-}
+    if (!editorUi.editor.cancelFirst) {
+        td.appendChild(genericBtn);
+    }
 
-row.appendChild(td);
-tbody.appendChild(row);
-table.appendChild(tbody);
-this.container = table;
+    row.appendChild(td);
+    tbody.appendChild(row);
+    table.appendChild(tbody);
+    this.container = table;
 };
 
 //for export & save as..  actions

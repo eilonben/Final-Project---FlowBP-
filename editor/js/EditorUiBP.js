@@ -14,6 +14,7 @@
 // };
 //
 // EditorUIBP.prototype.constructor = EditorUi;
+EditorUiBP.prototype.preDebugActions = []
 
 function EditorUiBP(editor, container, lightbox) {
     EditorUi.call(this,editor, container, lightbox);
@@ -73,23 +74,38 @@ EditorUiBP.prototype.createTemporaryGraph = function(stylesheet)
 
 // EditorUiBP.prototype.constructor = EditorUi;
 
-EditorUiBP.prototype.disableActionsForDebugging = function (bool) {
+EditorUiBP.prototype.disableActionsForDebugging = function () {
 
     var actions = Object.values(this.actions.actions);
+    EditorUiBP.prototype.preDebugActions = [];
 
     for (var i = 0; i < actions.length; i++) {
-        actions[i].setEnabled(bool);
+        EditorUiBP.prototype.preDebugActions.push([actions[i], actions[i].isEnabled()])
+        actions[i].setEnabled(false);
+    }
+
+    actions = ['stop_sbs', 'next_sbs'];
+    for (var i = 0; i < actions.length; i++) {
+        this.actions.get(actions[i]).setEnabled(true);
+    }
+}
+
+
+EditorUiBP.prototype.enableActionsAfterDebugging = function () {
+
+    for (var i = 0; i < EditorUiBP.prototype.preDebugActions.length; i++) {
+        var action = EditorUiBP.prototype.preDebugActions[i];
+        action[0].setEnabled(action[1]);
     }
 
     actions = ['stop_sbs', 'next_sbs', 'back_sbs'];
     for (var i = 0; i < actions.length; i++) {
-        this.actions.get(actions[i]).setEnabled(!bool);
+        this.actions.get(actions[i]).setEnabled(false);
     }
 }
 
 EditorUiBP.prototype.startDebugging = function () {
-
-    this.disableActionsForDebugging(false);
+    this.disableActionsForDebugging();
 
     this.toggleFormatPanel(true);
     this.sidebar.showTooltips = false;
@@ -100,15 +116,23 @@ EditorUiBP.prototype.startDebugging = function () {
 }
 
 EditorUiBP.prototype.endDebugging = function () {
-
-    this.disableActionsForDebugging(true);
-
+    this.enableActionsAfterDebugging();
+    this.hsplit.style.left = '12px';
     this.sidebarContainer.style.visibility = 'visible';
     this.toggleFormatPanel();
 }
 
-EditorUiBP.prototype.noUndo = function () {
+EditorUiBP.prototype.noUndoRedo = function () {
     this.actions.get('undo').setEnabled(false);
+    this.actions.get('redo').setEnabled(false);
+}
+
+EditorUiBP.prototype.enableBackSBS = function (bool) {
+    this.actions.get('back_sbs').setEnabled(bool);
+}
+
+EditorUiBP.prototype.enableNextSBS = function (bool) {
+    this.actions.get('next_sbs').setEnabled(bool);
 }
 
 EditorUiBP.prototype.saveFile = function(forceDialog)

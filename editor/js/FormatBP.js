@@ -1,21 +1,21 @@
-function removeAttribute (cell,name) {
+function removeAttribute(cell, name) {
     var userObject = cell.getValue();
     if (userObject != null && userObject.nodeType == mxConstants.NODETYPE_ELEMENT)
         userObject.removeAttribute(name);
 };
 
 function deletePrevLabels(cell, value, graph) {
-    var prevAmount =cell.getAttribute('numberOfOutputs',1);
-    for (let i = prevAmount; i >value ; i--) {
-        removeAttribute(cell,'Outputnumber'+i);
+    var prevAmount = cell.getAttribute('numberOfOutputs', 1);
+    for (let i = prevAmount; i > value; i--) {
+        removeAttribute(cell, 'Outputnumber' + i);
     }
 }
 
-function adjustConnectionConstraint(cell, connection_number){
+function adjustConnectionConstraint(cell, connection_number) {
     cell.new_constraints = [];
     var interval = 1 / (connection_number + 1);
-    for(var i = 1; i <= connection_number ; i++)
-        cell.new_constraints.push(new mxConnectionConstraint(new mxPoint(1, interval*i), true));
+    for (var i = 1; i <= connection_number; i++)
+        cell.new_constraints.push(new mxConnectionConstraint(new mxPoint(1, interval * i), true));
 
 }
 
@@ -44,21 +44,21 @@ function getValueByKey(style, key) {
 
 function adjustEdges(cell, numOfOutputs, graphModel) {
     var oldNumOfOutput = 1;
-    if(cell.new_constraints != null)
+    if (cell.new_constraints != null)
         oldNumOfOutput = cell.new_constraints.length;
     //need to adjust old arrows to new location
     var outEdges = getOutEdges(cell);
     graphModel.beginUpdate();
     try {
-        for (let i = 0; i <  outEdges.length; i++) {
+        for (let i = 0; i < outEdges.length; i++) {
             // get old location of edge
             var constraintNumber = parseInt(outEdges[i].getAttribute('labelNum'));
             //check if edge should erase
-            if(constraintNumber > numOfOutputs)
-                graphModel.remove(outEdges[i],true);
-            else{
-            //    relocate edge exit location of edge
-                var newY = constraintNumber * (1/(numOfOutputs+1))
+            if (constraintNumber > numOfOutputs)
+                graphModel.remove(outEdges[i], true);
+            else {
+                //    relocate edge exit location of edge
+                var newY = constraintNumber * (1 / (numOfOutputs + 1))
                 var new_style = mxUtils.setStyle(outEdges[i].style, 'exitY', newY);
                 graphModel.setStyle(outEdges[i], new_style);
             }
@@ -68,35 +68,32 @@ function adjustEdges(cell, numOfOutputs, graphModel) {
     }
 };
 
-function updateEdgesLabels(cell, numOfOutputs, graphModel,cellValue) {
+function updateEdgesLabels(cell, numOfOutputs, graphModel, cellValue) {
     var outEdges = getOutEdges(cell);
     graphModel.beginUpdate();
     try {
-        for (let i = 0; i < outEdges.length ; i++) {
+        for (let i = 0; i < outEdges.length; i++) {
             var value = graphModel.getValue(outEdges[i]);
-            value.setAttribute('label',cellValue.getAttribute('Outputnumber'+ (outEdges[i].getAttribute('labelNum'))));
-            graphModel.setValue(outEdges[i],value);
+            value.setAttribute('label', cellValue.getAttribute('Outputnumber' + (outEdges[i].getAttribute('labelNum'))));
+            graphModel.setValue(outEdges[i], value);
         }
-    }finally {
+    } finally {
         graphModel.endUpdate();
     }
 }
 
 
-
-FormatBP = function(editorUi, container)
-{
-    Format.call(this,editorUi,container);
+FormatBP = function (editorUi, container) {
+    Format.call(this, editorUi, container);
 };
 
 FormatBP.prototype = Object.create(Format.prototype);
 
-FormatBP.prototype.refresh = function() {
+FormatBP.prototype.refresh = function () {
 
 
     // Performance tweak: No refresh needed if not visible
-    if (this.container.style.width == '0px')
-    {
+    if (this.container.style.width == '0px') {
         return;
     }
 
@@ -122,8 +119,7 @@ FormatBP.prototype.refresh = function() {
     label.style.width = '100%';
     this.container.appendChild(div);
 
-    if (graph.isSelectionEmpty())
-    {
+    if (graph.isSelectionEmpty()) {
         /*mxUtils.write(label, mxResources.get('diagram'));
 
         // Adds button to hide the format panel since
@@ -156,8 +152,7 @@ FormatBP.prototype.refresh = function() {
         div.appendChild(label);
         this.panels.push(new DiagramFormatPanel(this, ui, div));*/
     }
-    else if (graph.isEditing())
-    {
+    else if (graph.isEditing()) {
         mxUtils.write(label, mxResources.get('text'));
         div.appendChild(label);
         this.panels.push(new TextFormatPanel(this, ui, div));
@@ -331,10 +326,10 @@ FormatBP.prototype.refresh = function() {
             }
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
-                adjustEdges(cell,parseInt(NumberOfOutPutBox.value), graph.getModel());
+                adjustEdges(cell, parseInt(NumberOfOutPutBox.value), graph.getModel());
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
-                adjustConnectionConstraint(cell,parseInt(NumberOfOutPutBox.value));
+                adjustConnectionConstraint(cell, parseInt(NumberOfOutPutBox.value));
                 graph.getModel().setValue(cell, value);
                 createLabels(NumberOfOutPutBox.value);
 
@@ -374,7 +369,7 @@ FormatBP.prototype.refresh = function() {
                         for (var i = 0; i < numOfOutputs; i++) {
                             value.setAttribute("Outputnumber" + (i + 1), document.getElementById("nodeID" + cell.id + "Outputnumber" + (i + 1)).value);
                         }
-                        updateEdgesLabels(cell,NumberOfOutPutBox.value,graph.getModel(),value);
+                        updateEdgesLabels(cell, NumberOfOutPutBox.value, graph.getModel(), value);
                         graph.getModel().setValue(cell, value);
                     };
                     InnerDIVOutputLabel.appendChild(applyButtonLabels);
@@ -382,7 +377,7 @@ FormatBP.prototype.refresh = function() {
                 OutputLabelDIV.appendChild(InnerDIVOutputLabel);
             };
 
-            createLabels(value.getAttribute("numberOfOutputs",1));
+            createLabels(value.getAttribute("numberOfOutputs", 1));
 
             generalDIV.appendChild(OutputLabelDIV);
             //add the DIV to cont
@@ -390,7 +385,7 @@ FormatBP.prototype.refresh = function() {
 
 
         } else if (getshape(cell.getStyle()) == "startnode") {
-            var dlg = new StartNodeForm(ui, cell);
+            // var dlg = new StartNodeForm(ui, cell);
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
             var startnodeDIV = document.createElement('div');
@@ -398,12 +393,95 @@ FormatBP.prototype.refresh = function() {
             var textnode = document.createElement("p");
             textnode.innerHTML = '<font size="3">Start Node</font>';
             startnodeDIV.appendChild(textnode);
-            startnodeDIV.appendChild(dlg.container);
-            dlg.init();
+            // startnodeDIV.appendChild(dlg.container);
+            // dlg.init();
+
+
+            //creating a div for defnining number of payloads on a start node
+            var NumberOfPayloadsDIV = document.createElement('div');
+            var NumberOfPayloadsText = document.createElement("p");
+            NumberOfPayloadsText.innerHTML = '<font size="2">Number of Payloads:</font>';
+            NumberOfPayloadsDIV.appendChild(NumberOfPayloadsText);
+            var AreaNumberOfPayloadsText = document.createElement("p");
+            var NumberOfPayloadsBox = document.createElement("INPUT");
+            NumberOfPayloadsBox.setAttribute("type", "number");
+            NumberOfPayloadsBox.setAttribute("max", 10);
+            NumberOfPayloadsBox.setAttribute("min", 1);
+            if (undefined != value.getAttribute("numberOfPayloads")) { // fetching the last number of payloads from the node itself
+                NumberOfPayloadsBox.setAttribute("value", value.getAttribute("numberOfPayloads"));
+            } else {
+                NumberOfPayloadsBox.setAttribute("value", "1");
+                value.setAttribute("numberOfPayloads", 1);
+            }
+            var NumberOfPayloadsButton = createApplyButton();
+            NumberOfPayloadsButton.onclick = function () {// defining what happens when clicking apply on num of payloads
+                value.setAttribute("numberOfPayloads", NumberOfPayloadsBox.value);
+                graph.getModel().setValue(cell, value);
+                createPayloads(NumberOfPayloadsBox.value);
+
+
+            };
+            AreaNumberOfPayloadsText.appendChild(NumberOfPayloadsBox);
+            AreaNumberOfPayloadsText.appendChild(NumberOfPayloadsButton);
+            NumberOfPayloadsDIV.appendChild(AreaNumberOfPayloadsText);
+            startnodeDIV.appendChild(NumberOfPayloadsDIV);
+
+
+            var PayloadsLabelDIV = document.createElement('div');
+            var PayloadsLabelText = document.createElement("p");
+            PayloadsLabelText.innerHTML = '<font size="2">Payloads:</font>';
+            PayloadsLabelDIV.appendChild(PayloadsLabelText);
+            // creating the Payload input text holders
+            var createPayloads = function (numOfPayloads) {
+                var InnerDIVPayloadsLabel = document.createElement('div');
+                InnerDIVPayloadsLabel.setAttribute("id", "InnerDIVPayloadsLabel" + cell.id);
+                for (var i = 0; i < numOfPayloads; i++) {
+                    var oneTextLabelDiv = document.createElement('div');
+                    oneTextLabelDiv.innerHTML = "Payload " + (i + 1) + ": ";
+                    var PayloadsLabelTextBox = document.createElement("INPUT");
+                    PayloadsLabelTextBox.id = "nodeID" + cell.id + "Payloadsnumber" + (i + 1);
+                    PayloadsLabelTextBox.setAttribute("type", "text");
+                    //checking if there was a former definition for the i'th payload holder
+                    var parsed = JSON.parse(value.getAttribute("Payloads"));
+                    if (parsed !== null && parsed !== undefined && parsed[i] != null && parsed[i] != undefined) {
+                        PayloadsLabelTextBox.setAttribute("value", parsed[i]);
+                    }
+                    oneTextLabelDiv.appendChild(PayloadsLabelTextBox);
+                    oneTextLabelDiv.style.marginBottom = "5px";
+                    InnerDIVPayloadsLabel.appendChild(oneTextLabelDiv);
+                }
+
+                if (numOfPayloads >= 1) {
+                    var applyButtonLabels = createApplyButton();
+                    InnerDIVPayloadsLabel.appendChild(applyButtonLabels);
+                    // inserting the new payloads given by the client to the node's "payloads" attribute(array)
+                    applyButtonLabels.onclick = function () {
+                        var Payloads = [];
+                        for (var i = 0; i < numOfPayloads; i++) {
+                            let payloadValue = document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value;
+                            if(payloadValue === "" || payloadValue === undefined || payloadValue ===null){
+                                Payloads.push("{}");
+                            }
+                            else {
+                                Payloads.push((document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value));
+                            }
+                        }
+                        value.setAttribute("Payloads", JSON.stringify(Payloads));
+                        //updateEdgesLabels(cell, NumberOfPayloadsBox.value, graph.getModel(), value);
+                        graph.getModel().setValue(cell, value);
+                    };
+                }
+                PayloadsLabelDIV.appendChild(InnerDIVPayloadsLabel);
+            };
+
+            createPayloads(value.getAttribute("numberOfPayloads", 1));
+
+            startnodeDIV.appendChild(PayloadsLabelDIV);
+
 
             cont.appendChild(startnodeDIV);
-        };
-
+           
+        }
 
     }
 
