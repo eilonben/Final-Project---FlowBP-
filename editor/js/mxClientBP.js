@@ -134,235 +134,192 @@ mxConnectionHandlerBP.prototype.insertEdge = function(parent, id, value, source,
 };
 
 
+
+
+function checkAndFixBorder(edge) {
+    var styles = edge.style.trim().split(";");
+    styles=styles.map(x=>x.split("="));
+    var stylesDic={};
+    function toDictionary(style,val) {
+        stylesDic[style]=val;
+    }
+
+    for (let i = 0; i < styles.length-1; i++) {
+        toDictionary(styles[i][0],styles[i][1])
+    }
+    stylesDic["entryX"]="0";
+    stylesDic["entryY"]= "0.5";
+    var newStyle="";
+    for (var key in stylesDic) {
+        newStyle+=key+"="+stylesDic[key]+";";
+    }
+    edge.style=newStyle;
+
+}
+
 //this is for labels per constraint point
 mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarget)
 {
-    if (target != null || this.isCreateTarget(evt) || this.graph.allowDanglingEdges)
-    {
-        // Uses the common parent of source and target or
-        // the default parent to insert the edge
-        var model = this.graph.getModel();
-        var terminalInserted = false;
-        var edge = null;
-
-        model.beginUpdate();
-        try
+        if (target != null || this.isCreateTarget(evt) || this.graph.allowDanglingEdges)
         {
-            if (source != null && target == null && !this.graph.isIgnoreTerminalEvent(evt) && this.isCreateTarget(evt))
+            // Uses the common parent of source and target or
+            // the default parent to insert the edge
+            var model = this.graph.getModel();
+            var terminalInserted = false;
+            var edge = null;
+
+            model.beginUpdate();
+            try
             {
-                target = this.createTargetVertex(evt, source);
-
-                if (target != null)
+                if (source != null && target == null && !this.graph.isIgnoreTerminalEvent(evt) && this.isCreateTarget(evt))
                 {
-                    dropTarget = this.graph.getDropTarget([target], evt, dropTarget);
-                    terminalInserted = true;
+                    target = this.createTargetVertex(evt, source);
 
-                    // Disables edges as drop targets if the target cell was created
-                    // FIXME: Should not shift if vertex was aligned (same in Java)
-                    if (dropTarget == null || !this.graph.getModel().isEdge(dropTarget))
+                    if (target != null)
                     {
-                        var pstate = this.graph.getView().getState(dropTarget);
+                        dropTarget = this.graph.getDropTarget([target], evt, dropTarget);
+                        terminalInserted = true;
 
-                        if (pstate != null)
+                        // Disables edges as drop targets if the target cell was created
+                        // FIXME: Should not shift if vertex was aligned (same in Java)
+                        if (dropTarget == null || !this.graph.getModel().isEdge(dropTarget))
                         {
-                            var tmp = model.getGeometry(target);
-                            tmp.x -= pstate.origin.x;
-                            tmp.y -= pstate.origin.y;
+                            var pstate = this.graph.getView().getState(dropTarget);
+
+                            if (pstate != null)
+                            {
+                                var tmp = model.getGeometry(target);
+                                tmp.x -= pstate.origin.x;
+                                tmp.y -= pstate.origin.y;
+                            }
                         }
-                    }
-                    else
-                    {
-                        dropTarget = this.graph.getDefaultParent();
-                    }
+                        else
+                        {
+                            dropTarget = this.graph.getDefaultParent();
+                        }
 
-                    this.graph.addCell(target, dropTarget);
+                        this.graph.addCell(target, dropTarget);
+                    }
                 }
-            }
 
-            var parent = this.graph.getDefaultParent();
+                var parent = this.graph.getDefaultParent();
 
-            if (source != null && target != null &&
-                model.getParent(source) == model.getParent(target) &&
-                model.getParent(model.getParent(source)) != model.getRoot())
-            {
-                parent = model.getParent(source);
-
-                if ((source.geometry != null && source.geometry.relative) &&
-                    (target.geometry != null && target.geometry.relative))
+                if (source != null && target != null &&
+                    model.getParent(source) == model.getParent(target) &&
+                    model.getParent(model.getParent(source)) != model.getRoot())
                 {
-                    parent = model.getParent(parent);
+                    parent = model.getParent(source);
+
+                    if ((source.geometry != null && source.geometry.relative) &&
+                        (target.geometry != null && target.geometry.relative))
+                    {
+                        parent = model.getParent(parent);
+                    }
                 }
-            }
 
-            // Uses the value of the preview edge state for inserting
-            // the new edge into the graph
-            var value = null;
-            var style = null;
-            var state = null;
+                // Uses the value of the preview edge state for inserting
+                // the new edge into the graph
+                var value = null;
+                var style = null;
+                var state = null;
 
-            if (this.edgeState != null)
-            {
-                value = this.edgeState.cell.value;
-                style = this.edgeState.cell.style;
-                state = this.edgeState.style;
-            }
-
-            edge = this.insertEdge(parent, null, value, source, target, style, state);
-
-            if (edge != null)
-            {
-                // Updates the connection constraints
-                this.graph.setConnectionConstraint(edge, source, true, this.sourceConstraint);
-                this.graph.setConnectionConstraint(edge, target, false, this.constraintHandler.currentConstraint);
-
-                // Uses geometry of the preview edge state
                 if (this.edgeState != null)
                 {
-                    model.setGeometry(edge, this.edgeState.cell.geometry);
+                    value = this.edgeState.cell.value;
+                    style = this.edgeState.cell.style;
+                    state = this.edgeState.style;
                 }
 
-                var parent = model.getParent(source);
+                edge = this.insertEdge(parent, null, value, source, target, style, state);
 
-                // Inserts edge before source
-                if (this.isInsertBefore(edge, source, target, evt, dropTarget))
+                if (edge != null)
                 {
-                    var index = null;
-                    var tmp = source;
-
-                    while (tmp.parent != null && tmp.geometry != null &&
-                    tmp.geometry.relative && tmp.parent != edge.parent)
+                    // Updates the connection constraints
+                    this.graph.setConnectionConstraint(edge, source, true, this.sourceConstraint);
+                    this.graph.setConnectionConstraint(edge, target, false, this.constraintHandler.currentConstraint);
+                    checkAndFixBorder(edge);
+                    // Uses geometry of the preview edge state
+                    if (this.edgeState != null)
                     {
-                        tmp = this.graph.model.getParent(tmp);
+                        model.setGeometry(edge, this.edgeState.cell.geometry);
                     }
 
-                    if (tmp != null && tmp.parent != null && tmp.parent == edge.parent)
+                    var parent = model.getParent(source);
+
+                    // Inserts edge before source
+                    if (this.isInsertBefore(edge, source, target, evt, dropTarget))
                     {
-                        model.add(parent, edge, tmp.parent.getIndex(tmp));
+                        var index = null;
+                        var tmp = source;
+
+                        while (tmp.parent != null && tmp.geometry != null &&
+                        tmp.geometry.relative && tmp.parent != edge.parent)
+                        {
+                            tmp = this.graph.model.getParent(tmp);
+                        }
+
+                        if (tmp != null && tmp.parent != null && tmp.parent == edge.parent)
+                        {
+                            model.add(parent, edge, tmp.parent.getIndex(tmp));
+                        }
                     }
-                }
 
-                // Makes sure the edge has a non-null, relative geometry
-                var geo = model.getGeometry(edge);
+                    // Makes sure the edge has a non-null, relative geometry
+                    var geo = model.getGeometry(edge);
 
-                if (geo == null)
-                {
-                    geo = new mxGeometry();
-                    geo.relative = true;
-
-                    model.setGeometry(edge, geo);
-                }
-
-                // Uses scaled waypoints in geometry
-                if (this.waypoints != null && this.waypoints.length > 0)
-                {
-                    var s = this.graph.view.scale;
-                    var tr = this.graph.view.translate;
-                    geo.points = [];
-
-                    for (var i = 0; i < this.waypoints.length; i++)
+                    if (geo == null)
                     {
-                        var pt = this.waypoints[i];
-                        geo.points.push(new mxPoint(pt.x / s - tr.x, pt.y / s - tr.y));
+                        geo = new mxGeometry();
+                        geo.relative = true;
+
+                        model.setGeometry(edge, geo);
                     }
-                }
 
-                if (target == null)
-                {
-                    var t = this.graph.view.translate;
-                    var s = this.graph.view.scale;
-                    var pt = (this.originalPoint != null) ?
-                        new mxPoint(this.originalPoint.x / s - t.x, this.originalPoint.y / s - t.y) :
-                        new mxPoint(this.currentPoint.x / s - t.x, this.currentPoint.y / s - t.y);
-                    pt.x -= this.graph.panDx / this.graph.view.scale;
-                    pt.y -= this.graph.panDy / this.graph.view.scale;
-                    geo.setTerminalPoint(pt, false);
-                }
+                    // Uses scaled waypoints in geometry
+                    if (this.waypoints != null && this.waypoints.length > 0)
+                    {
+                        var s = this.graph.view.scale;
+                        var tr = this.graph.view.translate;
+                        geo.points = [];
 
-                this.fireEvent(new mxEventObject(mxEvent.CONNECT, 'cell', edge, 'terminal', target,
-                    'event', evt, 'target', dropTarget, 'terminalInserted', terminalInserted));
+                        for (var i = 0; i < this.waypoints.length; i++)
+                        {
+                            var pt = this.waypoints[i];
+                            geo.points.push(new mxPoint(pt.x / s - tr.x, pt.y / s - tr.y));
+                        }
+                    }
+
+                    if (target == null)
+                    {
+                        var t = this.graph.view.translate;
+                        var s = this.graph.view.scale;
+                        var pt = (this.originalPoint != null) ?
+                            new mxPoint(this.originalPoint.x / s - t.x, this.originalPoint.y / s - t.y) :
+                            new mxPoint(this.currentPoint.x / s - t.x, this.currentPoint.y / s - t.y);
+                        pt.x -= this.graph.panDx / this.graph.view.scale;
+                        pt.y -= this.graph.panDy / this.graph.view.scale;
+                        geo.setTerminalPoint(pt, false);
+                    }
+
+                    this.fireEvent(new mxEventObject(mxEvent.CONNECT, 'cell', edge, 'terminal', target,
+                        'event', evt, 'target', dropTarget, 'terminalInserted', terminalInserted));
+                }
             }
-        }
-        catch (e)
-        {
-            mxLog.show();
-            mxLog.debug(e.message);
-        }
-        finally
-        {
-            model.endUpdate();
-        }
-
-        if (this.select)
-        {
-            this.selectCells(edge, (terminalInserted) ? target : null);
-        }
-    }
-};
-
-
-mxConnectionHandlerBP.prototype.mouseUp = function(sender, me)
-{
-    if (!me.isConsumed() && this.isConnecting())
-    {
-        if (this.waypointsEnabled && !this.isStopEvent(me))
-        {
-            this.addWaypointForEvent(me);
-            me.consume();
-
-            return;
-        }
-
-        var c1 = this.sourceConstraint;
-        var c2 = this.constraintHandler.currentConstraint;
-
-        var source = (this.previous != null) ? this.previous.cell : null;
-        var target = null;
-
-        if (this.constraintHandler.currentConstraint != null &&
-            this.constraintHandler.currentFocus != null)
-        {
-            target = this.constraintHandler.currentFocus.cell;
-        }
-
-        if (target == null && this.currentState != null)
-        {
-            target = this.currentState.cell;
-        }
-
-        // Inserts the edge if no validation error exists and if constraints differ
-        if (this.error == null && this.checkLeftConstraints(c1, c2) && (source == null || target == null ||
-            source != target || this.checkConstraints(c1, c2)))
-        {
-            this.connect(source, target, me.getEvent(), me.getCell());
-
-        }
-        else
-        {
-            // Selects the source terminal for self-references
-            if (this.previous != null && this.marker.validState != null &&
-                this.previous.cell == this.marker.validState.cell)
+            catch (e)
             {
-                this.graph.selectCellForEvent(this.marker.source, me.getEvent());
+                mxLog.show();
+                mxLog.debug(e.message);
+            }
+            finally
+            {
+                model.endUpdate();
             }
 
-            // Displays the error message if it is not an empty string,
-            // for empty error messages, the event is silently dropped
-            if (this.error != null && this.error.length > 0)
+            if (this.select)
             {
-                this.graph.validationAlert(this.error);
+                this.selectCells(edge, (terminalInserted) ? target : null);
             }
         }
-
-        // Redraws the connect icons and resets the handler state
-        this.destroyIcons();
-        me.consume();
-    }
-
-    if (this.first != null)
-    {
-        this.reset();
-    }
 };
-
 
 //mxGraphBP.prototype.constructor = mxGraph;
