@@ -380,7 +380,7 @@ FormatBP.prototype.refresh = function () {
             cont.appendChild(generalDIV);
 
 
-        } else if (getshape(cell.getStyle()) == "startnode") {
+        } else if (getshape(cell.getStyle()) === "startnode") {
             // var dlg = new StartNodeForm(ui, cell);
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
@@ -477,6 +477,30 @@ FormatBP.prototype.refresh = function () {
 
             cont.appendChild(startnodeDIV);
            
+        }
+
+        else if (getshape(cell.getStyle()) === "console"){
+            var con = document.getElementsByClassName("geFormatContainer")[0];
+            con.style.width = "22%";
+            var consoleDIV = document.createElement('div');
+            consoleDIV.style.marginLeft = "3%";
+            //Title
+            var textnod = document.createElement("p");
+            textnod.innerHTML = '<font size="3">General Node</font>';
+           consoleDIV.appendChild(textnode);
+
+            //Button code editor
+            var popUPbutton = document.createElement("BUTTON");
+            popUPbutton.appendChild(document.createTextNode("Open Code editor"));
+            popUPbutton.id = "codeEditorButton";
+            popUPbutton.onclick = function () {
+                var dlg = new CodeEditorDialog(ui, cell);
+                var etd = ui;
+                etd.showDialog(dlg.container, 520, 420, true, true);
+                dlg.init();
+            };
+            popUPbutton.className = 'geBtn gePrimaryBtn';
+            consoleDIV.appendChild(popUPbutton);
         }
 
     }
