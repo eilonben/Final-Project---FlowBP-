@@ -254,7 +254,7 @@ FormatBP.prototype.refresh = function () {
                 bsyncDIV.appendChild(dlg.container);
                 dlg.init();
                 cont.appendChild(bsyncDIV);
-            
+
 
         } else if (getshape(cell.getStyle()) == "general") {
             var cont = document.getElementsByClassName("geFormatContainer")[0];

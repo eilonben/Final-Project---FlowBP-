@@ -69,19 +69,15 @@ var BSyncForm = function (editorUi, cell) {
 
     var genericBtn = mxUtils.button(mxResources.get('apply'), function () {
         var lst = ["Request", "Wait", "Block"];
-        lst.map(x => {
-            if (linkInput[x].value.length != 0) linkInput[x].value = "\"" + linkInput[x].value + "\""
-        });
+        lst.map(x =>{if (linkInput[x].value.length != 0){var a =linkInput[x].value.split(","); linkInput[x].value = a.map(x=> "\""+x+"\"")}});
         value.setAttribute("sync", "{\"request\":[" + linkInput["Request"].value + "], \"wait\":[" + linkInput["Wait"].value + "],\"block\":[" + linkInput["Block"].value + "]}");
-        lst.map(x => {
-            if (linkInput[x].value.length != 0) linkInput[x].value = linkInput[x].value.replace(/\"/g, '')
-        });
+        lst.map(x =>{if (linkInput[x].value.length != 0) linkInput[x].value = linkInput[x].value.replace(/\"/g, '')});
         value.setAttribute("Request", linkInput["Request"].value);
         value.setAttribute("Wait", linkInput["Wait"].value);
         value.setAttribute("Block", linkInput["Block"].value);
         value.setAttribute("label","request: "+linkInput["Request"].value+"\nwait: "+linkInput["Wait"].value+"\nblock: "+linkInput["Block"].value);
         graph.getModel().setValue(cell, value);
-        // graph.updateCellSize(cell, true);
+        graph.updateCellSize(cell, true);
 
 
 

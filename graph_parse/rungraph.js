@@ -24,7 +24,7 @@ window.bpEngine = {
                 yield 'waiting for an event';
             console.log(e + "\n");
             mxUtils.alert("event selected: " + e + "\n");
-            window.eventSelected = e;
+            window.eventsSelected.push(e);
             window.bpEngine.BThreads.forEach(bt => {
                 if (isReqWait(bt, e)) {
                     bt.stmt = fixStmt(bt.iterator.next().value)
@@ -167,7 +167,7 @@ function* runInSameBT(c, payloads, bpEngine, model, scen, curTime) {
 function startRunning(model) {
 // Start the context nodes
     initSBS();
-
+    window.eventsSelected=[];
     var cells = model.cells;
     var arr = Object.keys(cells).map(function (key) {
         return cells[key]
