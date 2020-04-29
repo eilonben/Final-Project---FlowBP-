@@ -81,7 +81,6 @@
         EditorUiBP.prototype.init = function()
         {
             editorUiInit.apply(this, arguments);
-            this.actions.get('export').setEnabled(false);
 
             // Updates action states which require a backend
             if (!Editor.useLocalStorage)
@@ -92,8 +91,8 @@
                     this.actions.get('open').setEnabled(enabled || Graph.fileSupport);
                     this.actions.get('import').setEnabled(enabled || Graph.fileSupport);
                     this.actions.get('save').setEnabled(enabled);
-                    this.actions.get('saveAs').setEnabled(enabled);
-                    this.actions.get('export').setEnabled(enabled);
+                    this.actions.get('saveAs').setEnabled(enabled || Graph.fileSupport);
+                    this.actions.get('export').setEnabled(enabled || Graph.fileSupport);
                 }));
             }
         };
