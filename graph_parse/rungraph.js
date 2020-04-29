@@ -103,18 +103,32 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen, curTime) {
 }
 
 function* runInNewBT(c, payloads, bpEngine, model, curTime) {
-    // Cloning - Is this the right way?
-    let outputs = {};
-    let cloned = JSON.parse(JSON.stringify(payloads));
     window.bpEngine.registerBThread(function* () {
+        let outputs = {};
+        let cloned = JSON.parse(JSON.stringify(payloads))
         if (c.getAttribute("code") !== undefined) {
             try{
-            eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
-                outputs=func(cloned)
+                eval('var func = function(payloads){' + c.getAttribute("code") + '\n}');
+                outputs = func(cloned)
             }
             catch(e){
-                alert.log('There has been an error while executing the JS code on node ' +
-                     c.getId()+": \n" +e+" execution will now terminate.");
+                alert('There has been an error while executing the JS code on General node ' +
+                    c.getId()+": \n" +e+".\n execution will now terminate.");
+                return;
+            }
+        }
+        if (c.getAttribute("log") !== undefined) {
+            try{
+                eval('var func = function(payloads){' + c.getAttribute("log") + '\n}');
+                let consoleString = func(cloned);
+                if(window.consoleLog === undefined){
+                    window.consoleLog = consoleString + "\n";
+                }
+                window.consoleLog = window.consoleLog.concat(consoleString + "\n");
+            }
+            catch(e){
+                alert('There has been an error while executing the JS code on Console node ' +
+                    c.getId()+": \n" +e+".\n execution will now terminate.");
                 return;
             }
         }
@@ -139,20 +153,45 @@ function getshape(str) {
     return arr[0].split("=")[1].split(".")[1];
 }
 
+// function parsePayloads(payloads) {
+//     let cloned = [];
+//     let parsedArray = ;
+//     for (let i = 0; i < parsedArray.length; i++) {
+//         let parsedPayload = JSON.parse(parsedArray[i])
+//         cloned.push(parsedPayload)
+//     }
+//     return cloned;
+// }
+
 function* runInSameBT(c, payloads, bpEngine, model, scen, curTime) {
     let outputs = {};
     let cloned = JSON.parse(JSON.stringify(payloads));
     if (c.getAttribute("code") !== undefined) {
-        try{
-        eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
-            outputs=func(cloned)
+        try {
+            eval('var func = function(payloads){' + c.getAttribute("code") + '\n}');
+            outputs = func(cloned)
         }
-        catch(e){
+        catch (e) {
             alert('There has been an error while executing the JS code on node ' +
-                c.getId()+": \n" +e+".\n execution will now terminate.");
+                c.getId() + ": \n" + e + ".\n execution will now terminate.");
             return;
         }
     }
+        if (c.getAttribute("log") !== undefined) {
+            try {
+                eval('var func = function(payloads){' + c.getAttribute("log") + '\n}');
+                let consoleString = func(cloned);
+                if (window.consoleLog === undefined) {
+                    window.consoleLog = consoleString + "\n";
+                }
+                window.consoleLog = window.consoleLog.concat(consoleString + "\n");
+            }
+            catch (e) {
+                alert('There has been an error while executing the JS code on Console node ' +
+                    c.getId() + ": \n" + e + ".\n execution will now terminate.");
+                return;
+            }
+        }
     if (c.getAttribute("sync") !== undefined) {
         yield JSON.parse(c.getAttribute("sync"));
         // cloned["selected"] = window.eventSelected;
@@ -165,9 +204,7 @@ function* runInSameBT(c, payloads, bpEngine, model, scen, curTime) {
 }
 
 function startRunning(model) {
-// Start the context nodes
     initSBS();
-
     var cells = model.cells;
     var arr = Object.keys(cells).map(function (key) {
         return cells[key]

@@ -113,5 +113,7 @@ ToolbarBP.prototype.init = function () {
 
     var elts = this.addItems(['-', 'runModel']);
     elts[1].setAttribute('title','Execute');
+    var elts = this.addItems(['-', 'showConsole']);
+    elts[1].setAttribute('title','Show Console');
 };
 ToolbarBP.prototype.constructor = Toolbar;

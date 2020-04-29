@@ -254,7 +254,7 @@ FormatBP.prototype.refresh = function () {
                 bsyncDIV.appendChild(dlg.container);
                 dlg.init();
                 cont.appendChild(bsyncDIV);
-            
+
 
         } else if (getshape(cell.getStyle()) == "general") {
             var cont = document.getElementsByClassName("geFormatContainer")[0];
@@ -439,8 +439,8 @@ FormatBP.prototype.refresh = function () {
                     PayloadsLabelTextBox.setAttribute("type", "text");
                     //checking if there was a former definition for the i'th payload holder
                     var parsed = JSON.parse(value.getAttribute("Payloads"));
-                    if (parsed !== null && parsed !== undefined && parsed[i] != null && parsed[i] != undefined) {
-                        PayloadsLabelTextBox.setAttribute("value", parsed[i]);
+                    if (parsed !== null && parsed !== undefined && parsed[i] != null && parsed[i] !== undefined) {
+                        PayloadsLabelTextBox.setAttribute("value", JSON.stringify(parsed[i]));
                     }
                     oneTextLabelDiv.appendChild(PayloadsLabelTextBox);
                     oneTextLabelDiv.style.marginBottom = "5px";
@@ -454,16 +454,15 @@ FormatBP.prototype.refresh = function () {
                     applyButtonLabels.onclick = function () {
                         var Payloads = [];
                         for (var i = 0; i < numOfPayloads; i++) {
-                            let payloadValue = document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value;
+                            let payloadValue = JSON.parse(document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value);
                             if(payloadValue === "" || payloadValue === undefined || payloadValue ===null){
-                                Payloads.push("{}");
+                                Payloads.push({});
                             }
                             else {
-                                Payloads.push((document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value));
+                                Payloads.push(payloadValue);
                             }
                         }
                         value.setAttribute("Payloads", JSON.stringify(Payloads));
-                        //updateEdgesLabels(cell, NumberOfPayloadsBox.value, graph.getModel(), value);
                         graph.getModel().setValue(cell, value);
                     };
                 }
@@ -476,31 +475,32 @@ FormatBP.prototype.refresh = function () {
 
 
             cont.appendChild(startnodeDIV);
-           
+
         }
 
         else if (getshape(cell.getStyle()) === "console"){
-            var con = document.getElementsByClassName("geFormatContainer")[0];
-            con.style.width = "22%";
+            var cont = document.getElementsByClassName("geFormatContainer")[0];
+            cont.style.width = "22%";
             var consoleDIV = document.createElement('div');
             consoleDIV.style.marginLeft = "3%";
             //Title
             var textnod = document.createElement("p");
-            textnod.innerHTML = '<font size="3">General Node</font>';
-           consoleDIV.appendChild(textnode);
+            textnod.innerHTML = '<font size="3">Console Node</font>';
+           consoleDIV.appendChild(textnod);
 
             //Button code editor
-            var popUPbutton = document.createElement("BUTTON");
-            popUPbutton.appendChild(document.createTextNode("Open Code editor"));
-            popUPbutton.id = "codeEditorButton";
-            popUPbutton.onclick = function () {
-                var dlg = new CodeEditorDialog(ui, cell);
+            var consolePopUp = document.createElement("BUTTON");
+            consolePopUp.appendChild(document.createTextNode("Open Code editor"));
+            consolePopUp.id = "codeEditorButton";
+            consolePopUp.onclick = function () {
+                var dlg = new ConsoleDialog(ui, cell);
                 var etd = ui;
                 etd.showDialog(dlg.container, 520, 420, true, true);
                 dlg.init();
             };
-            popUPbutton.className = 'geBtn gePrimaryBtn';
-            consoleDIV.appendChild(popUPbutton);
+            consolePopUp.className = 'geBtn gePrimaryBtn';
+            consoleDIV.appendChild(consolePopUp);
+            cont.appendChild(consoleDIV);
         }
 
     }

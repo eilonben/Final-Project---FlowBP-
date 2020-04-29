@@ -79,17 +79,15 @@ var BSyncForm = function (editorUi, cell) {
         value.setAttribute("Request", linkInput["Request"].value);
         value.setAttribute("Wait", linkInput["Wait"].value);
         value.setAttribute("Block", linkInput["Block"].value);
-        value.setAttribute("label","request: "+linkInput["Request"].value+"\nwait: "+linkInput["Wait"].value+"\nblock: "+linkInput["Block"].value);
+        value.setAttribute("label", "request: " + linkInput["Request"].value + "\nwait: " + linkInput["Wait"].value + "\nblock: " + linkInput["Block"].value);
         graph.getModel().setValue(cell, value);
         // graph.updateCellSize(cell, true);
-
 
 
         editorUi.hideDialog();
     });
     genericBtn.className = 'geBtn gePrimaryBtn';
     td.appendChild(genericBtn);
-
 
 
     if (!editorUi.editor.cancelFirst) {
@@ -201,10 +199,10 @@ var CodeEditorDialog = function (editorUi, cell) {
         let genericBtn = mxUtils.button(mxResources.get('apply'), function () {
 
             try {
-                let syntax = esprima.parseScript(editor.getValue());
+                let syntax = esprima.parse(" let d = function(payloads){ " + editor.getValue() + "}");
                 console.log(JSON.stringify(syntax, null, 4));
             }
-            catch(error){
+            catch (error) {
                 alert("There has been a syntax error in the javaScript code.\n " + error);
                 return;
             }
@@ -279,7 +277,7 @@ var StartNodeForm = function (editorUi, cell) {
 
     tbody.appendChild(row);
 
-    if (value.getAttribute("payload") != undefined)
+    if (value.getAttribute("payload") !== undefined)
         input.value = value.getAttribute("payload");
 
 
@@ -310,29 +308,195 @@ var StartNodeForm = function (editorUi, cell) {
     this.container = table;
 };
 
-//for export & save as..  actions
-ExportDialog.saveLocalFile = function(editorUi, data, filename, format)
-{
+var ConsoleDialog = function (editorUi, cell) {
 
+    var graph = editorUi.editor.graph;
+    var value = graph.getModel().getValue(cell);
+
+    // Converts the value to an XML node
+    if (!mxUtils.isNode(value)) {
+        var doc = mxUtils.createXmlDocument();
+        var obj = doc.createElement('object');
+        obj.setAttribute('label', value || '');
+        value = obj;
+    }
+
+
+    w = 500;
+    h = 350;
+    noHide = true;
+    var row, td;
+
+    var table = document.createElement('table');
+    var tbody = document.createElement('tbody');
+
+    row = document.createElement('tr');
+
+    td = document.createElement('td');
+    td.style.fontSize = '10pt';
+    td.style.width = '100px';
+    mxUtils.write(td, "Console Code Editor: function(payloads){");
+    row.appendChild(td);
+    tbody.appendChild(row);
+
+    row = document.createElement('tr');
+    td = document.createElement('td');
+
+    var nameInput = document.createElement('textarea');
+    var editor;
+
+
+    nameInput.value = value.getAttribute('log');
+
+    nameInput.setAttribute('wrap', 'off');
+
+    nameInput.setAttribute('spellcheck', 'false');
+    nameInput.setAttribute('autocorrect', 'off');
+    nameInput.setAttribute('autocomplete', 'off');
+    nameInput.setAttribute('autocapitalize', 'off');
+
+    // mxUtils.write(nameInput, url || '');
+    nameInput.style.resize = 'none';
+    nameInput.style.width = w + 'px';
+    nameInput.style.height = h + 'px';
+
+    this.textarea = nameInput;
+
+
+    this.init = function () {
+        nameInput.focus();
+        nameInput.scrollTop = 0;
+
+        editor = CodeMirror.fromTextArea(this.textarea, {
+            lineNumbers: true,
+            // fixedGutter: true,
+            autofocus: true,
+        });
+    };
+
+    td.appendChild(nameInput);
+    row.appendChild(td);
+
+    tbody.appendChild(row);
+
+    row = document.createElement('tr');
+    td = document.createElement('td');
+    td.style.paddingTop = '14px';
+    td.style.whiteSpace = 'nowrap';
+    td.setAttribute('align', 'right');
+
+    var cancelBtn = mxUtils.button(mxResources.get('cancel'), function () {
         editorUi.hideDialog();
-        function download(data, filename, type) {
-            var file = new Blob([data], {type: type});
-            if (window.navigator.msSaveOrOpenBlob) // IE10+
-                window.navigator.msSaveOrOpenBlob(file, filename);
-            else { // Others
-                var a = document.createElement("a"),
-                    url = URL.createObjectURL(file);
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(function() {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 0);
+    });
+    cancelBtn.className = 'geBtn gePrimaryBtn';
+
+    if (editorUi.editor.cancelFirst) {
+        td.appendChild(cancelBtn);
+    }
+    td = document.createElement('td');
+    mxUtils.write(td, "}");
+
+
+    {
+        let genericBtn = mxUtils.button(mxResources.get('apply'), function () {
+
+            try {
+                let syntax = esprima.parse(" let d = function(payloads){ " + editor.getValue() + "}");
+                console.log(JSON.stringify(syntax, null, 4));
             }
+            catch (error) {
+                alert("There has been a syntax error in the javaScript code.\n " + error);
+                return;
+            }
+            editorUi.hideDialog();
+            value.setAttribute("log", editor.getValue());
+            graph.getModel().setValue(cell, value);
+        });
+
+        genericBtn.className = 'geBtn gePrimaryBtn';
+        td.appendChild(genericBtn);
+    }
+
+    if (!editorUi.editor.cancelFirst) {
+        td.appendChild(cancelBtn);
+    }
+
+    row.appendChild(td);
+    tbody.appendChild(row);
+    table.appendChild(tbody);
+    this.container = table;
+};
+
+var showConsoleDialog = function (editorUi) {
+
+    var td,row;
+    var table = document.createElement('table');
+    var tbody = document.createElement('tbody');
+
+    row = document.createElement('tr');
+    td = document.createElement('td');
+    td.style.fontSize = '10pt';
+    td.style.width = '100px';
+    mxUtils.write(td, "Current Console Log: ");
+    row.appendChild(td);
+    tbody.appendChild(row);
+    row = document.createElement('tr');
+    td = document.createElement('td');
+    var textarea = document.createElement('textarea');
+    textarea.setAttribute('wrap', 'off');
+    textarea.setAttribute('spellcheck', 'false');
+    textarea.setAttribute('autocorrect', 'off');
+    textarea.setAttribute('autocomplete', 'off');
+    textarea.setAttribute('autocapitalize', 'off');
+    textarea.style.overflow = 'auto';
+    textarea.style.resize = 'none';
+    textarea.style.width = '600px';
+    textarea.style.height = '360px';
+    textarea.style.marginBottom = '16px';
+    if (window.consoleLog === undefined) {
+        textarea.value = "";
+    }
+    else {
+        textarea.value = window.consoleLog;
+    }
+    td.appendChild(textarea);
+
+    this.init = function () {
+        textarea.focus();
+    };
+    var okBtn = mxUtils.button(mxResources.get('ok'), function () {
+        editorUi.hideDialog();
+    });
+    okBtn.className = 'geBtn gePrimaryBtn';
+    td.appendChild(okBtn);
+    row.appendChild(td);
+    tbody.appendChild(row);
+    table.appendChild(tbody);
+    this.container = table;
+};
+
+//for export & save as..  actions
+ExportDialog.saveLocalFile = function (editorUi, data, filename, format) {
+
+    editorUi.hideDialog();
+
+    function download(data, filename, type) {
+        var file = new Blob([data], {type: type});
+        if (window.navigator.msSaveOrOpenBlob) // IE10+
+            window.navigator.msSaveOrOpenBlob(file, filename);
+        else { // Others
+            var a = document.createElement("a"),
+                url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function () {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 0);
         }
-        download(data,filename,format);
+    }
 
-
+    download(data, filename, format);
 };
