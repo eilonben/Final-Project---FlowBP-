@@ -84,7 +84,7 @@ EditorUiBP.prototype.disableActionsForDebugging = function () {
         actions[i].setEnabled(false);
     }
 
-    actions = ['stop_sbs', 'next_sbs'];
+    actions = ['debug_stop', 'debug_next'];
     for (var i = 0; i < actions.length; i++) {
         this.actions.get(actions[i]).setEnabled(true);
     }
@@ -98,7 +98,7 @@ EditorUiBP.prototype.enableActionsAfterDebugging = function () {
         action[0].setEnabled(action[1]);
     }
 
-    actions = ['stop_sbs', 'next_sbs', 'back_sbs'];
+    actions = ['debug_stop', 'debug_next', 'debug_back'];
     for (var i = 0; i < actions.length; i++) {
         this.actions.get(actions[i]).setEnabled(false);
     }
@@ -127,10 +127,10 @@ EditorUiBP.prototype.noUndoRedo = function () {
     this.actions.get('redo').setEnabled(false);
 }
 
-EditorUiBP.prototype.enableBackSBS = function (bool) {
-    this.actions.get('back_sbs').setEnabled(bool);
+EditorUiBP.prototype.enableDebugBack = function (bool) {
+    this.actions.get('debug_back').setEnabled(bool);
 }
 
-EditorUiBP.prototype.enableNextSBS = function (bool) {
-    this.actions.get('next_sbs').setEnabled(bool);
+EditorUiBP.prototype.enableDebugNext = function (bool) {
+    this.actions.get('debug_next').setEnabled(bool);
 }

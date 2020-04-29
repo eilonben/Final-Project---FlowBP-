@@ -107,11 +107,22 @@ ToolbarBP.prototype.init = function () {
     var insertMenu = this.addMenu('', mxResources.get('insert') + ' (' + mxResources.get('doubleClickTooltip') + ')', true, 'insert', null, true);
     this.addDropDownArrow(insertMenu, 'geSprite-plus', 38, 48, -4, -3, 36, -8);
 
-    var elts = this.addItems(['-', 'debug_sbs', 'next_sbs', 'back_sbs', 'stop_sbs']);
-    //elts[1].setAttribute('title', mxResources.get('runNextSBS') + ' (' + this.editorUi.actions.get('runNextSBS').shortcut+ ')');
-    //elts[2].setAttribute('title', mxResources.get('runPrevSBS') + ' (' + this.editorUi.actions.get('runPrevSBS').shortcut+ ')');
-
     var elts = this.addItems(['-', 'runModel']);
     elts[1].setAttribute('title','Execute');
+    elts[1].childNodes[0].className = 'geDebug geDebug_run'
+
+    var elts = this.addItems(['-', 'debug_debug', 'debug_next', 'debug_back', 'debug_stop']);
+    elts[1].setAttribute('title','Start debugging');
+    elts[1].childNodes[0].className = 'geDebug geDebug_debug'
+
+    elts[2].setAttribute('title','Step forward');
+    elts[2].childNodes[0].className = 'geDebug geDebug_next'
+
+    elts[3].setAttribute('title','Step back');
+    elts[3].childNodes[0].className = 'geDebug geDebug_back'
+
+    elts[4].setAttribute('title','Stop Debugging');
+    elts[4].childNodes[0].className = 'geDebug geDebug_stop'
 };
+
 ToolbarBP.prototype.constructor = Toolbar;
