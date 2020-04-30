@@ -1,4 +1,4 @@
-window.sbs = {
+window.debug = {
     time: 0,
     curStage: -1,
     scenarios: {}
@@ -19,6 +19,7 @@ window.bpEngine = {
 
     run: function* () {
         while (true) {
+            fixStages();
             let e = getEvent();
             if (e === null)
                 yield 'waiting for an event';
@@ -30,7 +31,6 @@ window.bpEngine = {
                     bt.stmt = fixStmt(bt.iterator.next().value)
                 }
             })
-            fixStages();
         }
     }
 };
@@ -74,7 +74,7 @@ function getRandomItem(set) {
     return items[Math.floor(Math.random() * items.length)];
 }
 
-function* goToFollowers(c, payloads, bpEngine, model, outputs, scen, curTime) {
+function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
     let edg = model.getEdges(c, false, true, true);
     if (edg.length > 0) {
         // Run extra followers in new threads
@@ -86,7 +86,7 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen, curTime) {
                 if(edgeLabel!==undefined && outputs!==undefined && outputs[edgeLabel]!== undefined){
                     nextPayloads = outputs[edgeLabel];
                 }
-                yield* runInNewBT(target, nextPayloads, bpEngine, model, curTime);
+                runInNewBT(target, nextPayloads, bpEngine, model, window.debug.scenarios[scen].length);
             }
         }
         // Run the first follower in the same thread.
@@ -97,7 +97,7 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen, curTime) {
             if(edgeLabel!==undefined && outputs!==undefined && outputs[edgeLabel]!== undefined){
                 nextPayloads = outputs[edgeLabel];
             }
-            yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model, scen, curTime);
+            yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model, scen);
         }
     }
 }
@@ -132,18 +132,20 @@ function* runInNewBT(c, payloads, bpEngine, model, curTime) {
                 return;
             }
         }
+
+        c.setAttribute("scenarioID", c.id);
+        window.debug.scenarios[c.id] = [];
+        for(let i = 0; i < curTime; i++)
+            window.debug.scenarios[c.id].push([-1, null]);
+        window.debug.scenarios[c.id].push([c.id, cloned]);
+
         if (c.getAttribute("sync") !== undefined) {
             yield JSON.parse(c.getAttribute("sync"));
+            curTime = 0
             // cloned["selected"] = window.eventSelected;
         }
 
-        c.setAttribute("scenarioID", c.id);
-        window.sbs.scenarios[c.id] = [];
-        for(let i = 0; i < curTime; i++)
-            window.sbs.scenarios[c.id].push([-1, null]);
-        window.sbs.scenarios[c.id].push([c.id, cloned]);
-
-        yield* goToFollowers(c, cloned, bpEngine,model,outputs, c.id, curTime + 1);
+        yield* goToFollowers(c, cloned, bpEngine,model,outputs, c.id);
     }());
 
 };
@@ -153,17 +155,7 @@ function getshape(str) {
     return arr[0].split("=")[1].split(".")[1];
 }
 
-// function parsePayloads(payloads) {
-//     let cloned = [];
-//     let parsedArray = ;
-//     for (let i = 0; i < parsedArray.length; i++) {
-//         let parsedPayload = JSON.parse(parsedArray[i])
-//         cloned.push(parsedPayload)
-//     }
-//     return cloned;
-// }
-
-function* runInSameBT(c, payloads, bpEngine, model, scen, curTime) {
+function* runInSameBT(c, payloads, bpEngine, model, scen) {
     let outputs = {};
     let cloned = JSON.parse(JSON.stringify(payloads));
     if (c.getAttribute("code") !== undefined) {
@@ -192,19 +184,23 @@ function* runInSameBT(c, payloads, bpEngine, model, scen, curTime) {
                 return;
             }
         }
+
+    c.setAttribute("scenarioID", scen);
+    window.debug.scenarios[scen].push([c.id, cloned]);
+
     if (c.getAttribute("sync") !== undefined) {
         yield JSON.parse(c.getAttribute("sync"));
+        curTime = 0
         // cloned["selected"] = window.eventSelected;
     }
 
-    c.setAttribute("scenarioID", scen);
-    window.sbs.scenarios[scen].push([c.id, cloned]);
-
-    yield* goToFollowers(c, cloned, bpEngine, model, outputs, scen, curTime + 1);
+    yield* goToFollowers(c, cloned, bpEngine, model, outputs, scen);
 }
 
 function startRunning(model) {
-    initSBS();
+// Start the context nodes
+    initDebug();
+
     var cells = model.cells;
     var arr = Object.keys(cells).map(function (key) {
         return cells[key]
@@ -217,7 +213,7 @@ function startRunning(model) {
         let payloads = [{}];
         if (startNds[i].getAttribute("Payloads") !== undefined)
             payloads = (JSON.parse(startNds[i].getAttribute("Payloads")));
-        runInNewBT(startNds[i], payloads, bpEngine, model, 0).next();
+        runInNewBT(startNds[i], payloads, bpEngine, model, 0);
     }
     window.bpEngine.run().next();
     window.bpEngine.BThreads = [];
@@ -226,15 +222,15 @@ function startRunning(model) {
 function getProgramRecord() {
     var res = []
 
-    while(window.sbs.curStage < window.sbs.time - 1) {
-        window.sbs.curStage++;
+    while(window.debug.curStage < window.debug.time - 1) {
+        window.debug.curStage++;
 
         var curStage = []
-        var scens = Object.values(window.sbs.scenarios)
+        var scens = Object.values(window.debug.scenarios)
         for (let i = 0; i < scens.length; i++) {
             let cur = scens[i];
-            if (cur[window.sbs.curStage][0] != -1) {
-                curStage.push(cur[window.sbs.curStage])
+            if (cur[window.debug.curStage][0] != -1) {
+                curStage.push(cur[window.debug.curStage])
             }
         }
 
@@ -243,23 +239,24 @@ function getProgramRecord() {
     return res;
 }
 
-function initSBS() {
-    window.sbs.scenarios = {}
-    window.sbs.curStage = -1
-    window.sbs.time = 0
+function initDebug() {
+    window.debug.scenarios = {}
+    window.debug.curStage = -1
+    window.debug.time = 0
 }
 
 function fixStages() {
-    let scens = Object.values(window.sbs.scenarios)
+    let scens = Object.values(window.debug.scenarios)
     const lengths = scens.map(x => x.length);
     let curTime = Math.max(...lengths)
     for(let i = 0; i < scens.length; i++)
     {
         let curScen = scens[i];
-        for (let j = 0; j < curTime - curScen.length; j++)
+        let numOfFixes = curTime - curScen.length;
+        for (let j = 0; j < numOfFixes; j++)
             curScen.push([-1, null]);
     }
-    window.sbs.time = curTime
+    window.debug.time = curTime
 }
 
 
