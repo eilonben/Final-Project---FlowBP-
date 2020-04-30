@@ -242,7 +242,6 @@ FormatBP.prototype.refresh = function () {
 
 
         } else if (getshape(cell.getStyle()) == "bsync") {
-            if (cell != null) {
                 var dlg = new BSyncForm(ui, cell);
                 //dlg.container.style.width="100%";
                 var cont = document.getElementsByClassName("geFormatContainer")[0];
@@ -253,13 +252,10 @@ FormatBP.prototype.refresh = function () {
                 textnode.innerHTML = '<font size="3">BSync Node</font>';
                 bsyncDIV.appendChild(textnode);
                 bsyncDIV.appendChild(dlg.container);
-
                 dlg.init();
-
-
                 cont.appendChild(bsyncDIV);
+            
 
-            }
         } else if (getshape(cell.getStyle()) == "general") {
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
@@ -365,8 +361,6 @@ FormatBP.prototype.refresh = function () {
 
                 if (numOfOutputs >= 1) {
                     var applyButtonLabels = createApplyButton();
-                    InnerDIVOutputLabel.appendChild(applyButtonLabels);
-
                     applyButtonLabels.onclick = function () {
                         for (var i = 0; i < numOfOutputs; i++) {
                             value.setAttribute("Outputnumber" + (i + 1), document.getElementById("nodeID" + cell.id + "Outputnumber" + (i + 1)).value);
@@ -374,6 +368,7 @@ FormatBP.prototype.refresh = function () {
                         updateEdgesLabels(cell, NumberOfOutPutBox.value, graph.getModel(), value);
                         graph.getModel().setValue(cell, value);
                     };
+                    InnerDIVOutputLabel.appendChild(applyButtonLabels);
                 }
                 OutputLabelDIV.appendChild(InnerDIVOutputLabel);
             };
@@ -383,6 +378,7 @@ FormatBP.prototype.refresh = function () {
             generalDIV.appendChild(OutputLabelDIV);
             //add the DIV to cont
             cont.appendChild(generalDIV);
+
 
         } else if (getshape(cell.getStyle()) == "startnode") {
             // var dlg = new StartNodeForm(ui, cell);
@@ -480,7 +476,7 @@ FormatBP.prototype.refresh = function () {
 
 
             cont.appendChild(startnodeDIV);
-            //graph.getModel().setValue(cell, value);
+           
         }
 
     }

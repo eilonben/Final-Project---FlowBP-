@@ -9,6 +9,7 @@ ActionsBP.prototype.init = function(actions) {
 
     var lastUndo = 0;
 
+
     actions.addAction('editCode', function () {
         var cell = graph.getSelectionCell() || graph.getModel().getRoot();
 
@@ -151,6 +152,7 @@ ActionsBP.prototype.init = function(actions) {
              ui.enableDebugNext(false);
 
      }, null, null);
+
 };
 
 function lockLayers(graph, lock) {

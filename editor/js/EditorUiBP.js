@@ -18,7 +18,7 @@ EditorUiBP.prototype.preDebugActions = []
 
 function EditorUiBP(editor, container, lightbox) {
     EditorUi.call(this,editor, container, lightbox);
-    // new ActionsBP(this.actions);
+
 };
 
 EditorUiBP.prototype = Object.create(EditorUi.prototype);
@@ -134,3 +134,15 @@ EditorUiBP.prototype.enableDebugBack = function (bool) {
 EditorUiBP.prototype.enableDebugNext = function (bool) {
     this.actions.get('debug_next').setEnabled(bool);
 }
+
+EditorUiBP.prototype.saveFile = function(forceDialog)
+{
+    if (!forceDialog && this.editor.filename != null)  // save ..
+    {
+        this.save(this.editor.getOrCreateFilename());
+    }
+    else    //save as ..
+    {
+        ExportDialog.saveLocalFile(this, mxUtils.getXml(this.editor.getGraphXml()), this.editor.getOrCreateFilename(), "xml");
+    }
+};
