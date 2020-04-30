@@ -100,6 +100,8 @@ ActionsBP.prototype.init = function(actions) {
              //cell.setAttribute('label', cell.id)
          //})
 
+         ui.startDebugging();
+
          lockLayers(graph, true)
 
          var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
@@ -117,6 +119,10 @@ ActionsBP.prototype.init = function(actions) {
                  var cell = mod.getCell(curRec[j][0]);
                  var val = cell.clone().getValue();
                  val.setAttribute('Payloads', curRec[j][1]);
+                 //// payload on label
+                 //var x = JSON.stringify(curRec[j][1])
+                 //val.setAttribute('label', x);
+                 ////
                  // indicator
                  var style = cell.getStyle()
                  style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
@@ -140,8 +146,6 @@ ActionsBP.prototype.init = function(actions) {
          }
 
          graph.clearSelection()
-
-         ui.startDebugging();
 
          if(numOfUndos == 0)
              ui.enableDebugNext(false);
