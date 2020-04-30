@@ -8,10 +8,18 @@ ActionsBP.prototype.init = function (actions) {
     var graph = editor.graph;
 
     var lastUndo = 0;
+
+    function showConsole() {
+        if (this.consoleWindow == null) {
+            this.consoleWindow = new myConsoleWindow(ui, document.body.offsetWidth - 480, 120, 420, 240);
+        }
+        else {
+            this.consoleWindow.window.setVisible(!this.layersWindow.window.isVisible());
+        }
+    }
+
     actions.addAction('showConsole', function () {
-        var dlg = new showConsoleDialog(ui);
-        ui.showDialog(dlg.container, 620, 420, true, false);
-        dlg.init();
+        showConsole.call(this);
     });
     actions.addAction('editCode', function () {
         var cell = graph.getSelectionCell() || graph.getModel().getRoot();
@@ -26,12 +34,11 @@ ActionsBP.prototype.init = function (actions) {
     actions.addAction('runModel', function () {
         var cells = graph.getModel().cells;
         fixValues(Object.values(cells));
-
+        showConsole.call(this);
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
         parse_graph(code);
 
-        mxUtils.alert("Code deployed");
     }, null, null, 'Alt+Shift+R');
 
     actions.addAction('editBsync', function () {

@@ -493,7 +493,7 @@ FormatBP.prototype.refresh = function () {
             consolePopUp.appendChild(document.createTextNode("Open Code editor"));
             consolePopUp.id = "codeEditorButton";
             consolePopUp.onclick = function () {
-                var dlg = new ConsoleDialog(ui, cell);
+                var dlg = new ConsoleBlockSidebar(ui, cell);
                 var etd = ui;
                 etd.showDialog(dlg.container, 520, 420, true, true);
                 dlg.init();
