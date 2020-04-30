@@ -11,7 +11,7 @@ ActionsBP.prototype.init = function (actions) {
 
     function showConsole() {
         if (this.consoleWindow === null || this.consoleWindow === undefined) {
-            this.consoleWindow = new myConsoleWindow(ui, document.body.offsetWidth - 480, 120, 420, 240);
+            this.consoleWindow = new myConsoleWindow(ui, document.body.offsetWidth - 480, 120, 420, 285);
         }
         else {
             this.consoleWindow.window.setVisible(true);

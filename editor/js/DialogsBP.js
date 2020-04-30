@@ -517,6 +517,11 @@ var myConsoleWindow = function(editorUi, x, y, w, h)
     this.init = function () {
         textarea.focus();
     };
+    var okBtn = mxUtils.button('Clear', function () {
+        textarea.value = "";
+    });
+    okBtn.className = 'geBtn gePrimaryBtn';
+    td.appendChild(okBtn);
     row.appendChild(td);
     tbody.appendChild(row);
     table.appendChild(tbody);
