@@ -2,14 +2,25 @@ function ActionsBP(actions) {
     this.init(actions);
 }
 
-ActionsBP.prototype.init = function(actions) {
+ActionsBP.prototype.init = function (actions) {
     var ui = actions.editorUi;
     var editor = ui.editor;
     var graph = editor.graph;
 
     var lastUndo = 0;
 
+    function showConsole() {
+        if (this.consoleWindow === null || this.consoleWindow === undefined) {
+            this.consoleWindow = new myConsoleWindow(ui, document.body.offsetWidth - 480, 120, 420, 285);
+        }
+        else {
+            this.consoleWindow.window.setVisible(true);
+        }
+    }
 
+    actions.addAction('showConsole', function () {
+        showConsole.call(this);
+    });
     actions.addAction('editCode', function () {
         var cell = graph.getSelectionCell() || graph.getModel().getRoot();
 
@@ -20,18 +31,17 @@ ActionsBP.prototype.init = function(actions) {
         }
     });
 
-    actions.addAction('runModel', function() {
+    actions.addAction('runModel', function () {
         var cells = graph.getModel().cells;
         fixValues(Object.values(cells));
-
+        showConsole.call(this);
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
         parse_graph(code);
 
-        mxUtils.alert("Code deployed");
     }, null, null, 'Alt+Shift+R');
 
-    actions.addAction('editBsync', function() {
+    actions.addAction('editBsync', function () {
         var cell = graph.getSelectionCell() || graph.getModel().getRoot();
 
         if (cell != null) {
@@ -58,7 +68,7 @@ ActionsBP.prototype.init = function(actions) {
 
     actions.addAction('debug_back', function() {
 
-        if(editor.undoManager.indexOfNextAdd > lastUndo) {
+        if (editor.undoManager.indexOfNextAdd > lastUndo) {
             graph.getModel().beginUpdate();
 
             ui.undo();
@@ -78,7 +88,7 @@ ActionsBP.prototype.init = function(actions) {
 
         editor.undoManager.indexOfNextAdd = editor.undoManager.history.length
         var numOfNewUndos = editor.undoManager.history.length - lastUndo + 1;
-        while(numOfNewUndos-- > 0) {
+        while (numOfNewUndos-- > 0) {
             ui.undo()
             editor.undoManager.history.pop()
         }
@@ -94,7 +104,7 @@ ActionsBP.prototype.init = function(actions) {
          var mod = graph.getModel()
          fixValues(Object.values(mod.cells));
 
-         lastUndo = editor.undoManager.indexOfNextAdd + 1;
+        lastUndo = editor.undoManager.indexOfNextAdd + 1;
 
          //var mod = graph.getModel()
          //Object.values(mod.cells).forEach(cell => {
@@ -107,47 +117,47 @@ ActionsBP.prototype.init = function(actions) {
          console.log(code);
          parse_graph(code);
 
-         // coloring
-         var record = getProgramRecord();
+        // coloring
+        var record = getProgramRecord();
 
          for (let i = 0; i < record.length; i++) {
              mod.beginUpdate();
 
-             var curRec = record[i];
-             for (let j = 0; j < curRec.length; j++) {
-                 var cell = mod.getCell(curRec[j][0]);
-                 var val = cell.clone().getValue();
-                 val.setAttribute('Payloads', curRec[j][1]);
-                 // indicator
-                 var style = cell.getStyle()
-                 style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
-                 mod.setStyle(cell, style);
-                 ////////////
-                 mod.setValue(cell, val);
-             }
+            var curRec = record[i];
+            for (let j = 0; j < curRec.length; j++) {
+                var cell = mod.getCell(curRec[j][0]);
+                var val = cell.clone().getValue();
+                val.setAttribute('Payloads', curRec[j][1]);
+                // indicator
+                var style = cell.getStyle()
+                style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
+                mod.setStyle(cell, style);
+                ////////////
+                mod.setValue(cell, val);
+            }
 
              mod.endUpdate();
          }
          //
 
-         let numOfUndos = editor.undoManager.indexOfNextAdd - lastUndo
+        let numOfUndos = editor.undoManager.indexOfNextAdd - lastUndo
 
-         for (let i = 0; i < numOfUndos; i++) {
-             graph.model.beginUpdate();
+        for (let i = 0; i < numOfUndos; i++) {
+            graph.model.beginUpdate();
 
-             ui.undo();
+            ui.undo();
 
-             graph.model.endUpdate();
-         }
+            graph.model.endUpdate();
+        }
 
-         graph.clearSelection()
+        graph.clearSelection()
 
-         ui.startDebugging();
+        ui.startDebugging();
 
          if(numOfUndos == 0)
              ui.enableDebugNext(false);
 
-     }, null, null);
+    }, null, null);
 
 };
 
@@ -172,14 +182,12 @@ function lockLayers(graph, lock) {
 }
 
 function fixValues(cells) {
-    for(let i = 0; i < cells.length; i++)
-    {
+    for (let i = 0; i < cells.length; i++) {
         let c = cells[i];
         let value = c.getValue();
 
         // Converts the value to an XML node
-        if (value == "")
-        {
+        if (value == "") {
             var doc = mxUtils.createXmlDocument();
             var obj = doc.createElement('object');
             obj.setAttribute('label', value || '');
