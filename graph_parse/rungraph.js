@@ -170,6 +170,7 @@ function* runInSameBT(c, payloads, bpEngine, model, scen) {
 
 function startRunning(model) {
 // Start the context nodes
+    window.eventsSelected=[];
     initDebug();
 
     var cells = model.cells;

@@ -23,7 +23,15 @@ function loadXMl(filePath) {
     return xml_for_test;
 }
 
-var testHeyOrGoodbye = function () {
+function printToIndex(testName,resulte) {
+    var body= document.getElementById("001");
+    if(resulte)
+        body.innerText += "test "+testName+"\t-\tPass\n";
+    else
+        body.innerText += "test "+testName+"\t-\tFail\n";
+}
+
+var testHiOrGoodbye = function () {
     var expected = ["Hi","Goodbye"];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HiOrGoodbye.xml");
@@ -39,7 +47,6 @@ var testHeyOrGoodbye = function () {
         return false;
     return expected.includes(resulte[0]);
 }
-
 
 var testHelloWorld = function () {
     var expected = ["Hello","World"];
@@ -90,7 +97,11 @@ var testRandomOrder = function () {
     return false;
 }
 
-console.log("test HeyOrGoodbye   -   "+testHeyOrGoodbye());
-console.log("test HelloWorld   -   "+testHelloWorld());
-console.log("test HotCold   -   "+testHotCold());
-console.log("test RandomOrder   -   "+testRandomOrder());
+var runTests = function() {
+    printToIndex("HeyOrGoodbye", testHiOrGoodbye());
+    printToIndex("HelloWorld", testHelloWorld());
+    printToIndex("HotCold", testHotCold());
+    printToIndex("RandomOrder", testRandomOrder());
+}
+
+runTests();
