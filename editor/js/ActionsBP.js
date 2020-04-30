@@ -10,11 +10,11 @@ ActionsBP.prototype.init = function (actions) {
     var lastUndo = 0;
 
     function showConsole() {
-        if (this.consoleWindow == null) {
+        if (this.consoleWindow === null || this.consoleWindow === undefined) {
             this.consoleWindow = new myConsoleWindow(ui, document.body.offsetWidth - 480, 120, 420, 240);
         }
         else {
-            this.consoleWindow.window.setVisible(!this.layersWindow.window.isVisible());
+            this.consoleWindow.window.setVisible(true);
         }
     }
 
