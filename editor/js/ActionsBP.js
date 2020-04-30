@@ -41,7 +41,7 @@ ActionsBP.prototype.init = function(actions) {
         }
     });
 
-    actions.addAction('next_sbs', function() {
+    actions.addAction('debug_next', function() {
         graph.getModel().beginUpdate();
 
         ui.redo();
@@ -51,12 +51,12 @@ ActionsBP.prototype.init = function(actions) {
         graph.getModel().endUpdate();
 
         if(lastUndo + 1 == editor.undoManager.indexOfNextAdd)
-            ui.enableBackSBS(true);
+            ui.enableDebugBack(true);
         else if(editor.undoManager.indexOfNextAdd == editor.undoManager.history.length)
-            ui.enableNextSBS(false);
+            ui.enableDebugNext(false);
     }, false, null);
 
-    actions.addAction('back_sbs', function() {
+    actions.addAction('debug_back', function() {
 
         if(editor.undoManager.indexOfNextAdd > lastUndo) {
             graph.getModel().beginUpdate();
@@ -68,13 +68,13 @@ ActionsBP.prototype.init = function(actions) {
             graph.getModel().endUpdate();
 
             if (editor.undoManager.indexOfNextAdd == lastUndo)
-                ui.enableBackSBS(false);
+                ui.enableDebugBack(false);
             else if(editor.undoManager.indexOfNextAdd + 1 == editor.undoManager.history.length)
-                ui.enableNextSBS(true);
+                ui.enableDebugNext(true);
         }
     }, false, null);
 
-    actions.addAction('stop_sbs', function() {
+    actions.addAction('debug_stop', function() {
 
         editor.undoManager.indexOfNextAdd = editor.undoManager.history.length
         var numOfNewUndos = editor.undoManager.history.length - lastUndo + 1;
@@ -89,15 +89,19 @@ ActionsBP.prototype.init = function(actions) {
 
     }, false, null);
 
-     actions.addAction('debug_sbs', function() {
+     actions.addAction('debug_debug', function() {
 
-         var cells = graph.getModel().cells;
-         fixValues(Object.values(cells));
+         var mod = graph.getModel()
+         fixValues(Object.values(mod.cells));
 
          lastUndo = editor.undoManager.indexOfNextAdd + 1;
 
-         var mod = graph.getModel()
-         lockLayer(mod, true)
+         //var mod = graph.getModel()
+         //Object.values(mod.cells).forEach(cell => {
+             //cell.setAttribute('label', cell.id)
+         //})
+
+         lockLayers(graph, true)
 
          var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
          console.log(code);
@@ -107,7 +111,7 @@ ActionsBP.prototype.init = function(actions) {
          var record = getProgramRecord();
 
          for (let i = 0; i < record.length; i++) {
-             graph.model.beginUpdate();
+             mod.beginUpdate();
 
              var curRec = record[i];
              for (let j = 0; j < curRec.length; j++) {
@@ -122,7 +126,7 @@ ActionsBP.prototype.init = function(actions) {
                  mod.setValue(cell, val);
              }
 
-             graph.model.endUpdate();
+             mod.endUpdate();
          }
          //
 
@@ -141,22 +145,30 @@ ActionsBP.prototype.init = function(actions) {
          ui.startDebugging();
 
          if(numOfUndos == 0)
-             ui.enableNextSBS(false);
+             ui.enableDebugNext(false);
 
      }, null, null);
 
 };
 
-function lockLayer(mod, lock) {
+function lockLayers(graph, lock) {
+
+    var mod = graph.getModel()
+    graph.getModel().beginUpdate();
+
     var locker;
-    lock ? locker = 1 : locker = 0;
+    lock ? locker = '1' : locker = '0';
+
     mod.root.children.forEach(layer => {
         if(mod.isLayer(layer)) {
-            var style = layer.getStyle();
-            style !== undefined ? style = style.replace('locked=' + locker, 'locked=' + !locker) : style = 'locked=' + locker;
-            mod.setStyle(layer, style);
+            var style = layer.getStyle()
+            var value = (mxUtils.getValue(style, 'locked', locker) == '1') ? locker : !locker;
+            graph.setCellStyles('locked', value, [layer]);
         }
     });
+
+    graph.getModel().endUpdate();
+
 }
 
 function fixValues(cells) {
