@@ -1067,3 +1067,39 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
     return edge;
 };
 
+
+
+//repaint edges or shapes in black after they were painted in red
+
+mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSource)
+{
+    var previous = this.getTerminal(edge, isSource);
+
+    if (terminal != null)
+    {
+        terminal.insertEdge(edge, isSource);
+
+        //	repaint eadge or shape in black
+        if(terminal.repaint)
+        {
+            var new_style = mxUtils.setStyle(terminal.getStyle(), 'strokeColor', '#000000');
+            //after fixing the cell it will repaint in black
+            terminal.repaint = null;
+            this.setStyle(terminal, new_style);
+        }
+        if(edge.repaint)
+        {
+            var new_style = mxUtils.setStyle(edge.getStyle(), 'strokeColor', '#000000');
+            //after fixing the cell it will repaint in black
+            edge.repaint = null;
+            this.setStyle(edge, new_style);
+        }
+
+    }
+    else if (previous != null)
+    {
+        previous.removeEdge(edge, isSource);
+    }
+
+    return previous;
+};

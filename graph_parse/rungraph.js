@@ -120,6 +120,8 @@ function* runInNewBT(c, payloads, bpEngine, model) {
 };
 
 function getshape(str) {
+    if(str == null)
+        return "";
     let arr = str.split(";");
     return arr[0].split("=")[1].split(".")[1];
 }

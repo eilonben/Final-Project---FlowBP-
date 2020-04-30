@@ -1,3 +1,25 @@
+const colorOfInvalid = '#ff6666';
+
+function paintCells(graph,cells , updateModel) {
+
+    var graphModel = graph.getModel();
+    if (updateModel)
+        graphModel.beginUpdate();
+    try {
+        for (var i = 0; i < cells.length; i++) {
+            var new_style = mxUtils.setStyle(cells[i].getStyle(), 'strokeColor', colorOfInvalid);
+            //after fixing the cell it will repaint in black
+            cells[i].repaint = true;
+            graphModel.setStyle(cells[i], new_style);
+        }
+    }
+    finally {
+        if (updateModel)
+            graphModel.endUpdate();
+    }
+};
+
+
 function ActionsBP(actions) {
     this.init(actions);
 }
@@ -21,9 +43,14 @@ ActionsBP.prototype.init = function(actions) {
     actions.addAction('runModel', function() {
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
-        parse_graph(code);
+        var invalidCells = parse_graph(code,graph,true);
 
-        mxUtils.alert("Code deployed");
+        if(invalidCells.length == 0)
+            mxUtils.alert("Code deployed");
+        else {
+            paintCells(graph, invalidCells, true);
+            mxUtils.alert("Graph is Invalid! lonely start node or edge");
+        }
     }, null, null, 'Alt+Shift+R');
 
     actions.addAction('editBsync', function() {
@@ -134,7 +161,7 @@ ActionsBP.prototype.init = function(actions) {
 
          var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
          console.log(code);
-         parse_graph(code);
+         parse_graph(code,graph);
 
          graph.selectionModel.cells = []
 
