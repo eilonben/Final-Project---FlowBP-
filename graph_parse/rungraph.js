@@ -32,7 +32,7 @@ window.bpEngine = {
                 yield 'waiting for an event';
             console.log(e + "\n");
             writeToConsole("event selected: " + e);
-            window.eventSelected = e;
+            window.eventsSelected.push(e);
             window.bpEngine.BThreads.forEach(bt => {
                 if (isReqWait(bt, e)) {
                     bt.stmt = fixStmt(bt.iterator.next().value)
@@ -200,6 +200,7 @@ function* runInSameBT(c, payloads, bpEngine, model, scen) {
 
 function startRunning(model) {
 // Start the context nodes
+    window.eventsSelected=[];
     initDebug();
 
     var cells = model.cells;
