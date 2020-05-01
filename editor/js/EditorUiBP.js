@@ -14,10 +14,11 @@
 // };
 //
 // EditorUIBP.prototype.constructor = EditorUi;
+EditorUiBP.prototype.preDebugActions = []
 
 function EditorUiBP(editor, container, lightbox) {
     EditorUi.call(this,editor, container, lightbox);
-    // new ActionsBP(this.actions);
+
 };
 
 EditorUiBP.prototype = Object.create(EditorUi.prototype);
@@ -73,23 +74,38 @@ EditorUiBP.prototype.createTemporaryGraph = function(stylesheet)
 
 // EditorUiBP.prototype.constructor = EditorUi;
 
-EditorUiBP.prototype.disableActionsForDebugging = function (bool) {
+EditorUiBP.prototype.disableActionsForDebugging = function () {
 
     var actions = Object.values(this.actions.actions);
+    EditorUiBP.prototype.preDebugActions = [];
 
     for (var i = 0; i < actions.length; i++) {
-        actions[i].setEnabled(bool);
+        EditorUiBP.prototype.preDebugActions.push([actions[i], actions[i].isEnabled()])
+        actions[i].setEnabled(false);
     }
 
-    actions = ['stop_sbs', 'next_sbs', 'back_sbs'];
+    actions = ['debug_stop', 'debug_next'];
     for (var i = 0; i < actions.length; i++) {
-        this.actions.get(actions[i]).setEnabled(!bool);
+        this.actions.get(actions[i]).setEnabled(true);
+    }
+}
+
+
+EditorUiBP.prototype.enableActionsAfterDebugging = function () {
+
+    for (var i = 0; i < EditorUiBP.prototype.preDebugActions.length; i++) {
+        var action = EditorUiBP.prototype.preDebugActions[i];
+        action[0].setEnabled(action[1]);
+    }
+
+    actions = ['debug_stop', 'debug_next', 'debug_back'];
+    for (var i = 0; i < actions.length; i++) {
+        this.actions.get(actions[i]).setEnabled(false);
     }
 }
 
 EditorUiBP.prototype.startDebugging = function () {
-
-    this.disableActionsForDebugging(false);
+    this.disableActionsForDebugging();
 
     this.toggleFormatPanel(true);
     this.sidebar.showTooltips = false;
@@ -100,13 +116,33 @@ EditorUiBP.prototype.startDebugging = function () {
 }
 
 EditorUiBP.prototype.endDebugging = function () {
-
-    this.disableActionsForDebugging(true);
-
+    this.enableActionsAfterDebugging();
+    this.hsplit.style.left = '12px';
     this.sidebarContainer.style.visibility = 'visible';
     this.toggleFormatPanel();
 }
 
-EditorUiBP.prototype.noUndo = function () {
+EditorUiBP.prototype.noUndoRedo = function () {
     this.actions.get('undo').setEnabled(false);
+    this.actions.get('redo').setEnabled(false);
 }
+
+EditorUiBP.prototype.enableDebugBack = function (bool) {
+    this.actions.get('debug_back').setEnabled(bool);
+}
+
+EditorUiBP.prototype.enableDebugNext = function (bool) {
+    this.actions.get('debug_next').setEnabled(bool);
+}
+
+EditorUiBP.prototype.saveFile = function(forceDialog)
+{
+    if (!forceDialog && this.editor.filename != null)  // save ..
+    {
+        this.save(this.editor.getOrCreateFilename());
+    }
+    else    //save as ..
+    {
+        ExportDialog.saveLocalFile(this, mxUtils.getXml(this.editor.getGraphXml()), this.editor.getOrCreateFilename(), "xml");
+    }
+};

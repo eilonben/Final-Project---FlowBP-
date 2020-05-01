@@ -1,7 +1,15 @@
-window.sbs = {
-    stages: [],
-    curStage: -1
+window.debug = {
+    time: 0,
+    curStage: -1,
+    scenarios: {}
 };
+
+function writeToConsole(message) {
+    let myConsole = document.getElementById("ConsoleText1");
+    if (myConsole !== undefined && myConsole !== null) {
+        myConsole.value += message +"\n" ;
+    }
+}
 
 window.bpEngine = {
     BThreads: [],
@@ -18,12 +26,13 @@ window.bpEngine = {
 
     run: function* () {
         while (true) {
+            fixStages();
             let e = getEvent();
             if (e === null)
                 yield 'waiting for an event';
             console.log(e + "\n");
-            mxUtils.alert("event selected: " + e + "\n");
-            window.eventSelected = e;
+            writeToConsole("event selected: " + e);
+            window.eventsSelected.push(e);
             window.bpEngine.BThreads.forEach(bt => {
                 if (isReqWait(bt, e)) {
                     bt.stmt = fixStmt(bt.iterator.next().value)
@@ -72,7 +81,7 @@ function getRandomItem(set) {
     return items[Math.floor(Math.random() * items.length)];
 }
 
-function* goToFollowers(c, payloads, bpEngine, model,outputs) {
+function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
     let edg = model.getEdges(c, false, true, true);
     if (edg.length > 0) {
         // Run extra followers in new threads
@@ -84,7 +93,7 @@ function* goToFollowers(c, payloads, bpEngine, model,outputs) {
                 if(edgeLabel!==undefined && outputs!==undefined && outputs[edgeLabel]!== undefined){
                     nextPayloads = outputs[edgeLabel];
                 }
-                yield* runInNewBT(target,nextPayloads, bpEngine,model);
+                runInNewBT(target, nextPayloads, bpEngine, model, window.debug.scenarios[scen].length);
             }
         }
         // Run the first follower in the same thread.
@@ -95,26 +104,52 @@ function* goToFollowers(c, payloads, bpEngine, model,outputs) {
             if(edgeLabel!==undefined && outputs!==undefined && outputs[edgeLabel]!== undefined){
                 nextPayloads = outputs[edgeLabel];
             }
-            yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model);
+            yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model, scen);
         }
     }
 }
 
-function* runInNewBT(c, payloads, bpEngine, model) {
-    // Cloning - Is this the right way?
-    let outputs = {};
-    let cloned = JSON.parse(JSON.stringify(payloads));
+function runInNewBT(c, payloads, bpEngine, model, curTime) {
     window.bpEngine.registerBThread(function* () {
+        let outputs = {};
+        let cloned = JSON.parse(JSON.stringify(payloads))
         if (c.getAttribute("code") !== undefined) {
-            eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
-            outputs = func(cloned);
+            try{
+                eval('var func = function(payloads){' + c.getAttribute("code") + '\n}');
+                outputs = func(cloned)
+            }
+            catch(e){
+                alert('There has been an error while executing the JS code on General node ' +
+                    c.getId()+": \n" +e+".\n execution will now terminate.");
+                return;
+            }
         }
+        if (c.getAttribute("log") !== undefined) {
+            try{
+                eval('var func = function(payloads){' + c.getAttribute("log") + '\n}');
+                let consoleString = func(cloned);
+                writeToConsole(consoleString);
+            }
+            catch(e){
+                alert('There has been an error while executing the JS code on Console node ' +
+                    c.getId()+": \n" +e+".\n execution will now terminate.");
+                return;
+            }
+        }
+
+        c.setAttribute("scenarioID", c.id);
+        window.debug.scenarios[c.id] = [];
+        for(let i = 0; i < curTime; i++)
+            window.debug.scenarios[c.id].push([-1, null]);
+        window.debug.scenarios[c.id].push([c.id, cloned]);
+
         if (c.getAttribute("sync") !== undefined) {
             yield JSON.parse(c.getAttribute("sync"));
-            // curr["selected"] = window.eventSelected;
+            curTime = 0
+            // cloned["selected"] = window.eventSelected;
         }
-        window.sbs.stages.push(c.id);
-        yield* goToFollowers(c, cloned, bpEngine,model,outputs);
+
+        yield* goToFollowers(c, cloned, bpEngine,model,outputs, c.id);
     }());
 
 };
@@ -126,27 +161,52 @@ function getshape(str) {
     return arr[0].split("=")[1].split(".")[1];
 }
 
-function* runInSameBT(c, payloads, bpEngine, model) {
+function* runInSameBT(c, payloads, bpEngine, model, scen) {
     let outputs = {};
-    let curr = JSON.parse(JSON.stringify(payloads));
+    let cloned = JSON.parse(JSON.stringify(payloads));
     if (c.getAttribute("code") !== undefined) {
-        eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
-        outputs = func(curr);
+        try {
+            eval('var func = function(payloads){' + c.getAttribute("code") + '\n}');
+            outputs = func(cloned)
+        }
+        catch (e) {
+            alert('There has been an error while executing the JS code on node ' +
+                c.getId() + ": \n" + e + ".\n execution will now terminate.");
+            return;
+        }
     }
+        if (c.getAttribute("log") !== undefined) {
+            try {
+                eval('var func = function(payloads){' + c.getAttribute("log") + '\n}');
+                let consoleString = func(cloned);
+                writeToConsole(consoleString);
+            }
+            catch (e) {
+                alert('There has been an error while executing the JS code on Console node ' +
+                    c.getId() + ": \n" + e + ".\n execution will now terminate.");
+                return;
+            }
+        }
+
+    c.setAttribute("scenarioID", scen);
+    window.debug.scenarios[scen].push([c.id, cloned]);
+
     if (c.getAttribute("sync") !== undefined) {
         yield JSON.parse(c.getAttribute("sync"));
-        // curr["selected"] = window.eventSelected;
+        curTime = 0
+        // cloned["selected"] = window.eventSelected;
     }
 
-    window.sbs.stages.push(c.id);
-
-    yield *goToFollowers(c, curr,  bpEngine,model,outputs);
+    yield* goToFollowers(c, cloned, bpEngine, model, outputs, scen);
 }
 
 function startRunning(model) {
 // Start the context nodes
-    let cells = model.cells;
-    let arr = Object.keys(cells).map(function (key) {
+    window.eventsSelected=[];
+    initDebug();
+
+    var cells = model.cells;
+    var arr = Object.keys(cells).map(function (key) {
         return cells[key]
     });
     let startNds = model.filterCells(arr,
@@ -157,27 +217,50 @@ function startRunning(model) {
         let payloads = [{}];
         if (startNds[i].getAttribute("Payloads") !== undefined)
             payloads = (JSON.parse(startNds[i].getAttribute("Payloads")));
-        runInNewBT(startNds[i], payloads, bpEngine, model).next();
+        runInNewBT(startNds[i], payloads, bpEngine, model, 0);
     }
     window.bpEngine.run().next();
     window.bpEngine.BThreads = [];
 }
 
-function getNextStage() {
-    if(window.sbs.curStage < window.sbs.stages.length - 1)
-        return window.sbs.stages[++window.sbs.curStage]
-    return window.sbs.stages[window.sbs.curStage = window.sbs.stages.length - 1]
+function getProgramRecord() {
+    var res = []
+
+    while(window.debug.curStage < window.debug.time - 1) {
+        window.debug.curStage++;
+
+        var curStage = []
+        var scens = Object.values(window.debug.scenarios)
+        for (let i = 0; i < scens.length; i++) {
+            let cur = scens[i];
+            if (cur[window.debug.curStage][0] != -1) {
+                curStage.push(cur[window.debug.curStage])
+            }
+        }
+
+        res.push(curStage)
+    }
+    return res;
 }
 
-function getPrevStage() {
-    if(window.sbs.curStage > 0)
-        return window.sbs.stages[--window.sbs.curStage]
-    return window.sbs.stages[window.sbs.curStage = 0]
+function initDebug() {
+    window.debug.scenarios = {}
+    window.debug.curStage = -1
+    window.debug.time = 0
 }
 
-function initSBS() {
-    window.sbs.stages = []
-    window.sbs.curStage = -1
+function fixStages() {
+    let scens = Object.values(window.debug.scenarios)
+    const lengths = scens.map(x => x.length);
+    let curTime = Math.max(...lengths)
+    for(let i = 0; i < scens.length; i++)
+    {
+        let curScen = scens[i];
+        let numOfFixes = curTime - curScen.length;
+        for (let j = 0; j < numOfFixes; j++)
+            curScen.push([-1, null]);
+    }
+    window.debug.time = curTime
 }
 
 

@@ -6,8 +6,10 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<link rel="stylesheet" type="text/css" href="../resources/mxgraph/javascript/examples/grapheditor/www/styles/grapheditor.css">
+	<link rel="stylesheet" href="styles/grapheditor.css">
 	<link rel="stylesheet" href="codemirror/lib/codemirror.css">
 	<script src="codemirror/lib/codemirror.js"></script>
+	<script src="https://unpkg.com/esprima@~4.0/dist/esprima.js"></script>
 	<script src="codemirror/mode/javascript/javascript.js"></script>
 	<script type="text/javascript">
         // Parses URL parameters. Supported parameters are:
@@ -79,7 +81,6 @@
         EditorUiBP.prototype.init = function()
         {
             editorUiInit.apply(this, arguments);
-            this.actions.get('export').setEnabled(false);
 
             // Updates action states which require a backend
             if (!Editor.useLocalStorage)
@@ -90,8 +91,8 @@
                     this.actions.get('open').setEnabled(enabled || Graph.fileSupport);
                     this.actions.get('import').setEnabled(enabled || Graph.fileSupport);
                     this.actions.get('save').setEnabled(enabled);
-                    this.actions.get('saveAs').setEnabled(enabled);
-                    this.actions.get('export').setEnabled(enabled);
+                    this.actions.get('saveAs').setEnabled(enabled || Graph.fileSupport);
+                    this.actions.get('export').setEnabled(enabled || Graph.fileSupport);
                 }));
             }
         };
