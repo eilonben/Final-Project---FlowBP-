@@ -1,10 +1,9 @@
 const colorOfInvalid = '#9A5688';
 
-function paintCells(graph,cells , updateModel) {
+function paint_cells(graph,cells) {
 
     var graphModel = graph.getModel();
-    if (updateModel)
-        graphModel.beginUpdate();
+    graphModel.beginUpdate();
     try {
         for (var i = 0; i < cells.length; i++) {
             var new_style = mxUtils.setStyle(cells[i].getStyle(), 'strokeColor', colorOfInvalid);
@@ -14,9 +13,9 @@ function paintCells(graph,cells , updateModel) {
         }
     }
     finally {
-        if (updateModel)
-            graphModel.endUpdate();
+        graphModel.endUpdate();
     }
+
 };
 
 
@@ -59,12 +58,12 @@ ActionsBP.prototype.init = function (actions) {
         showConsole.call(this);
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
-        var invalidCells = parse_graph(code,graph,true);
+        var invalidCells = parse_graph(code,graph);
 
         if(invalidCells.length == 0)
             mxUtils.alert("Code deployed");
         else {
-            paintCells(graph, invalidCells, true);
+            paint_cells(graph, invalidCells);
             mxUtils.alert("Graph is Invalid! lonely start node or edge");
         }
     }, null, null, 'Alt+Shift+R');
@@ -143,7 +142,15 @@ ActionsBP.prototype.init = function (actions) {
 
          var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
          console.log(code);
-         parse_graph(code);
+
+         var invalidCells = parse_graph(code,graph);
+
+         if(invalidCells.length != 0) {
+             paint_cells(graph, invalidCells);
+             mxUtils.alert("Graph is Invalid! lonely start node or edge");
+             return;
+         }
+
 
         // coloring
         var record = getProgramRecord();

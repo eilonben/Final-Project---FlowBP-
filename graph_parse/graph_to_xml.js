@@ -25,7 +25,7 @@ function findInvalidCells(graph) {
 };
 
 //decode the xml string received from Actions.js
-function parse_graph(xml_code, graph, runMood) {
+function parse_graph(xml_code, graph) {
     // console.log(xml_code);
     let doc = mxUtils.parseXml(xml_code);
     let codec = new mxCodec(doc);
