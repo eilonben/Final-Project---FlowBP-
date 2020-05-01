@@ -86,7 +86,7 @@ ActionsBP.prototype.init = function (actions) {
 
     actions.addAction('debug_stop', function() {
 
-        editor.undoManager.indexOfNextAdd = editor.undoManager.history.length
+        editor.undoManager.indexOfNextAdd = editor.undoManager.history.length;
         var numOfNewUndos = editor.undoManager.history.length - lastUndo + 1;
         while (numOfNewUndos-- > 0) {
             ui.undo()
