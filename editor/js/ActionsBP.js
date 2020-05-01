@@ -1,4 +1,4 @@
-const colorOfInvalid = '#ff6666';
+const colorOfInvalid = '#9A5688';
 
 function paintCells(graph,cells , updateModel) {
 
