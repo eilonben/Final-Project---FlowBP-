@@ -40,7 +40,7 @@ function consoleToArray(){
         arr.pop();
     return arr;
 }
-var testHiOrGoodbye = function () {
+var testRequestsList = function () {
     var expected = ["Hi","Goodbye"];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HiOrGoodbye.xml");
@@ -164,13 +164,15 @@ var runTests = function() {
         printToIndex(name,func());
     }
 
-    run("HeyOrGoodbye", testHiOrGoodbye);
-    run("HelloWorld", testHelloWorld);
-    run("HotCold", testHotCold);
-    run("RandomOrder", testRandomOrder);
-    run("payload", testPayload);
-    run("payloadChange", testPayloadChange);
-    run("PayloadsIfElse", testPayloadsIfElse);
+    run("RequestsList", testRequestsList);  //Checks that only one of the requests events has occurred
+    run("HelloWorld", testHelloWorld);     //Checks the order of requests that occur
+    run("RandomOrder", testRandomOrder);   //Checks that randomization of requests events occurrence from two scenarios that starting from two different start-nodes is legal.
+    run("HotCold", testHotCold);           /* Checking the program hot cold:
+                                               Checks the order of requests that occur in conjunction with block and wait events*/
+    run("payload", testPayload);           //Check that the payloads that apply in the start node pass between nodes and check the current value of them
+    run("payloadChange", testPayloadChange);    /*check that the payloads that apply in the start node can by change their value.
+                                                    passes the payloads with the news changes between nodes and check the current new value of them*/
+    run("PayloadsIfElse", testPayloadsIfElse);    //check that general node send other payloads to other outputs, according to the user-defined in the "if-else" condition.
 }
 
 runTests();
