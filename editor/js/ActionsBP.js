@@ -37,13 +37,19 @@ ActionsBP.prototype.init = function (actions) {
         showConsole.call(this);
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
-        var invalidCells = parse_graph(code,graph);
+
+        // if invalidCells is not empty -> there are edges without source or target OR start node without edges
+        var invalidCells = findInvalidCells(graph.getModel());
 
         //Confirm that the graph is valid
-        if(invalidCells.length == 0)
-            mxUtils.alert("Code deployed");
-        else
+        if(invalidCells.length != 0)
             mxUtils.alert("Graph is Invalid! lonely start node or edge");
+        else
+            {
+            parse_graph(code);
+            mxUtils.alert("Code deployed");
+        }
+
 
     }, null, null, 'Alt+Shift+R');
 
@@ -120,14 +126,16 @@ ActionsBP.prototype.init = function (actions) {
          var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
          console.log(code);
 
-         //Confirm that the graph is valid
-         var invalidCells = parse_graph(code,graph);
+         // if invalidCells is not empty -> there are edges without source or target OR start node without edges
+         var invalidCells = findInvalidCells(graph.getModel());
+
          if(invalidCells.length != 0) {
              mxUtils.alert("Graph is Invalid! lonely start node or edge");
              return;
          }
-         lockLayers(graph, true)
 
+         lockLayers(graph, true)
+         parse_graph(code,graph);
 
         // coloring
         var record = getProgramRecord();
