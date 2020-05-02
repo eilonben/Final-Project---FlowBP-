@@ -438,7 +438,7 @@ var showConsoleDialog = function (editorUi) {
     row = document.createElement('tr');
     td = document.createElement('td');
     var textarea = document.createElement('textarea');
-    textarea.setAttribute("id","ConsoleText1")
+    textarea.setAttribute("id","ConsoleText1");
     textarea.setAttribute('wrap', 'off');
     textarea.setAttribute('spellcheck', 'false');
     textarea.setAttribute('autocorrect', 'off');
