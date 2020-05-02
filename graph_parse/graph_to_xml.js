@@ -1,6 +1,6 @@
 const colorOfInvalid = '#9A5688';
 
-function paint_cells(graph,cells) {
+function paint_cells(graph, cells) {
 
     var graphModel = graph.getModel();
     graphModel.beginUpdate();
@@ -18,6 +18,23 @@ function paint_cells(graph,cells) {
 
 };
 
+function checkCellValidation(cell) {
+    //edge
+    if (cell.isEdge()) {
+        var edge = cell;
+        if (edge.source == null || edge.target == null)
+            return false;
+
+    }
+    //shape - start node
+    else if(getshape(cell.getStyle()) == "startnode") {
+            var startNode = cell;
+            if(startNode.edges == null || startNode.edges.length == 0)
+                return false;
+    }
+    return true;
+}
+
 
 function findInvalidCells(graph) {
     var invalidCells = [];
@@ -25,22 +42,8 @@ function findInvalidCells(graph) {
     const cells = Object.values(model.cells);
 
     for (var i = 0; i < cells.length; i++) {
-        //edge
-        if (cells[i].isEdge()) {
-            var edge = cells[i];
-            if (edge.source == null || edge.target == null) {
-                invalidCells.push(edge);
-            }
-        }
-        //shape
-        else {
-            if (getshape(cells[i].getStyle()) == "startnode") {
-                var startNode = cells[i];
-                if(startNode.edges == null || startNode.edges.length == 0)
-                    invalidCells.push(startNode);
-            }
-
-        }
+        if(!checkCellValidation(cells[i]))
+            invalidCells.push(cells[i]);
     }
     paint_cells(graph, invalidCells);
     return invalidCells;
