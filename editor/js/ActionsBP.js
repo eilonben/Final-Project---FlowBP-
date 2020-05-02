@@ -1,24 +1,3 @@
-const colorOfInvalid = '#9A5688';
-
-function paint_cells(graph,cells) {
-
-    var graphModel = graph.getModel();
-    graphModel.beginUpdate();
-    try {
-        for (var i = 0; i < cells.length; i++) {
-            var new_style = mxUtils.setStyle(cells[i].getStyle(), 'strokeColor', colorOfInvalid);
-            //after fixing the cell it will repaint in black
-            cells[i].repaint = true;
-            graphModel.setStyle(cells[i], new_style);
-        }
-    }
-    finally {
-        graphModel.endUpdate();
-    }
-
-};
-
-
 function ActionsBP(actions) {
     this.init(actions);
 }
@@ -62,10 +41,9 @@ ActionsBP.prototype.init = function (actions) {
 
         if(invalidCells.length == 0)
             mxUtils.alert("Code deployed");
-        else {
-            paint_cells(graph, invalidCells);
+        else
             mxUtils.alert("Graph is Invalid! lonely start node or edge");
-        }
+
     }, null, null, 'Alt+Shift+R');
 
     actions.addAction('editBsync', function () {
@@ -146,7 +124,6 @@ ActionsBP.prototype.init = function (actions) {
          var invalidCells = parse_graph(code,graph);
 
          if(invalidCells.length != 0) {
-             paint_cells(graph, invalidCells);
              mxUtils.alert("Graph is Invalid! lonely start node or edge");
              return;
          }
