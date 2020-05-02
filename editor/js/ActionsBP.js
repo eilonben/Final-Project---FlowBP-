@@ -39,6 +39,7 @@ ActionsBP.prototype.init = function (actions) {
         console.log(code);
         var invalidCells = parse_graph(code,graph);
 
+        //Confirm that the graph is valid
         if(invalidCells.length == 0)
             mxUtils.alert("Code deployed");
         else
@@ -116,17 +117,16 @@ ActionsBP.prototype.init = function (actions) {
              //cell.setAttribute('label', cell.id)
          //})
 
-         lockLayers(graph, true)
-
          var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
          console.log(code);
 
+         //Confirm that the graph is valid
          var invalidCells = parse_graph(code,graph);
-
          if(invalidCells.length != 0) {
              mxUtils.alert("Graph is Invalid! lonely start node or edge");
              return;
          }
+         lockLayers(graph, true)
 
 
         // coloring
