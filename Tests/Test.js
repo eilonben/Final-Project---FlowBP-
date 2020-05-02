@@ -45,6 +45,7 @@ var testRequestsList = function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HiOrGoodbye.xml");
     try {
+
         parse_graph(xml);
         resulte = consoleToArray();
     }catch (e) {

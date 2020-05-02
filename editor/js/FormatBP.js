@@ -99,7 +99,6 @@ FormatBP.prototype.refresh = function () {
     this.clear();
     var ui = this.editorUi;
     var graph = ui.editor.graph;
-
     var div = document.createElement('div');
     div.style.whiteSpace = 'nowrap';
     div.style.color = 'rgb(112, 112, 112)';

@@ -77,7 +77,7 @@ var BSyncForm = function (editorUi, cell) {
         value.setAttribute("Block", linkInput["Block"].value);
         value.setAttribute("label","Request: "+linkInput["Request"].value+"\nWait: "+linkInput["Wait"].value+"\nBlock: "+linkInput["Block"].value);
         graph.getModel().setValue(cell, value);
-        graph.updateCellSize(cell, true);
+        //graph.updateCellSize(cell, true);
 
 
         editorUi.hideDialog();
