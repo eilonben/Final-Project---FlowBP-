@@ -37,7 +37,13 @@ ActionsBP.prototype.init = function (actions) {
         showConsole.call(this);
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
-        parse_graph(code);
+        var invalidCells = parse_graph(code,graph);
+
+        //Confirm that the graph is valid
+        if(invalidCells.length == 0)
+            mxUtils.alert("Code deployed");
+        else
+            mxUtils.alert("Graph is Invalid! lonely start node or edge");
 
     }, null, null, 'Alt+Shift+R');
 
@@ -111,11 +117,17 @@ ActionsBP.prototype.init = function (actions) {
              //cell.setAttribute('label', cell.id)
          //})
 
-         lockLayers(graph, true)
-
          var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
          console.log(code);
-         parse_graph(code);
+
+         //Confirm that the graph is valid
+         var invalidCells = parse_graph(code,graph);
+         if(invalidCells.length != 0) {
+             mxUtils.alert("Graph is Invalid! lonely start node or edge");
+             return;
+         }
+         lockLayers(graph, true)
+
 
         // coloring
         var record = getProgramRecord();
