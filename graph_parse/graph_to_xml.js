@@ -1,8 +1,6 @@
 const colorOfInvalid = '#9A5688';
 
-function paint_cells(graph, cells) {
-
-    var graphModel = graph.getModel();
+function paint_cells(graphModel, cells) {
     graphModel.beginUpdate();
     try {
         for (var i = 0; i < cells.length; i++) {
@@ -36,33 +34,28 @@ function checkCellValidation(cell) {
 }
 
 
-function findInvalidCells(graph) {
+function findInvalidCells(model) {
     var invalidCells = [];
-    var model = graph.getModel();
     const cells = Object.values(model.cells);
 
     for (var i = 0; i < cells.length; i++) {
         if(!checkCellValidation(cells[i]))
             invalidCells.push(cells[i]);
     }
-    paint_cells(graph, invalidCells);
+    paint_cells(model, invalidCells);
     return invalidCells;
 };
 
 //decode the xml string received from Actions.js
-function parse_graph(xml_code, graph) {
+function parse_graph(xml_code) {
     // console.log(xml_code);
     let doc = mxUtils.parseXml(xml_code);
     let codec = new mxCodec(doc);
     let model = new mxGraphModel();
     codec.decode(doc.documentElement, model);
 
-    var invalidCells = findInvalidCells(graph);
-    // if invalidCells is not empty -> there are edges without source or target OR start node without edges
-    if (invalidCells.length == 0)
-        startRunning(model);
+    startRunning(model);
 
-    return invalidCells;
-}
+};
 
 
