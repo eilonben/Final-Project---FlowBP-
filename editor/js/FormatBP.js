@@ -11,11 +11,12 @@ function deletePrevLabels(cell, value, graph) {
     }
 }
 
-function adjustConnectionConstraint(cell, connection_number) {
+function adjustConnectionConstraint(cell, connection_number, graph) {
     cell.new_constraints = [];
     var interval = 1 / (connection_number + 1);
     for (var i = 1; i <= connection_number; i++)
         cell.new_constraints.push(new mxConnectionConstraint(new mxPoint(1, interval * i), true));
+    graph.connectionHandler.constraintHandler.showConstraint(graph.view.getState(cell,false));
 
 }
 
@@ -43,9 +44,7 @@ function getValueByKey(style, key) {
 
 
 function adjustEdges(cell, numOfOutputs, graphModel) {
-    var oldNumOfOutput = 1;
-    if (cell.new_constraints != null)
-        oldNumOfOutput = cell.new_constraints.length;
+    var oldNumOfOutput =cell.new_constraints == null ? 1 : cell.new_constraints.length;
     //need to adjust old arrows to new location
     var outEdges = getOutEdges(cell);
     graphModel.beginUpdate();
@@ -325,7 +324,7 @@ FormatBP.prototype.refresh = function () {
                 adjustEdges(cell, parseInt(NumberOfOutPutBox.value), graph.getModel());
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
-                adjustConnectionConstraint(cell, parseInt(NumberOfOutPutBox.value));
+                adjustConnectionConstraint(cell, parseInt(NumberOfOutPutBox.value), graph);
                 graph.getModel().setValue(cell, value);
                 createLabels(NumberOfOutPutBox.value);
 
