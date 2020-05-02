@@ -31,14 +31,22 @@ function printToIndex(testName,resulte) {
         body.innerText += "test "+testName+"\t-\tFail\n";
 }
 
+function consoleToArray(){
+    var arr = [];
+    var cons =document.getElementById("ConsoleText1").value;
+    cons = cons.replace(/event selected: /g,'');
+    arr=cons.split("\n");
+    if(arr.length>0)
+        arr.pop();
+    return arr;
+}
 var testHiOrGoodbye = function () {
     var expected = ["Hi","Goodbye"];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HiOrGoodbye.xml");
     try {
         parse_graph(xml);
-        resulte = window.eventsSelected;
-       // console.log(window.eventsSelected);
+        resulte = consoleToArray();
     }catch (e) {
         console.log(e);
         return false;
@@ -54,7 +62,7 @@ var testHelloWorld = function () {
     var xml = loadXMl("XML_for_tests/Hello_World.xml");
     try {
         parse_graph(xml);
-        resulte = window.eventsSelected;
+        resulte = consoleToArray();
         //console.log(window.eventsSelected);
     }catch (e) {
         console.log(e);
@@ -69,7 +77,7 @@ var testHotCold = function () {
     var xml = loadXMl("XML_for_tests/HotCold.xml");
     try {
         parse_graph(xml);
-        resulte = window.eventsSelected;
+        resulte = consoleToArray();
        // console.log(window.eventsSelected);
     }catch (e) {
         console.log(e);
@@ -84,7 +92,7 @@ var testRandomOrder = function () {
     var xml = loadXMl("XML_for_tests/RandomOrder.xml");
     try {
         parse_graph(xml);
-        resulte = window.eventsSelected;
+        resulte = consoleToArray();
         // console.log(window.eventsSelected);
     }catch (e) {
         console.log(e);
@@ -97,11 +105,72 @@ var testRandomOrder = function () {
     return false;
 }
 
+var testPayload =function () {
+    var expected = [3,4];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/Payloads.xml");
+    try {
+        parse_graph(xml);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
+var testPayloadChange =function () {
+    var expected = [5,6];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/PayloadsChange.xml");
+    try {
+        parse_graph(xml);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
+var testPayloadsIfElse =function () {
+    var expected = [["3","undefined"],["undefined","3"]];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/PayloadsIfElse.xml");
+    try {
+        parse_graph(xml);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    for (let i = 0; i < expected.length; i++) {
+        if (expected[i].toString() === resulte.toString())
+            return true;
+    }
+    return false;
+}
+
+function initConsole() {
+    var textarea = document.createElement('textarea');
+    textarea.setAttribute("id", "ConsoleText1");
+    textarea.hidden = true;
+    document.getElementById("001").appendChild(textarea);
+}
+
 var runTests = function() {
-    printToIndex("HeyOrGoodbye", testHiOrGoodbye());
-    printToIndex("HelloWorld", testHelloWorld());
-    printToIndex("HotCold", testHotCold());
-    printToIndex("RandomOrder", testRandomOrder());
+    function run(name,func) {
+        initConsole();
+        printToIndex(name,func());
+    }
+
+    run("HeyOrGoodbye", testHiOrGoodbye);
+    run("HelloWorld", testHelloWorld);
+    run("HotCold", testHotCold);
+    run("RandomOrder", testRandomOrder);
+    run("payload", testPayload);
+    run("payloadChange", testPayloadChange);
+    run("PayloadsIfElse", testPayloadsIfElse);
 }
 
 runTests();
