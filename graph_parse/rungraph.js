@@ -4,6 +4,13 @@ window.debug = {
     scenarios: {}
 };
 
+function writeToConsole(message) {
+    let myConsole = document.getElementById("ConsoleText1");
+    if (myConsole !== undefined && myConsole !== null) {
+        myConsole.value += message +"\n" ;
+    }
+}
+
 window.bpEngine = {
     BThreads: [],
 
@@ -24,8 +31,7 @@ window.bpEngine = {
             if (e === null)
                 yield 'waiting for an event';
             console.log(e + "\n");
-            mxUtils.alert("event selected: " + e + "\n");
-            window.eventSelected = e;
+            writeToConsole("event selected: " + e);
             window.bpEngine.BThreads.forEach(bt => {
                 if (isReqWait(bt, e)) {
                     bt.stmt = fixStmt(bt.iterator.next().value)
@@ -83,8 +89,13 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
             if (target !== undefined) {
                 let nextPayloads = payloads;
                 let edgeLabel = edg[i].getAttribute("label");
-                if(edgeLabel!==undefined && outputs!==undefined && outputs[edgeLabel]!== undefined){
-                    nextPayloads = outputs[edgeLabel];
+                if(edgeLabel!==undefined && outputs!==undefined){
+                    if(outputs[edgeLabel]!== undefined) {
+                        nextPayloads = outputs[edgeLabel];
+                    }
+                    else{
+                        nextPayloads = [{}];
+                    }
                 }
                 runInNewBT(target, nextPayloads, bpEngine, model, window.debug.scenarios[scen].length);
             }
@@ -94,8 +105,13 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
         if (target !== undefined) {
             let nextPayloads = payloads;
             let edgeLabel = edg[0].getAttribute("label");
-            if(edgeLabel!==undefined && outputs!==undefined && outputs[edgeLabel]!== undefined){
-                nextPayloads = outputs[edgeLabel];
+            if(edgeLabel!==undefined && outputs!==undefined) {
+                if (outputs[edgeLabel] !== undefined) {
+                    nextPayloads = outputs[edgeLabel];
+                }
+                else {
+                    nextPayloads = [{}];
+                }
             }
             yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model, scen);
         }
@@ -103,18 +119,29 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
 }
 
 function runInNewBT(c, payloads, bpEngine, model, curTime) {
-    // Cloning - Is this the right way?
-    let outputs = {};
-    let cloned = JSON.parse(JSON.stringify(payloads));
     window.bpEngine.registerBThread(function* () {
+        let outputs = {};
+        let cloned = JSON.parse(JSON.stringify(payloads))
         if (c.getAttribute("code") !== undefined) {
             try{
-            eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
-                outputs=func(cloned)
+                eval('var func = function(payloads){' + c.getAttribute("code") + '\n}');
+                outputs = func(cloned)
             }
             catch(e){
-                alert.log('There has been an error while executing the JS code on node ' +
-                     c.getId()+": \n" +e+" execution will now terminate.");
+                alert('There has been an error while executing the JS code on General node ' +
+                    c.getId()+": \n" +e+".\n execution will now terminate.");
+                return;
+            }
+        }
+        if (c.getAttribute("log") !== undefined) {
+            try{
+                eval('var func = function(payloads){' + c.getAttribute("log") + '\n}');
+                let consoleString = func(cloned);
+                writeToConsole(consoleString);
+            }
+            catch(e){
+                alert('There has been an error while executing the JS code on Console node ' +
+                    c.getId()+": \n" +e+".\n execution will now terminate.");
                 return;
             }
         }
@@ -137,6 +164,8 @@ function runInNewBT(c, payloads, bpEngine, model, curTime) {
 };
 
 function getshape(str) {
+    if(str == null)
+        return "";
     let arr = str.split(";");
     return arr[0].split("=")[1].split(".")[1];
 }
@@ -145,16 +174,28 @@ function* runInSameBT(c, payloads, bpEngine, model, scen) {
     let outputs = {};
     let cloned = JSON.parse(JSON.stringify(payloads));
     if (c.getAttribute("code") !== undefined) {
-        try{
-        eval('var func = function(payloads) {' + c.getAttribute("code") + '}');
-            outputs=func(cloned)
+        try {
+            eval('var func = function(payloads){' + c.getAttribute("code") + '\n}');
+            outputs = func(cloned)
         }
-        catch(e){
+        catch (e) {
             alert('There has been an error while executing the JS code on node ' +
-                c.getId()+": \n" +e+".\n execution will now terminate.");
+                c.getId() + ": \n" + e + ".\n execution will now terminate.");
             return;
         }
     }
+        if (c.getAttribute("log") !== undefined) {
+            try {
+                eval('var func = function(payloads){' + c.getAttribute("log") + '\n}');
+                let consoleString = func(cloned);
+                writeToConsole(consoleString);
+            }
+            catch (e) {
+                alert('There has been an error while executing the JS code on Console node ' +
+                    c.getId() + ": \n" + e + ".\n execution will now terminate.");
+                return;
+            }
+        }
 
     c.setAttribute("scenarioID", scen);
     window.debug.scenarios[scen].push([c.id, cloned]);

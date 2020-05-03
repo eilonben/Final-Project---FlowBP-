@@ -2,14 +2,25 @@ function ActionsBP(actions) {
     this.init(actions);
 }
 
-ActionsBP.prototype.init = function(actions) {
+ActionsBP.prototype.init = function (actions) {
     var ui = actions.editorUi;
     var editor = ui.editor;
     var graph = editor.graph;
 
     var lastUndo = 0;
 
+    function showConsole() {
+        if (this.consoleWindow === null || this.consoleWindow === undefined) {
+            this.consoleWindow = new myConsoleWindow(ui, document.body.offsetWidth - 480, 120, 420, 285);
+        }
+        else {
+            this.consoleWindow.window.setVisible(true);
+        }
+    }
 
+    actions.addAction('showConsole', function () {
+        showConsole.call(this);
+    });
     actions.addAction('editCode', function () {
         var cell = graph.getSelectionCell() || graph.getModel().getRoot();
 
@@ -20,18 +31,29 @@ ActionsBP.prototype.init = function(actions) {
         }
     });
 
-    actions.addAction('runModel', function() {
+    actions.addAction('runModel', function () {
         var cells = graph.getModel().cells;
         fixValues(Object.values(cells));
-
+        showConsole.call(this);
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
-        parse_graph(code);
 
-        mxUtils.alert("Code deployed");
+        // if invalidCells is not empty -> there are edges without source or target OR start node without edges
+        var invalidCells = findInvalidCells(graph.getModel());
+
+        //Confirm that the graph is valid
+        if(invalidCells.length != 0)
+            mxUtils.alert("Graph is Invalid! lonely start node or edge");
+        else
+            {
+            parse_graph(code);
+            mxUtils.alert("Code deployed");
+        }
+
+
     }, null, null, 'Alt+Shift+R');
 
-    actions.addAction('editBsync', function() {
+    actions.addAction('editBsync', function () {
         var cell = graph.getSelectionCell() || graph.getModel().getRoot();
 
         if (cell != null) {
@@ -58,7 +80,7 @@ ActionsBP.prototype.init = function(actions) {
 
     actions.addAction('debug_back', function() {
 
-        if(editor.undoManager.indexOfNextAdd > lastUndo) {
+        if (editor.undoManager.indexOfNextAdd > lastUndo) {
             graph.getModel().beginUpdate();
 
             ui.undo();
@@ -76,9 +98,9 @@ ActionsBP.prototype.init = function(actions) {
 
     actions.addAction('debug_stop', function() {
 
-        editor.undoManager.indexOfNextAdd = editor.undoManager.history.length
+        editor.undoManager.indexOfNextAdd = editor.undoManager.history.length;
         var numOfNewUndos = editor.undoManager.history.length - lastUndo + 1;
-        while(numOfNewUndos-- > 0) {
+        while (numOfNewUndos-- > 0) {
             ui.undo()
             editor.undoManager.history.pop()
         }
@@ -94,7 +116,7 @@ ActionsBP.prototype.init = function(actions) {
          var mod = graph.getModel()
          fixValues(Object.values(mod.cells));
 
-         lastUndo = editor.undoManager.indexOfNextAdd + 1;
+        lastUndo = editor.undoManager.indexOfNextAdd + 1;
 
          //var mod = graph.getModel()
          //Object.values(mod.cells).forEach(cell => {
@@ -107,10 +129,20 @@ ActionsBP.prototype.init = function(actions) {
 
          var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
          console.log(code);
-         parse_graph(code);
 
-         // coloring
-         var record = getProgramRecord();
+         // if invalidCells is not empty -> there are edges without source or target OR start node without edges
+         var invalidCells = findInvalidCells(graph.getModel());
+
+         if(invalidCells.length != 0) {
+             mxUtils.alert("Graph is Invalid! lonely start node or edge");
+             return;
+         }
+
+         lockLayers(graph, true)
+         parse_graph(code,graph);
+
+        // coloring
+        var record = getProgramRecord();
 
          for (let i = 0; i < record.length; i++) {
              mod.beginUpdate();
@@ -136,22 +168,22 @@ ActionsBP.prototype.init = function(actions) {
          }
          //
 
-         let numOfUndos = editor.undoManager.indexOfNextAdd - lastUndo
+        let numOfUndos = editor.undoManager.indexOfNextAdd - lastUndo
 
-         for (let i = 0; i < numOfUndos; i++) {
-             graph.model.beginUpdate();
+        for (let i = 0; i < numOfUndos; i++) {
+            graph.model.beginUpdate();
 
-             ui.undo();
+            ui.undo();
 
-             graph.model.endUpdate();
-         }
+            graph.model.endUpdate();
+        }
 
-         graph.clearSelection()
+        graph.clearSelection()
 
          if(numOfUndos == 0)
              ui.enableDebugNext(false);
 
-     }, null, null);
+    }, null, null);
 
 };
 
@@ -176,14 +208,12 @@ function lockLayers(graph, lock) {
 }
 
 function fixValues(cells) {
-    for(let i = 0; i < cells.length; i++)
-    {
+    for (let i = 0; i < cells.length; i++) {
         let c = cells[i];
         let value = c.getValue();
 
         // Converts the value to an XML node
-        if (value == "")
-        {
+        if (value == "") {
             var doc = mxUtils.createXmlDocument();
             var obj = doc.createElement('object');
             obj.setAttribute('label', value || '');

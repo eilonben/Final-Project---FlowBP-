@@ -11,11 +11,12 @@ function deletePrevLabels(cell, value, graph) {
     }
 }
 
-function adjustConnectionConstraint(cell, connection_number) {
+function adjustConnectionConstraint(cell, connection_number, graph) {
     cell.new_constraints = [];
     var interval = 1 / (connection_number + 1);
     for (var i = 1; i <= connection_number; i++)
         cell.new_constraints.push(new mxConnectionConstraint(new mxPoint(1, interval * i), true));
+    graph.connectionHandler.constraintHandler.showConstraint(graph.view.getState(cell,false));
 
 }
 
@@ -43,9 +44,7 @@ function getValueByKey(style, key) {
 
 
 function adjustEdges(cell, numOfOutputs, graphModel) {
-    var oldNumOfOutput = 1;
-    if (cell.new_constraints != null)
-        oldNumOfOutput = cell.new_constraints.length;
+    var oldNumOfOutput =cell.new_constraints == null ? 1 : cell.new_constraints.length;
     //need to adjust old arrows to new location
     var outEdges = getOutEdges(cell);
     graphModel.beginUpdate();
@@ -100,7 +99,6 @@ FormatBP.prototype.refresh = function () {
     this.clear();
     var ui = this.editorUi;
     var graph = ui.editor.graph;
-
     var div = document.createElement('div');
     div.style.whiteSpace = 'nowrap';
     div.style.color = 'rgb(112, 112, 112)';
@@ -254,7 +252,7 @@ FormatBP.prototype.refresh = function () {
                 bsyncDIV.appendChild(dlg.container);
                 dlg.init();
                 cont.appendChild(bsyncDIV);
-            
+
 
         } else if (getshape(cell.getStyle()) == "general") {
             var cont = document.getElementsByClassName("geFormatContainer")[0];
@@ -325,7 +323,7 @@ FormatBP.prototype.refresh = function () {
                 adjustEdges(cell, parseInt(NumberOfOutPutBox.value), graph.getModel());
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
-                adjustConnectionConstraint(cell, parseInt(NumberOfOutPutBox.value));
+                adjustConnectionConstraint(cell, parseInt(NumberOfOutPutBox.value), graph);
                 graph.getModel().setValue(cell, value);
                 createLabels(NumberOfOutPutBox.value);
 
@@ -380,7 +378,7 @@ FormatBP.prototype.refresh = function () {
             cont.appendChild(generalDIV);
 
 
-        } else if (getshape(cell.getStyle()) == "startnode") {
+        } else if (getshape(cell.getStyle()) === "startnode") {
             // var dlg = new StartNodeForm(ui, cell);
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
@@ -439,8 +437,8 @@ FormatBP.prototype.refresh = function () {
                     PayloadsLabelTextBox.setAttribute("type", "text");
                     //checking if there was a former definition for the i'th payload holder
                     var parsed = JSON.parse(value.getAttribute("Payloads"));
-                    if (parsed !== null && parsed !== undefined && parsed[i] != null && parsed[i] != undefined) {
-                        PayloadsLabelTextBox.setAttribute("value", parsed[i]);
+                    if (parsed !== null && parsed !== undefined && parsed[i] != null && parsed[i] !== undefined) {
+                        PayloadsLabelTextBox.setAttribute("value", JSON.stringify(parsed[i]));
                     }
                     oneTextLabelDiv.appendChild(PayloadsLabelTextBox);
                     oneTextLabelDiv.style.marginBottom = "5px";
@@ -454,16 +452,15 @@ FormatBP.prototype.refresh = function () {
                     applyButtonLabels.onclick = function () {
                         var Payloads = [];
                         for (var i = 0; i < numOfPayloads; i++) {
-                            let payloadValue = document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value;
+                            let payloadValue = JSON.parse(document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value);
                             if(payloadValue === "" || payloadValue === undefined || payloadValue ===null){
-                                Payloads.push("{}");
+                                Payloads.push({});
                             }
                             else {
-                                Payloads.push((document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value));
+                                Payloads.push(payloadValue);
                             }
                         }
                         value.setAttribute("Payloads", JSON.stringify(Payloads));
-                        //updateEdgesLabels(cell, NumberOfPayloadsBox.value, graph.getModel(), value);
                         graph.getModel().setValue(cell, value);
                     };
                 }
@@ -476,7 +473,32 @@ FormatBP.prototype.refresh = function () {
 
 
             cont.appendChild(startnodeDIV);
-           
+
+        }
+
+        else if (getshape(cell.getStyle()) === "console"){
+            var cont = document.getElementsByClassName("geFormatContainer")[0];
+            cont.style.width = "22%";
+            var consoleDIV = document.createElement('div');
+            consoleDIV.style.marginLeft = "3%";
+            //Title
+            var textnod = document.createElement("p");
+            textnod.innerHTML = '<font size="3">Console Node</font>';
+           consoleDIV.appendChild(textnod);
+
+            //Button code editor
+            var consolePopUp = document.createElement("BUTTON");
+            consolePopUp.appendChild(document.createTextNode("Open Code editor"));
+            consolePopUp.id = "codeEditorButton";
+            consolePopUp.onclick = function () {
+                var dlg = new ConsoleBlockSidebar(ui, cell);
+                var etd = ui;
+                etd.showDialog(dlg.container, 520, 420, true, true);
+                dlg.init();
+            };
+            consolePopUp.className = 'geBtn gePrimaryBtn';
+            consoleDIV.appendChild(consolePopUp);
+            cont.appendChild(consoleDIV);
         }
 
     }
