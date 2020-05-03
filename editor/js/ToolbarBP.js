@@ -123,6 +123,8 @@ ToolbarBP.prototype.init = function () {
 
     elts[3].setAttribute('title','Stop Debugging');
     elts[3].childNodes[0].className = 'geDebug geDebug_stop'
+    var elts = this.addItems(['-', 'showConsole']);
+    elts[1].setAttribute('title','Show Console');
 };
 
 ToolbarBP.prototype.constructor = Toolbar;

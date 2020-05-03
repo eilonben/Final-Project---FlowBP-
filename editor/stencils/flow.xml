@@ -55,7 +55,7 @@
 			<fillstroke />
 		</foreground>
 	</shape>
-	<!--<shape name="Node" h="25" w="100" aspect="variable" strokewidth="inherit">
+	<shape name="Console" h="25" w="100" aspect="variable" strokewidth="inherit">
 		<connections>
 			<constraint x="0" y="0.5" perimeter="0" name="W" />
 			<constraint x="1" y="0.5" perimeter="0" name="E" />
@@ -74,7 +74,7 @@
 			<fillstroke />
 		</foreground>
 	</shape>
-	<shape aspect="fixed" h="50" name="General Start" strokewidth="inherit"
+	<!--<shape aspect="fixed" h="50" name="General Start" strokewidth="inherit"
 		w="50">
 		<connections>
 			<constraint name="N" perimeter="0" x="0.5" y="0" />
