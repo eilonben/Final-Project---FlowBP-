@@ -1,7 +1,6 @@
 window.debug = {
-    time: 0,
-    curStage: -1,
-    scenarios: {}
+    scenarios: {},
+    blockedBlocks: []
 };
 
 function writeToConsole(message) {
@@ -9,6 +8,14 @@ function writeToConsole(message) {
     if (myConsole !== undefined && myConsole !== null) {
         myConsole.value += message +"\n" ;
     }
+}
+
+function getBlockedEvents() {
+    var res = []
+    window.bpEngine.BThreads.forEach(bt => {
+        bt.stmt.block.forEach(e => res.push(e));
+    });
+    return res;
 }
 
 window.bpEngine = {
@@ -27,6 +34,17 @@ window.bpEngine = {
     run: function* () {
         while (true) {
             fixStages();
+            ///////
+            let blockedEvents = getBlockedEvents();
+            let curBlocked = []
+            blockedEvents.forEach(e => {
+                window.bpEngine.BThreads.forEach(bt => {
+                    if(isReqWait(bt, e))
+                        curBlocked.push(bt.stmt.cellID);
+                });
+            });
+            window.debug.blockedBlocks.push(curBlocked);
+            ////////
             let e = getEvent();
             if (e === null)
                 yield 'waiting for an event';
@@ -153,8 +171,9 @@ function runInNewBT(c, payloads, bpEngine, model, curTime) {
         window.debug.scenarios[c.id].push([c.id, cloned]);
 
         if (c.getAttribute("sync") !== undefined) {
-            yield JSON.parse(c.getAttribute("sync"));
-            curTime = 0
+            var stmt = JSON.parse(c.getAttribute("sync"));
+            stmt["cellID"] = c.id;
+            yield stmt;
             // cloned["selected"] = window.eventSelected;
         }
 
@@ -201,8 +220,9 @@ function* runInSameBT(c, payloads, bpEngine, model, scen) {
     window.debug.scenarios[scen].push([c.id, cloned]);
 
     if (c.getAttribute("sync") !== undefined) {
-        yield JSON.parse(c.getAttribute("sync"));
-        curTime = 0
+        var stmt = JSON.parse(c.getAttribute("sync"));
+        stmt["cellID"] = c.id;
+        yield stmt;
         // cloned["selected"] = window.eventSelected;
     }
 
@@ -231,30 +251,37 @@ function startRunning(model) {
     window.bpEngine.BThreads = [];
 }
 
+function getNumOfSteps(){
+    let scen = Object.values(window.debug.scenarios);
+    if(scen.length > 0)
+        return scen[0].length;
+    return 0;
+}
+
 function getProgramRecord() {
     var res = []
 
-    while(window.debug.curStage < window.debug.time - 1) {
-        window.debug.curStage++;
+    for(let step = 0; step < getNumOfSteps(); step++){
 
-        var curStage = []
+        var curStage = {stages:[], blockedBlocks: []}
         var scens = Object.values(window.debug.scenarios)
-        for (let i = 0; i < scens.length; i++) {
-            let cur = scens[i];
-            if (cur[window.debug.curStage][0] != -1) {
-                curStage.push(cur[window.debug.curStage])
-            }
+        curStage.stages = {}
+        for (let j = 0; j < scens.length; j++) {
+            let cur = scens[j];
+            if(cur[step][0] != -1)
+                curStage.stages[cur[step][0]] = cur[step][1];
         }
-
-        res.push(curStage)
+        if(Object.keys(curStage.stages).length > 0)
+            res.push(curStage)
+        if(window.debug.blockedBlocks[step] != -1)
+            res.push({stages:{}, blockedBlocks: window.debug.blockedBlocks[step]});
     }
+
     return res;
 }
 
 function initDebug() {
     window.debug.scenarios = {}
-    window.debug.curStage = -1
-    window.debug.time = 0
 }
 
 function fixStages() {
@@ -265,10 +292,12 @@ function fixStages() {
     {
         let curScen = scens[i];
         let numOfFixes = curTime - curScen.length;
-        for (let j = 0; j < numOfFixes; j++)
+        for (let j = 0; j < numOfFixes + 1; j++)
             curScen.push([-1, null]);
     }
-    window.debug.time = curTime
+    let numOfFixes = curTime - window.debug.blockedBlocks.length;
+    for (let j = 0; j < numOfFixes; j++)
+        window.debug.blockedBlocks.push(-1);
 }
 
 

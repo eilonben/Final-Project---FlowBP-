@@ -6,6 +6,7 @@ ActionsBP.prototype.init = function (actions) {
     var ui = actions.editorUi;
     var editor = ui.editor;
     var graph = editor.graph;
+    var mod = graph.getModel();
 
     var lastUndo = 0;
 
@@ -111,65 +112,68 @@ ActionsBP.prototype.init = function (actions) {
 
     }, false, null);
 
-     actions.addAction('debug_debug', function() {
+    function updateCell(cell, blocked, payload) {
+        var val = cell.clone().getValue();
+        val.setAttribute('payloadUpdated', '1');
+        if(blocked) {
+            val.setAttribute('Blocked', '1');
+            //style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
+        }
+        else if(payload !== undefined){
+            val.setAttribute('Blocked', '0');
+            val.setAttribute('Payloads', payload);
+            //style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
+        }
+        else
+            val.setAttribute('payloadUpdated', '0');
+        mod.setValue(cell, val);
+    }
 
-         var mod = graph.getModel()
-         fixValues(Object.values(mod.cells));
+    function updateVertexCells(record) {
+        let cells = Object.values(mod.cells).filter(cell => cell.isVertex());
+
+        for (let i = 0; i < record.length; i++) {
+            mod.beginUpdate();
+
+            let curBlocksToBlock = record[i].blockedBlocks;
+            let curStage = record[i].stages;
+
+            cells.forEach(cell => {
+                updateCell(cell, curBlocksToBlock.includes(cell.id), curStage[cell.id])
+            });
+
+            mod.endUpdate();
+        }
+    }
+
+    actions.addAction('debug_debug', function() {
+
+        fixValues(Object.values(mod.cells));
 
         lastUndo = editor.undoManager.indexOfNextAdd + 1;
 
-         //var mod = graph.getModel()
-         //Object.values(mod.cells).forEach(cell => {
-             //cell.setAttribute('label', cell.id)
-         //})
+        ui.startDebugging();
 
-         ui.startDebugging();
+        lockLayers(graph, true)
 
-         lockLayers(graph, true)
+        var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
+        console.log(code);
 
-         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
-         console.log(code);
+        // if invalidCells is not empty -> there are edges without source or target OR start node without edges
+        var invalidCells = findInvalidCells(graph.getModel());
 
-         // if invalidCells is not empty -> there are edges without source or target OR start node without edges
-         var invalidCells = findInvalidCells(graph.getModel());
+        if (invalidCells.length != 0) {
+            mxUtils.alert("Graph is Invalid! disconnected start node or edge");
+            return;
+        }
 
-         if(invalidCells.length != 0) {
-             mxUtils.alert("Graph is Invalid! lonely start node or edge");
-             return;
-         }
+        lockLayers(graph, true)
+        parse_graph(code, graph);
 
-         lockLayers(graph, true)
-         parse_graph(code,graph);
-
-        // coloring
         var record = getProgramRecord();
+        updateVertexCells(record);
 
-         for (let i = 0; i < record.length; i++) {
-             mod.beginUpdate();
-
-             var curRec = record[i];
-             for (let j = 0; j < curRec.length; j++) {
-                 var cell = mod.getCell(curRec[j][0]);
-                 var val = cell.clone().getValue();
-                 val.setAttribute('Payloads', curRec[j][1]);
-                 //// payload on label
-                 //var x = JSON.stringify(curRec[j][1])
-                 //val.setAttribute('label', x);
-                 ////
-                 // indicator
-                 var style = cell.getStyle()
-                 style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
-                 mod.setStyle(cell, style);
-                 ////////////
-                 mod.setValue(cell, val);
-             }
-
-             mod.endUpdate();
-         }
-         //
-
-        let numOfUndos = editor.undoManager.indexOfNextAdd - lastUndo
-
+        let numOfUndos = editor.undoManager.indexOfNextAdd - lastUndo;
         for (let i = 0; i < numOfUndos; i++) {
             graph.model.beginUpdate();
 
@@ -180,8 +184,8 @@ ActionsBP.prototype.init = function (actions) {
 
         graph.clearSelection()
 
-         if(numOfUndos == 0)
-             ui.enableDebugNext(false);
+        if (numOfUndos == 0)
+            ui.enableDebugNext(false);
 
     }, null, null);
 
