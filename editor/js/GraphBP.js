@@ -159,7 +159,7 @@ GraphBP.prototype = Object.create(Graph.prototype);
 
 
 GraphBP.prototype.getAllConnectionConstraints = function(terminal, source){
-     if (terminal != null && terminal.cell.new_constraints != null)
+     if (terminal != null && terminal.cell != null && terminal.cell.new_constraints != null)
      {
              return terminal.cell.new_constraints;
      }
