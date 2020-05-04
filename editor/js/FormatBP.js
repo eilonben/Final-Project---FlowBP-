@@ -320,10 +320,11 @@ FormatBP.prototype.refresh = function () {
             }
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
-                adjustEdges(cell, parseInt(NumberOfOutPutBox.value), graph.getModel());
+                var outputNumber = parseInt(NumberOfOutPutBox.value);
+                adjustEdges(cell, outputNumber, graph.getModel());
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
-                adjustConnectionConstraint(cell, parseInt(NumberOfOutPutBox.value), graph);
+                adjustConnectionConstraint(cell, outputNumber, graph);
                 graph.getModel().setValue(cell, value);
                 createLabels(NumberOfOutPutBox.value);
 
@@ -360,8 +361,11 @@ FormatBP.prototype.refresh = function () {
                 if (numOfOutputs >= 1) {
                     var applyButtonLabels = createApplyButton();
                     applyButtonLabels.onclick = function () {
+                        cell.constraints_labels = {};
                         for (var i = 0; i < numOfOutputs; i++) {
-                            value.setAttribute("Outputnumber" + (i + 1), document.getElementById("nodeID" + cell.id + "Outputnumber" + (i + 1)).value);
+                            var label = document.getElementById("nodeID" + cell.id + "Outputnumber" + (i + 1)).value;
+                            value.setAttribute("Outputnumber" + (i + 1), label);
+                            cell.constraints_labels[cell.new_constraints[i]] = label;
                         }
                         updateEdgesLabels(cell, NumberOfOutPutBox.value, graph.getModel(), value);
                         graph.getModel().setValue(cell, value);
