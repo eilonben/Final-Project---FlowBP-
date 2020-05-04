@@ -59,99 +59,21 @@ mxGraphView.prototype.removeState = function(cell)
 };
 
 
+mxGraphView.prototype.createState = function(cell)
+{
+    if(getshape(cell.getStyle()) == "general") {
+        cell.constraints_labels = {};
+        cell.new_constraints = [new mxConnectionConstraint(new mxPoint(1, 0.5), true)];
+    }
+    return new mxCellState(this, cell, this.graph.getCellStyle(cell));
+};
+
+
 function mxVertexHandlerBP(state){
     mxVertexHandler.call(this, state);
 };
 
-
 mxVertexHandlerBP.prototype = Object.create(mxVertexHandler.prototype);
-
-
-//when adding Vertex(shape) add her the connection point
-mxVertexHandlerBP.prototype.init = function()
-{
-    this.graph = this.state.view.graph;
-    this.selectionBounds = this.getSelectionBounds(this.state);
-    this.bounds = new mxRectangle(this.selectionBounds.x, this.selectionBounds.y, this.selectionBounds.width, this.selectionBounds.height);
-    this.selectionBorder = this.createSelectionShape(this.bounds);
-    // VML dialect required here for event transparency in IE
-    this.selectionBorder.dialect = (this.graph.dialect != mxConstants.DIALECT_SVG) ? mxConstants.DIALECT_VML : mxConstants.DIALECT_SVG;
-    this.selectionBorder.pointerEvents = false;
-    this.selectionBorder.rotation = Number(this.state.style[mxConstants.STYLE_ROTATION] || '0');
-    this.selectionBorder.init(this.graph.getView().getOverlayPane());
-    mxEvent.redirectMouseEvents(this.selectionBorder.node, this.graph, this.state);
-
-    if (this.graph.isCellMovable(this.state.cell))
-    {
-        this.selectionBorder.setCursor(mxConstants.CURSOR_MOVABLE_VERTEX);
-    }
-
-    // Adds the sizer handles
-    if (mxGraphHandlerBP.prototype.maxCells <= 0 || this.graph.getSelectionCount() < mxGraphHandlerBP.prototype.maxCells)
-    {
-        var resizable = this.graph.isCellResizable(this.state.cell);
-        this.sizers = [];
-
-        if (resizable || (this.graph.isLabelMovable(this.state.cell) &&
-            this.state.width >= 2 && this.state.height >= 2))
-        {
-            var i = 0;
-
-            if (resizable)
-            {
-                if (!this.singleSizer)
-                {
-                    this.sizers.push(this.createSizer('nw-resize', i++));
-                    this.sizers.push(this.createSizer('n-resize', i++));
-                    this.sizers.push(this.createSizer('ne-resize', i++));
-                    this.sizers.push(this.createSizer('w-resize', i++));
-                    this.sizers.push(this.createSizer('e-resize', i++));
-                    this.sizers.push(this.createSizer('sw-resize', i++));
-                    this.sizers.push(this.createSizer('s-resize', i++));
-                }
-
-                this.sizers.push(this.createSizer('se-resize', i++));
-            }
-
-            var geo = this.graph.model.getGeometry(this.state.cell);
-
-            if (geo != null && !geo.relative && !this.graph.isSwimlane(this.state.cell) &&
-                this.graph.isLabelMovable(this.state.cell))
-            {
-                // Marks this as the label handle for getHandleForEvent
-                this.labelShape = this.createSizer(mxConstants.CURSOR_LABEL_HANDLE, mxEvent.LABEL_HANDLE,
-                    mxConstants.LABEL_HANDLE_SIZE, mxConstants.LABEL_HANDLE_FILLCOLOR);
-                this.sizers.push(this.labelShape);
-            }
-        }
-        else if (this.graph.isCellMovable(this.state.cell) && !this.graph.isCellResizable(this.state.cell) &&
-            this.state.width < 2 && this.state.height < 2)
-        {
-            this.labelShape = this.createSizer(mxConstants.CURSOR_MOVABLE_VERTEX,
-                mxEvent.LABEL_HANDLE, null, mxConstants.LABEL_HANDLE_FILLCOLOR);
-            this.sizers.push(this.labelShape);
-        }
-    }
-
-    // Adds the rotation handler
-    if (this.isRotationHandleVisible())
-    {
-        this.rotationShape = this.createSizer(this.rotationCursor, mxEvent.ROTATION_HANDLE,
-            mxConstants.HANDLE_SIZE + 3, mxConstants.HANDLE_FILLCOLOR);
-        this.sizers.push(this.rotationShape);
-    }
-
-    this.customHandles = this.createCustomHandles();
-    this.redraw();
-
-    if (this.constrainGroupByChildren)
-    {
-        this.updateMinBounds();
-    }
-    //the only change
-    this.graph.connectionHandler.constraintHandler.showConstraint(this.state);
-};
-
 
 //when resizing shape move her connection point
 mxVertexHandlerBP.prototype.updateLivePreview = function(me) {
@@ -236,6 +158,7 @@ mxConnectionHandlerBP.prototype.insertEdge = function(parent, id, value, source,
     }
 };
 
+//this is for change constraintHandler to mxConstraintHandlerBP
 mxConnectionHandlerBP.prototype.init = function()
 {
     this.graph.addMouseListener(this);
@@ -741,6 +664,7 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 //state is optional
 mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
 {
+    var size = 1;
     // when state is null, get all states in graph
     var states = this.graph.view.getStates().getValues();
     states = inputState == null ? states : [inputState];
@@ -772,8 +696,8 @@ mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
                 var img = this.getImageForConstraint(state, this.constraints[i], cp);
 
                 var src = img.src;
-                var bounds = new mxRectangle(Math.round(cp.x - img.width / 2),
-                    Math.round(cp.y - img.height / 2), img.width, img.height);
+                var bounds = new mxRectangle(Math.round(cp.x - (img.width * size) / 2),
+                    Math.round(cp.y - (img.height * size) / 2), img.width * size, img.height * size);
                 var icon = new mxImageShape(bounds, src);
                 icon.dialect = (this.graph.dialect != mxConstants.DIALECT_SVG) ?
                     mxConstants.DIALECT_MIXEDHTML : mxConstants.DIALECT_SVG;
@@ -876,8 +800,6 @@ mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, ev
 
     }
 
-    //the only change
-    this.graph.connectionHandler.constraintHandler.showConstraint();
     // Selects the new cells if cells have been cloned
     if (clone) {
         this.graph.setSelectionCells(cells);
@@ -1129,4 +1051,25 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
             return null;
     }
     return edge;
+};
+
+mxGraph.prototype.graphModelChanged = function(changes)
+{
+    // var changeStates = [];
+    for (var i = 0; i < changes.length; i++)
+    {
+        this.processChange(changes[i]);
+        // if(changes[i].cell != null)
+        //     changeStates.push(changes[i].cell)
+    }
+
+    this.updateSelection();
+    this.view.validate();
+    this.sizeDidChange();
+
+
+    // changeStates = changeStates.map(cell => this.view.getState(cell, false));
+    if(changes.length !=0)
+        this.connectionHandler.constraintHandler.showConstraint();
+
 };
