@@ -586,7 +586,7 @@ mxConstraintHandlerBP.prototype.redraw = function()
 
 mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 {
-    var size = 1;
+    var size = this.graph.view.scale;
     this.constraints = (state != null && !this.isStateIgnored(state, source) &&
         this.graph.isCellConnectable(state.cell)) ? ((this.isEnabled()) ?
         (this.graph.getAllConnectionConstraints(state, source) || []) : []) : null;
@@ -664,7 +664,7 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 //state is optional
 mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
 {
-    var size = 1;
+    var size = this.graph.view.scale;
     // when state is null, get all states in graph
     var states = this.graph.view.getStates().getValues();
     states = inputState == null ? states : [inputState];
