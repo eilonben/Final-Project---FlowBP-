@@ -586,7 +586,7 @@ mxConstraintHandlerBP.prototype.redraw = function()
 
 mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 {
-
+    var size = 1;
     this.constraints = (state != null && !this.isStateIgnored(state, source) &&
         this.graph.isCellConnectable(state.cell)) ? ((this.isEnabled()) ?
         (this.graph.getAllConnectionConstraints(state, source) || []) : []) : null;
@@ -617,8 +617,8 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
 
             var src = img.src;
-            var bounds = new mxRectangle(Math.round(cp.x - img.width / 2),
-                Math.round(cp.y - img.height / 2), img.width, img.height);
+            var bounds = new mxRectangle(Math.round(cp.x - (img.width * size) / 2),
+                Math.round(cp.y - (img.height * size) / 2), img.width * size, img.height * size);
             var icon = new mxImageShape(bounds, src);
             icon.dialect = (this.graph.dialect != mxConstants.DIALECT_SVG) ?
                 mxConstants.DIALECT_MIXEDHTML : mxConstants.DIALECT_SVG;
@@ -1072,4 +1072,82 @@ mxGraph.prototype.graphModelChanged = function(changes)
     if(changes.length !=0)
         this.connectionHandler.constraintHandler.showConstraint();
 
+};
+
+mxGraph.prototype.zoom = function(factor, center)
+{
+    center = (center != null) ? center : this.centerZoom;
+    var scale = Math.round(this.view.scale * factor * 100) / 100;
+    var state = this.view.getState(this.getSelectionCell());
+    factor = scale / this.view.scale;
+
+    if (this.keepSelectionVisibleOnZoom && state != null)
+    {
+        var rect = new mxRectangle(state.x * factor, state.y * factor,
+            state.width * factor, state.height * factor);
+
+        // Refreshes the display only once if a scroll is carried out
+        this.view.scale = scale;
+
+        if (!this.scrollRectToVisible(rect))
+        {
+            this.view.revalidate();
+
+            // Forces an event to be fired but does not revalidate again
+            this.view.setScale(scale);
+        }
+    }
+    else
+    {
+        var hasScrollbars = mxUtils.hasScrollbars(this.container);
+
+        if (center && !hasScrollbars)
+        {
+            var dx = this.container.offsetWidth;
+            var dy = this.container.offsetHeight;
+
+            if (factor > 1)
+            {
+                var f = (factor - 1) / (scale * 2);
+                dx *= -f;
+                dy *= -f;
+            }
+            else
+            {
+                var f = (1 / factor - 1) / (this.view.scale * 2);
+                dx *= f;
+                dy *= f;
+            }
+
+            this.view.scaleAndTranslate(scale,
+                this.view.translate.x + dx,
+                this.view.translate.y + dy);
+        }
+        else
+        {
+            // Allows for changes of translate and scrollbars during setscale
+            var tx = this.view.translate.x;
+            var ty = this.view.translate.y;
+            var sl = this.container.scrollLeft;
+            var st = this.container.scrollTop;
+
+            this.view.setScale(scale);
+
+            if (hasScrollbars)
+            {
+                var dx = 0;
+                var dy = 0;
+
+                if (center)
+                {
+                    dx = this.container.offsetWidth * (factor - 1) / 2;
+                    dy = this.container.offsetHeight * (factor - 1) / 2;
+                }
+
+                this.container.scrollLeft = (this.view.translate.x - tx) * this.view.scale + Math.round(sl * factor + dx);
+                this.container.scrollTop = (this.view.translate.y - ty) * this.view.scale + Math.round(st * factor + dy);
+            }
+        }
+    }
+    this.connectionHandler.constraintHandler.showConstraint();
 };
