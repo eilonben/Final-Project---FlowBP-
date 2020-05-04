@@ -35,15 +35,15 @@ window.bpEngine = {
         while (true) {
             fixStages();
             ///////
-            let blockedEvents = getBlockedEvents();
-            let curBlocked = []
-            blockedEvents.forEach(e => {
-                window.bpEngine.BThreads.forEach(bt => {
-                    if(isReqWait(bt, e))
-                        curBlocked.push(bt.stmt.cellID);
-                });
-            });
-            window.debug.blockedBlocks.push(curBlocked);
+            //let blockedEvents = getBlockedEvents();
+            //let curBlocked = []
+            //blockedEvents.forEach(e => {
+                //window.bpEngine.BThreads.forEach(bt => {
+                    //if(isReqWait(bt, e))
+                        //curBlocked.push(bt.stmt.cellID);
+                //});
+            //});
+            //window.debug.blockedBlocks.push(curBlocked);
             ////////
             let e = getEvent();
             if (e === null)
@@ -263,7 +263,7 @@ function getProgramRecord() {
 
     for(let step = 0; step < getNumOfSteps(); step++){
 
-        var curStage = {stages:[], blockedBlocks: []}
+        var curStage = {stages:[]}//, blockedBlocks: []}
         var scens = Object.values(window.debug.scenarios)
         curStage.stages = {}
         for (let j = 0; j < scens.length; j++) {
@@ -273,8 +273,8 @@ function getProgramRecord() {
         }
         if(Object.keys(curStage.stages).length > 0)
             res.push(curStage)
-        if(window.debug.blockedBlocks[step] != -1)
-            res.push({stages:{}, blockedBlocks: window.debug.blockedBlocks[step]});
+        //if(window.debug.blockedBlocks[step] != -1)
+            //res.push({stages:{}, blockedBlocks: window.debug.blockedBlocks[step]});
     }
 
     return res;
@@ -295,9 +295,9 @@ function fixStages() {
         for (let j = 0; j < numOfFixes + 1; j++)
             curScen.push([-1, null]);
     }
-    let numOfFixes = curTime - window.debug.blockedBlocks.length;
-    for (let j = 0; j < numOfFixes; j++)
-        window.debug.blockedBlocks.push(-1);
+    //let numOfFixes = curTime - window.debug.blockedBlocks.length;
+    //for (let j = 0; j < numOfFixes; j++)
+        //window.debug.blockedBlocks.push(-1);
 }
 
 

@@ -112,22 +112,31 @@ ActionsBP.prototype.init = function (actions) {
 
     }, false, null);
 
-    function updateCell(cell, blocked, payload) {
+    function fixSizes(cell) {
+        graph.cellSizeUpdated(cell, true);
+        //graph.fireEvent(new mxEventObject(mxEvent.UPDATE_CELL_SIZE,
+            //'cell', cell, 'ignoreChildren', true));
+    }
+
+    function updateCell(cell, payload) {//blocked, payload) {
         var val = cell.clone().getValue();
-        var style = cell.getStyle()
+        var style = cell.getStyle();
         //cell.setAttribute('payloadUpdated', '1');
-        if(blocked) {
-            val.setAttribute('Blocked', '1');
+        //if(blocked) {
+            //val.setAttribute('Blocked', '1');
+            //style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
+        //}
+        //else
+         if(payload !== undefined){
+            //val.setAttribute('Blocked', '0');
+            val.setAttribute('Payloads', JSON.stringify(payload));
+            cell.setAttribute('label', JSON.stringify(payload));
+            fixSizes(cell, true);
             //style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
         }
-        else if(payload !== undefined){
-            val.setAttribute('Blocked', '0');
-            val.setAttribute('Payloads', JSON.stringify(payload));
-            style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
-        }
-        else
+        //else
             //val.setAttribute('payloadUpdated', '0');
-            style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
+            //style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
         mod.setValue(cell, val);
         mod.setStyle(cell, style);
     }
@@ -138,11 +147,11 @@ ActionsBP.prototype.init = function (actions) {
         for (let i = 0; i < record.length; i++) {
             mod.beginUpdate();
 
-            let curBlocksToBlock = record[i].blockedBlocks;
+            //let curBlocksToBlock = record[i].blockedBlocks;
             let curStage = record[i].stages;
 
             cells.forEach(cell => {
-                updateCell(cell, curBlocksToBlock.includes(cell.id), curStage[cell.id])
+                updateCell(cell, curStage[cell.id]) //curBlocksToBlock.includes(cell.id), curStage[cell.id])
             });
 
             mod.endUpdate();
@@ -156,8 +165,6 @@ ActionsBP.prototype.init = function (actions) {
         lastUndo = editor.undoManager.indexOfNextAdd + 1;
 
         ui.startDebugging();
-
-        lockLayers(graph, true)
 
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
