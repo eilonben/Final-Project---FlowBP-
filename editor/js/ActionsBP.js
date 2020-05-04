@@ -114,19 +114,22 @@ ActionsBP.prototype.init = function (actions) {
 
     function updateCell(cell, blocked, payload) {
         var val = cell.clone().getValue();
-        val.setAttribute('payloadUpdated', '1');
+        var style = cell.getStyle()
+        //cell.setAttribute('payloadUpdated', '1');
         if(blocked) {
             val.setAttribute('Blocked', '1');
             //style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
         }
         else if(payload !== undefined){
             val.setAttribute('Blocked', '0');
-            val.setAttribute('Payloads', payload);
-            //style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
+            val.setAttribute('Payloads', JSON.stringify(payload));
+            style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
         }
         else
-            val.setAttribute('payloadUpdated', '0');
+            //val.setAttribute('payloadUpdated', '0');
+            style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
         mod.setValue(cell, val);
+        mod.setStyle(cell, style);
     }
 
     function updateVertexCells(record) {
@@ -183,6 +186,8 @@ ActionsBP.prototype.init = function (actions) {
         }
 
         graph.clearSelection()
+
+        graph.view.validate();
 
         if (numOfUndos == 0)
             ui.enableDebugNext(false);
