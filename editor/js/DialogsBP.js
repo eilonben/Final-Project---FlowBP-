@@ -77,7 +77,7 @@ var BSyncForm = function (editorUi, cell) {
         value.setAttribute("Block", linkInput["Block"].value);
         value.setAttribute("label","Request: "+linkInput["Request"].value+"\nWait: "+linkInput["Wait"].value+"\nBlock: "+linkInput["Block"].value);
         graph.getModel().setValue(cell, value);
-        graph.updateCellSize(cell, true);
+        //graph.updateCellSize(cell, true);
 
 
         editorUi.hideDialog();
@@ -438,7 +438,7 @@ var showConsoleDialog = function (editorUi) {
     row = document.createElement('tr');
     td = document.createElement('td');
     var textarea = document.createElement('textarea');
-    textarea.setAttribute("id","ConsoleText1")
+    textarea.setAttribute("id","ConsoleText1");
     textarea.setAttribute('wrap', 'off');
     textarea.setAttribute('spellcheck', 'false');
     textarea.setAttribute('autocorrect', 'off');

@@ -32,7 +32,6 @@ window.bpEngine = {
                 yield 'waiting for an event';
             console.log(e + "\n");
             writeToConsole("event selected: " + e);
-            window.eventsSelected.push(e);
             window.bpEngine.BThreads.forEach(bt => {
                 if (isReqWait(bt, e)) {
                     bt.stmt = fixStmt(bt.iterator.next().value)
@@ -90,8 +89,13 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
             if (target !== undefined) {
                 let nextPayloads = payloads;
                 let edgeLabel = edg[i].getAttribute("label");
-                if(edgeLabel!==undefined && outputs!==undefined && outputs[edgeLabel]!== undefined){
-                    nextPayloads = outputs[edgeLabel];
+                if(edgeLabel!==undefined && outputs!==undefined){
+                    if(outputs[edgeLabel]!== undefined) {
+                        nextPayloads = outputs[edgeLabel];
+                    }
+                    else{
+                        nextPayloads = [{}];
+                    }
                 }
                 runInNewBT(target, nextPayloads, bpEngine, model, window.debug.scenarios[scen].length);
             }
@@ -101,8 +105,13 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
         if (target !== undefined) {
             let nextPayloads = payloads;
             let edgeLabel = edg[0].getAttribute("label");
-            if(edgeLabel!==undefined && outputs!==undefined && outputs[edgeLabel]!== undefined){
-                nextPayloads = outputs[edgeLabel];
+            if(edgeLabel!==undefined && outputs!==undefined) {
+                if (outputs[edgeLabel] !== undefined) {
+                    nextPayloads = outputs[edgeLabel];
+                }
+                else {
+                    nextPayloads = [{}];
+                }
             }
             yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model, scen);
         }
@@ -203,7 +212,6 @@ function* runInSameBT(c, payloads, bpEngine, model, scen) {
 
 function startRunning(model) {
 // Start the context nodes
-    window.eventsSelected=[];
     initDebug();
 
     var cells = model.cells;
