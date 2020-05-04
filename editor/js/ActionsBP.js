@@ -34,7 +34,7 @@ ActionsBP.prototype.init = function (actions) {
     actions.addAction('runModel', function () {
         var cells = graph.getModel().cells;
         fixValues(Object.values(cells));
-        showConsole.call(this);
+
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
 
@@ -45,7 +45,8 @@ ActionsBP.prototype.init = function (actions) {
         if(invalidCells.length != 0)
             mxUtils.alert("Graph is Invalid! lonely start node or edge");
         else
-            {
+        {
+            showConsole.call(this);
             parse_graph(code);
             mxUtils.alert("Code deployed");
         }
