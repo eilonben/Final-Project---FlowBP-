@@ -79,7 +79,6 @@ var testHotCold = function () {
     try {
         parse_graph(xml);
         resulte = consoleToArray();
-       // console.log(window.eventsSelected);
     }catch (e) {
         console.log(e);
         return false;
@@ -89,21 +88,34 @@ var testHotCold = function () {
 
 var testRandomOrder = function () {
     var expected = [["1","2","3","4"],["3","4","1","2"],["1","3","2","4"],["1","3","4","2"],["3","1","2","4"],["3","1","4","2"]];
+    var statistic=[0,0,0,0,0,0];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/RandomOrder.xml");
-    try {
-        parse_graph(xml);
-        resulte = consoleToArray();
-        // console.log(window.eventsSelected);
-    }catch (e) {
-        console.log(e);
+    for (var j = 0 ; j<100 ; j++) {
+        try {
+            document.getElementById("ConsoleText1").value="";
+            parse_graph(xml);
+            resulte = consoleToArray();
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+        for (let i = 0; i < expected.length; i++) {
+            if (expected[i].toString() === resulte.toString()) {
+                statistic[i]+=1;
+            }
+        }
+    }
+    var sum = statistic.reduce(function(a, b){
+        return a + b;
+    }, 0);
+    if(sum!=100)
         return false;
-    }
-    for (let i = 0; i < expected.length; i++) {
-        if (expected[i].toString() === resulte.toString())
-            return true;
-    }
-    return false;
+    for (var i =0 ; i<statistic.length ; i++)
+        if(statistic[i]>=45){
+            return false;
+        }
+    return true;
 }
 
 var testPayload =function () {
