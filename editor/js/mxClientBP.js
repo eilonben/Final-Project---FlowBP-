@@ -951,10 +951,13 @@ mxGraphHandlerBP.prototype.updateLivePreview = function(dx, dy)
 //repaint edges or shapes in black after they were painted in red
 mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSource)
 {
+
     var previous = this.getTerminal(edge, isSource);
 
     if (terminal != null)
     {
+        if (getshape(terminal.getStyle())=="startnode")
+            return previous;
         terminal.insertEdge(edge, isSource);
 
         //	repaint eadge or shape in black
@@ -1150,4 +1153,46 @@ mxGraph.prototype.zoom = function(factor, center)
         }
     }
     this.connectionHandler.constraintHandler.showConstraint();
+};
+
+
+// edge entry from left only
+mxGraph.prototype.getConnectionConstraint = function(edge, terminal, source)
+{
+
+    var point = null;
+    var x = edge.style[(source) ? mxConstants.STYLE_EXIT_X : mxConstants.STYLE_ENTRY_X];
+
+    if (x != null)
+    {
+        var y = edge.style[(source) ? mxConstants.STYLE_EXIT_Y : mxConstants.STYLE_ENTRY_Y];
+
+        if (y != null)
+        {
+            point = new mxPoint(parseFloat(x), parseFloat(y));
+        }
+    }
+
+    var perimeter = false;
+    var dx = 0, dy = 0;
+
+    if (point != null)
+    {
+        perimeter = mxUtils.getValue(edge.style, (source) ? mxConstants.STYLE_EXIT_PERIMETER :
+            mxConstants.STYLE_ENTRY_PERIMETER, true);
+
+        //Add entry/exit offset
+        dx = parseFloat(edge.style[(source) ? mxConstants.STYLE_EXIT_DX : mxConstants.STYLE_ENTRY_DX]);
+        dy = parseFloat(edge.style[(source) ? mxConstants.STYLE_EXIT_DY : mxConstants.STYLE_ENTRY_DY]);
+
+        dx = isFinite(dx)? dx : 0;
+        dy = isFinite(dy)? dy : 0;
+    }
+    if (edge.cell.target!=null){
+        edge.style.entryX=0;
+        edge.style.entryY=0.5;
+    }
+
+
+    return new mxConnectionConstraint(point, perimeter, null, dx, dy);
 };
