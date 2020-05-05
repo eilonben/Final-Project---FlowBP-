@@ -11,12 +11,23 @@ function deletePrevLabels(cell, value, graph) {
     }
 };
 
+function validateNewConstraint(cell, graph){
+    if(cell.new_constraints == null){
+        var state = graph.view.getState(cell, false);
+        cell.new_constraints = graph.getAllConnectionConstraints(state, true);
+    }
+}
+
 // update connection point number
 function adjustConnectionPoints(cell, connection_number, graph) {
-    cell.new_constraints = cell.new_constraints.filter(x => x.name = "I");
+    validateNewConstraint(cell, graph);
+    // input constraint always at the end of the list
+    var inputConstraint = cell.new_constraints.filter(x => x.name == "I");
+    cell.new_constraints = [];
     var interval = 1 / (connection_number + 1);
     for (var i = 1; i <= connection_number; i++)
         cell.new_constraints.push(new mxConnectionConstraint(new mxPoint(1, interval * i), true, "O", 1, interval * i));
+    cell.new_constraints = cell.new_constraints.concat(inputConstraint);
     graph.connectionHandler.constraintHandler.showConstraint(graph.view.getState(cell,false));
 
 };

@@ -66,9 +66,7 @@ mxGraphView.prototype.createState = function(cell)
     //initial special general node atributes
     if(getshape(cell.getStyle()) == "general"){
         cell.connection_points_labels = cell.connection_points_labels != null? cell.connection_points_labels : [] ;
-        cell.new_constraints = cell.new_constraints != null ? cell.new_constraints :
-        [new mxConnectionConstraint(new mxPoint(1, 0.5), true, "O", 0, 0),
-            new mxConnectionConstraint(new mxPoint(-0.05, 0.5), true, "I", 0, 0)];
+
     }
     return state;
 };
@@ -402,7 +400,7 @@ mxConstraintHandlerBP.prototype.highlightColor = '#808080';
 
 mxConstraintHandlerBP.prototype.getImageForConstraint = function(state, constraint, point)
 {
-    if(constraint.name == "O")
+    if(constraint == null || constraint.name == "O")
         return this.OutputPointImage;
     else
         return this.InputPointImage;
@@ -582,7 +580,7 @@ mxConstraintHandlerBP.prototype.redraw = function()
 
         var allIcons = state == null || this.focusIcons[state.cell.id] == null ? Object.values(this.focusIcons).flat() : this.focusIcons[state.cell.id] ;
 
-        for (var i = 0; i < this.constraints.length; i++)
+        for (var i = 0; i < this.allIcons.length; i++)
         {
             var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
