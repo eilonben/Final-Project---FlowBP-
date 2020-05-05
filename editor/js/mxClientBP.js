@@ -66,7 +66,9 @@ mxGraphView.prototype.createState = function(cell)
     //initial special general node atributes
     if(getshape(cell.getStyle()) == "general"){
         cell.connection_points_labels = cell.connection_points_labels != null? cell.connection_points_labels : [] ;
-        cell.new_constraints = this.graph.getAllConnectionConstraints(state,true);
+        cell.new_constraints = cell.new_constraints != null ? cell.new_constraints :
+        [new mxConnectionConstraint(new mxPoint(1, 0.5), true, "O", 0, 0),
+            new mxConnectionConstraint(new mxPoint(-0.05, 0.5), true, "I", 0, 0)];
     }
     return state;
 };

@@ -13,10 +13,10 @@ function deletePrevLabels(cell, value, graph) {
 
 // update connection point number
 function adjustConnectionPoints(cell, connection_number, graph) {
-    cell.new_constraints = [];
+    cell.new_constraints = cell.new_constraints.filter(x => x.name = "I");
     var interval = 1 / (connection_number + 1);
     for (var i = 1; i <= connection_number; i++)
-        cell.new_constraints.push(new mxConnectionConstraint(new mxPoint(1, interval * i), true));
+        cell.new_constraints.push(new mxConnectionConstraint(new mxPoint(1, interval * i), true, "O", 1, interval * i));
     graph.connectionHandler.constraintHandler.showConstraint(graph.view.getState(cell,false));
 
 };
