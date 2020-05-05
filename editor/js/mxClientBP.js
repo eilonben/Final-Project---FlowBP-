@@ -956,7 +956,7 @@ mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSourc
 
     if (terminal != null)
     {
-        if (getshape(terminal.getStyle())=="startnode")
+        if (getshape(terminal.getStyle())=="startnode" &&  isSource==null)
             return previous;
         terminal.insertEdge(edge, isSource);
 
