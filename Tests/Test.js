@@ -41,20 +41,32 @@ function consoleToArray(){
     return arr;
 }
 var testRequestsList = function () {
-    var expected = ["Hi","Goodbye"];
+    var expected = [["Hi"],["Goodbye"]];
+    var statistic=[0,0];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HiOrGoodbye.xml");
-    try {
-
-        parse_graph(xml);
-        resulte = consoleToArray();
-    }catch (e) {
-        console.log(e);
-        return false;
+    for (var j = 0 ; j<100 ; j++) {
+        try {
+            document.getElementById("ConsoleText1").value="";
+            parse_graph(xml);
+            resulte = consoleToArray();
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+        if (resulte.length != 1)
+            return false;
+        for (let i = 0; i < expected.length; i++) {
+            if (expected[i].toString() === resulte.toString()) {
+                statistic[i] += 1;
+            }
+        }
     }
-    if (resulte.length != 1)
+    if(statistic[0]+statistic[1] != 100)
         return false;
-    return expected.includes(resulte[0]);
+    if(statistic[0]>80 || statistic[1]>80)
+        return false;
+    return true;
 }
 
 var testHelloWorld = function () {

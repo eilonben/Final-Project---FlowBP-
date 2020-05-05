@@ -951,10 +951,13 @@ mxGraphHandlerBP.prototype.updateLivePreview = function(dx, dy)
 //repaint edges or shapes in black after they were painted in red
 mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSource)
 {
+
     var previous = this.getTerminal(edge, isSource);
 
     if (terminal != null)
     {
+        if (getshape(terminal.getStyle())=="startnode")
+            return previous;
         terminal.insertEdge(edge, isSource);
 
         //	repaint eadge or shape in black
@@ -1156,6 +1159,7 @@ mxGraph.prototype.zoom = function(factor, center)
 // edge entry from left only
 mxGraph.prototype.getConnectionConstraint = function(edge, terminal, source)
 {
+
     var point = null;
     var x = edge.style[(source) ? mxConstants.STYLE_EXIT_X : mxConstants.STYLE_ENTRY_X];
 
