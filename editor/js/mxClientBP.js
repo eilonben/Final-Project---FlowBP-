@@ -61,11 +61,15 @@ mxGraphView.prototype.removeState = function(cell)
 
 mxGraphView.prototype.createState = function(cell)
 {
-    if(getshape(cell.getStyle()) == "general") {
-        cell.constraints_labels = {};
-        cell.new_constraints = [new mxConnectionConstraint(new mxPoint(1, 0.5), true)];
+
+    var state = new mxCellState(this, cell, this.graph.getCellStyle(cell));
+    //initial special general node atributes
+    if(getshape(cell.getStyle()) == "general"){
+        cell.connection_points_labels = cell.connection_points_labels != null? cell.connection_points_labels : [] ;
+        cell.original_id = state.cell.id;
+
     }
-    return new mxCellState(this, cell, this.graph.getCellStyle(cell));
+    return state;
 };
 
 
@@ -127,9 +131,11 @@ mxVertexHandlerBP.prototype.updateLivePreview = function(me) {
     }
 
     //the only change
-    this.graph.connectionHandler.constraintHandler.showConstraint(this.state);
+    // this.graph.connectionHandler.constraintHandler.showConstraint(this.state);
     // Restores current state
     this.state.setState(tempState);
+
+    // adjustEdges(this.state.cell, null, this.graph.getModel());
 
 
 };
@@ -139,6 +145,13 @@ function mxConnectionHandlerBP(graph, factoryMethod){
     mxConnectionHandler.call(this,graph, factoryMethod);
 };
 
+mxConnectionHandlerBP.defultOutputX = 1;
+
+mxConnectionHandlerBP.defultOutputY = 0.5;
+
+mxConnectionHandlerBP.defultInputX = -0.3;
+
+mxConnectionHandlerBP.defultInputY = 0.5;
 
 mxConnectionHandlerBP.prototype = Object.create(mxConnectionHandler.prototype);
 
@@ -225,6 +238,7 @@ mxConnectionHandlerBP.prototype.checkAndFixBorder = function(edge) {
 
 //this is for labels per constraint point
 mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarget) {
+
     if (target != null || this.isCreateTarget(evt) || this.graph.allowDanglingEdges) {
         // Uses the common parent of source and target or
         // the default parent to insert the edge
@@ -383,7 +397,10 @@ function mxConstraintHandlerBP(graph){
 mxConstraintHandlerBP.prototype = Object.create(mxConstraintHandler.prototype);
 
 
-mxConstraintHandlerBP.prototype.pointImage = new mxImage(mxClient.imageBasePath + '/purple-point.png', 10, 10);
+mxConstraintHandlerBP.prototype.OutputPointImage = new mxImage(mxClient.imageBasePath + '/purple-point.png', 10, 10);
+
+
+mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input2.png', 10, 10);
 
 
 mxConstraintHandlerBP.prototype.highlightColor = '#808080';
@@ -391,7 +408,10 @@ mxConstraintHandlerBP.prototype.highlightColor = '#808080';
 
 mxConstraintHandlerBP.prototype.getImageForConstraint = function(state, constraint, point)
 {
-    return this.pointImage;
+    if(constraint == null || constraint.name == "O")
+        return this.OutputPointImage;
+    else
+        return this.InputPointImage;
 };
 
 
@@ -422,6 +442,7 @@ mxConstraintHandlerBP.prototype.reset = function()
  */
 mxConstraintHandlerBP.prototype.destroyIcons = function()
 {
+    this.showConstraint();
     return;
 };
 
@@ -493,6 +514,7 @@ mxConstraintHandlerBP.prototype.update = function(me, source, existingEdge, poin
             var cy = mouse.getCenterY();
 
             var allIcons = state == null ? Object.values(this.focusIcons).flat() : this.focusIcons[state.cell.id] ;
+            allIcons = allIcons != null ? allIcons : [];
 
             for (var i = 0; i < allIcons.length; i++)
             {
@@ -568,7 +590,7 @@ mxConstraintHandlerBP.prototype.redraw = function()
 
         var allIcons = state == null || this.focusIcons[state.cell.id] == null ? Object.values(this.focusIcons).flat() : this.focusIcons[state.cell.id] ;
 
-        for (var i = 0; i < this.constraints.length; i++)
+        for (var i = 0; i < allIcons.length; i++)
         {
             var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
@@ -586,7 +608,7 @@ mxConstraintHandlerBP.prototype.redraw = function()
 
 mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 {
-    var size = 1;
+    var size = this.graph.view.scale;
     this.constraints = (state != null && !this.isStateIgnored(state, source) &&
         this.graph.isCellConnectable(state.cell)) ? ((this.isEnabled()) ?
         (this.graph.getAllConnectionConstraints(state, source) || []) : []) : null;
@@ -613,6 +635,9 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 
         for (var i = 0; i < this.constraints.length; i++)
         {
+            // hover a shape hide input icon when the shape is the source.
+            if(this.constraints[i].name == "I" && source)
+                continue;
             var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
 
@@ -625,37 +650,45 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
             icon.preserveImageAspect = false;
             icon.init(this.graph.getView().getDecoratorPane());
 
-            // Fixes lost event tracking for images in quirks / IE8 standards
-            if (mxClient.IS_QUIRKS || document.documentMode == 8)
-            {
-                mxEvent.addListener(icon.node, 'dragstart', function(evt)
-                {
-                    mxEvent.consume(evt);
+            //add connection attributes
+            if(this.constraints[i].name == "O") {
 
-                    return false;
+                // Fixes lost event tracking for images in quirks / IE8 standards
+                if (mxClient.IS_QUIRKS || document.documentMode == 8) {
+                    mxEvent.addListener(icon.node, 'dragstart', function (evt) {
+                        mxEvent.consume(evt);
+
+                        return false;
+                    });
+                }
+
+                // Move the icon behind all other overlays
+                if (icon.node.previousSibling != null) {
+                    icon.node.parentNode.insertBefore(icon.node, icon.node.parentNode.firstChild);
+                }
+
+                var getState = mxUtils.bind(this, function () {
+                    return (this.currentFocus != null) ? this.currentFocus : state;
                 });
+
+                icon.redraw();
+                mxEvent.redirectMouseEvents(icon.node, this.graph, getState);
+                this.currentFocusArea.add(icon.bounds);
+                this.focusIcons[state.cell.id].push(icon);
+                this.focusPoints.push(cp);
             }
-
-            // Move the icon behind all other overlays
-            if (icon.node.previousSibling != null)
-            {
-                icon.node.parentNode.insertBefore(icon.node, icon.node.parentNode.firstChild);
+            else {
+                icon.redraw();
+                this.focusIcons[state.cell.id].push(icon);
+                this.focusPoints.push(cp);
             }
-
-            var getState = mxUtils.bind(this, function()
-            {
-                return (this.currentFocus != null) ? this.currentFocus : state;
-            });
-
-            icon.redraw();
-
-            mxEvent.redirectMouseEvents(icon.node, this.graph, getState);
-            this.currentFocusArea.add(icon.bounds);
-            this.focusIcons[state.cell.id].push(icon);
-            this.focusPoints.push(cp);
         }
 
         this.currentFocusArea.grow(this.getTolerance(me));
+    }
+    else {
+        this.destroyIcons();
+        this.destroyFocusHighlight();
     }
 };
 
@@ -664,7 +697,7 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 //state is optional
 mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
 {
-    var size = 1;
+    var size = this.graph.view.scale;
     // when state is null, get all states in graph
     var states = this.graph.view.getStates().getValues();
     states = inputState == null ? states : [inputState];
@@ -676,8 +709,6 @@ mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
 
         // Only uses cells which have constraints
         if (this.constraints != null) {
-            // this.currentFocus = state;
-            // this.currentFocusArea = new mxRectangle(state.x, state.y, state.width, state.height);
 
             if (this.focusIcons[state.cell.id] != null) {
                 for (var i = 0; i < this.focusIcons[state.cell.id].length; i++) {
@@ -692,9 +723,9 @@ mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
             this.focusIcons[state.cell.id] = [];
 
             for (var i = 0; i < this.constraints.length; i++) {
+
                 var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
                 var img = this.getImageForConstraint(state, this.constraints[i], cp);
-
                 var src = img.src;
                 var bounds = new mxRectangle(Math.round(cp.x - (img.width * size) / 2),
                     Math.round(cp.y - (img.height * size) / 2), img.width * size, img.height * size);
@@ -706,13 +737,13 @@ mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
 
 
                 // Move the icon behind all other overlays
-                if(icon.node.previousSibling != null) {
+                if (icon.node.previousSibling != null) {
                     icon.node.parentNode.insertBefore(icon.node, icon.node.parentNode.firstChild);
                 }
 
                 var getState = mxUtils.bind(this, function () {
-                     return (this.currentFocus != null) ? this.currentFocus : state;
-                 });
+                    return (this.currentFocus != null) ? this.currentFocus : state;
+                });
 
                 icon.redraw();
 
@@ -720,6 +751,7 @@ mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
             }
         }
     }
+
 };
 
 
@@ -732,7 +764,7 @@ function mxGraphHandlerBP(graph){
 
 mxGraphHandlerBP.prototype = Object.create(mxGraphHandler.prototype);
 
-//This is for displaying constraints and preventing moving a edge
+//This is for preventing moving only an edge without its source and target
 mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, evt) {
     //this is new
     const edges = cells.filter(cell => cell.getStyle().includes("edgeStyle"));
@@ -942,7 +974,7 @@ mxGraphHandlerBP.prototype.updateLivePreview = function(dx, dy)
         this.graph.view.validate();
         this.redrawHandles(states);
         //the only change
-        this.graph.connectionHandler.constraintHandler.showConstraint(states[1]);
+        // this.graph.connectionHandler.constraintHandler.showConstraint(states[1]);
         this.resetPreviewStates(states);
     }
 };
@@ -956,23 +988,33 @@ mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSourc
 
     if (terminal != null)
     {
-        if (getshape(terminal.getStyle())=="startnode" &&  isSource==null)
+        //denny connect start node
+        if (getshape(terminal.getStyle())=="startnode" && !isSource)
             return previous;
+
         terminal.insertEdge(edge, isSource);
+
+        // remove old label attribute of edge if exist or update it
+        // if (isSource && getshape(terminal.getStyle()) == "general")
+        // {
+        //     var cellValue = this.getValue(terminal);
+        //         if (cellValue != null)
+        //             updateEdgesLabels(terminal, this, cellValue);
+        // }
 
         //	repaint eadge or shape in black
         if(terminal.repaint)
         {
             var new_style = mxUtils.setStyle(terminal.getStyle(), 'strokeColor', '#000000');
             //after fixing the cell it will repaint in black
-            terminal.repaint = null;
+            delete terminal.repaint ;
             this.setStyle(terminal, new_style);
         }
         if(edge.repaint)
         {
             var new_style = mxUtils.setStyle(edge.getStyle(), 'strokeColor', '#000000');
             //after fixing the cell it will repaint in black
-            edge.repaint = null;
+            delete edge.repaint;
             this.setStyle(edge, new_style);
         }
 
@@ -1043,7 +1085,8 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
         value.setAttribute('label',label);
         edge.setValue(value);
 
-    }else if(source!=null && getshape(source.getStyle())=="bsync" ){
+    }else
+        if(source!=null && getshape(source.getStyle())=="bsync" ){
         var numberOfOutEdges = getNumOfOutEdges(source);
         if(numberOfOutEdges >= 1)
             return null;
@@ -1056,103 +1099,78 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
     return edge;
 };
 
-mxGraph.prototype.graphModelChanged = function(changes)
+
+mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
 {
-    // var changeStates = [];
-    for (var i = 0; i < changes.length; i++)
-    {
-        this.processChange(changes[i]);
-        // if(changes[i].cell != null)
-        //     changeStates.push(changes[i].cell)
-    }
-
-    this.updateSelection();
-    this.view.validate();
-    this.sizeDidChange();
-
-
-    // changeStates = changeStates.map(cell => this.view.getState(cell, false));
-    if(changes.length !=0)
-        this.connectionHandler.constraintHandler.showConstraint();
-
+    var output =  this.resizeCells([cell], [bounds], recurse)[0];
+    fixConnectionPointsLabelLocation(this, cell);
+    return output;
 };
 
-mxGraph.prototype.zoom = function(factor, center)
+
+mxGraphView.prototype.validate = function(cell)
 {
-    center = (center != null) ? center : this.centerZoom;
-    var scale = Math.round(this.view.scale * factor * 100) / 100;
-    var state = this.view.getState(this.getSelectionCell());
-    factor = scale / this.view.scale;
+    var t0 = mxLog.enter('mxGraphView.validate');
+    window.status = mxResources.get(this.updatingDocumentResource) ||
+        this.updatingDocumentResource;
 
-    if (this.keepSelectionVisibleOnZoom && state != null)
+    this.resetValidationState();
+
+    // Improves IE rendering speed by minimizing reflows
+    var prevDisplay = null;
+
+    if (this.optimizeVmlReflows && this.canvas != null && this.textDiv == null &&
+        ((document.documentMode == 8 && !mxClient.IS_EM) || mxClient.IS_QUIRKS))
     {
-        var rect = new mxRectangle(state.x * factor, state.y * factor,
-            state.width * factor, state.height * factor);
+        // Placeholder keeps scrollbar positions when canvas is hidden
+        this.placeholder = document.createElement('div');
+        this.placeholder.style.position = 'absolute';
+        this.placeholder.style.width = this.canvas.clientWidth + 'px';
+        this.placeholder.style.height = this.canvas.clientHeight + 'px';
+        this.canvas.parentNode.appendChild(this.placeholder);
 
-        // Refreshes the display only once if a scroll is carried out
-        this.view.scale = scale;
+        prevDisplay = this.drawPane.style.display;
+        this.canvas.style.display = 'none';
 
-        if (!this.scrollRectToVisible(rect))
-        {
-            this.view.revalidate();
+        // Creates temporary DIV used for text measuring in mxText.updateBoundingBox
+        this.textDiv = document.createElement('div');
+        this.textDiv.style.position = 'absolute';
+        this.textDiv.style.whiteSpace = 'nowrap';
+        this.textDiv.style.visibility = 'hidden';
+        this.textDiv.style.display = (mxClient.IS_QUIRKS) ? 'inline' : 'inline-block';
+        this.textDiv.style.zoom = '1';
 
-            // Forces an event to be fired but does not revalidate again
-            this.view.setScale(scale);
-        }
+        document.body.appendChild(this.textDiv);
     }
-    else
+
+    var graphBounds = this.getBoundingBox(this.validateCellState(
+        this.validateCell(cell || ((this.currentRoot != null) ?
+            this.currentRoot : this.graph.getModel().getRoot()))));
+    this.setGraphBounds((graphBounds != null) ? graphBounds : this.getEmptyBounds());
+    this.validateBackground();
+
+    if (prevDisplay != null)
     {
-        var hasScrollbars = mxUtils.hasScrollbars(this.container);
+        this.canvas.style.display = prevDisplay;
+        this.textDiv.parentNode.removeChild(this.textDiv);
 
-        if (center && !hasScrollbars)
+        if (this.placeholder != null)
         {
-            var dx = this.container.offsetWidth;
-            var dy = this.container.offsetHeight;
-
-            if (factor > 1)
-            {
-                var f = (factor - 1) / (scale * 2);
-                dx *= -f;
-                dy *= -f;
-            }
-            else
-            {
-                var f = (1 / factor - 1) / (this.view.scale * 2);
-                dx *= f;
-                dy *= f;
-            }
-
-            this.view.scaleAndTranslate(scale,
-                this.view.translate.x + dx,
-                this.view.translate.y + dy);
+            this.placeholder.parentNode.removeChild(this.placeholder);
         }
-        else
-        {
-            // Allows for changes of translate and scrollbars during setscale
-            var tx = this.view.translate.x;
-            var ty = this.view.translate.y;
-            var sl = this.container.scrollLeft;
-            var st = this.container.scrollTop;
 
-            this.view.setScale(scale);
-
-            if (hasScrollbars)
-            {
-                var dx = 0;
-                var dy = 0;
-
-                if (center)
-                {
-                    dx = this.container.offsetWidth * (factor - 1) / 2;
-                    dy = this.container.offsetHeight * (factor - 1) / 2;
-                }
-
-                this.container.scrollLeft = (this.view.translate.x - tx) * this.view.scale + Math.round(sl * factor + dx);
-                this.container.scrollTop = (this.view.translate.y - ty) * this.view.scale + Math.round(st * factor + dy);
-            }
-        }
+        // Textdiv cannot be reused
+        this.textDiv = null;
     }
-    this.connectionHandler.constraintHandler.showConstraint();
+
+    this.resetValidationState();
+
+    window.status = mxResources.get(this.doneResource) ||
+        this.doneResource;
+    mxLog.leave('mxGraphView.validate', t0);
+
+
+    this.graph.connectionHandler.constraintHandler.showConstraint();
 };
 
 
