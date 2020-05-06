@@ -66,6 +66,7 @@ mxGraphView.prototype.createState = function(cell)
     //initial special general node atributes
     if(getshape(cell.getStyle()) == "general"){
         cell.connection_points_labels = cell.connection_points_labels != null? cell.connection_points_labels : [] ;
+        cell.original_id = state.cell.id;
 
     }
     return state;
@@ -986,9 +987,24 @@ mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSourc
 
     if (terminal != null)
     {
-        if (getshape(terminal.getStyle())=="startnode" &&  isSource==null)
+        //denny connect start node
+        if (getshape(terminal.getStyle())=="startnode" && !isSource)
             return previous;
+
         terminal.insertEdge(edge, isSource);
+
+        // remove old label attribute of edge if exist or update it
+        if ( isSource)
+        {
+            var cellValue = this.getValue(terminal);
+            var edgeValue = this.getValue(edge);
+            if(edgeValue.getAttribute("label") != null) {
+                edgeValue.removeAttribute("label");
+                //update attribute if it general node
+                if (getshape(terminal.getStyle()) == "general")
+                    updateEdgesLabels(terminal, this, cellValue);
+            }
+        }
 
         //	repaint eadge or shape in black
         if(terminal.repaint)
@@ -1073,7 +1089,8 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
         value.setAttribute('label',label);
         edge.setValue(value);
 
-    }else if(source!=null && getshape(source.getStyle())=="bsync" ){
+    }else
+        if(source!=null && getshape(source.getStyle())=="bsync" ){
         var numberOfOutEdges = getNumOfOutEdges(source);
         if(numberOfOutEdges >= 1)
             return null;

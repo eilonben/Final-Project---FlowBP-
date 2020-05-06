@@ -47,6 +47,7 @@ function findConnectionPointLabelCell(graph, labelId){
 
 //update the connection points labels
 function updateConnectionPointsLabels(graph, cell, labels){
+    validateNewConstraint(cell, graph);
     graph.getModel().beginUpdate();
     try {
         for (var i = 0; i < labels.length; i++) {
@@ -154,7 +155,7 @@ function adjustEdges(cell, numOfOutputs, graphModel) {
     }
 };
 
-function updateEdgesLabels(cell, numOfOutputs, graphModel, cellValue) {
+function updateEdgesLabels(cell, graphModel, cellValue ) {
     var outEdges = getOutEdges(cell);
     graphModel.beginUpdate();
     try {
@@ -455,7 +456,7 @@ FormatBP.prototype.refresh = function () {
                             value.setAttribute("Outputnumber" + (i + 1), label);
                             labels.push(label);
                         }
-                        updateEdgesLabels(cell, NumberOfOutPutBox.value, graph.getModel(), value);
+                        updateEdgesLabels(cell, graph.getModel(), value);
                         updateConnectionPointsLabels(graph, cell, labels);
                         graph.getModel().setValue(cell, value);
                     };
