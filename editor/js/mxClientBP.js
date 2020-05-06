@@ -514,6 +514,7 @@ mxConstraintHandlerBP.prototype.update = function(me, source, existingEdge, poin
             var cy = mouse.getCenterY();
 
             var allIcons = state == null ? Object.values(this.focusIcons).flat() : this.focusIcons[state.cell.id] ;
+            allIcons = allIcons != null ? allIcons : [];
 
             for (var i = 0; i < allIcons.length; i++)
             {
@@ -589,7 +590,7 @@ mxConstraintHandlerBP.prototype.redraw = function()
 
         var allIcons = state == null || this.focusIcons[state.cell.id] == null ? Object.values(this.focusIcons).flat() : this.focusIcons[state.cell.id] ;
 
-        for (var i = 0; i < this.allIcons.length; i++)
+        for (var i = 0; i < allIcons.length; i++)
         {
             var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
@@ -994,17 +995,12 @@ mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSourc
         terminal.insertEdge(edge, isSource);
 
         // remove old label attribute of edge if exist or update it
-        if ( isSource)
-        {
-            var cellValue = this.getValue(terminal);
-            var edgeValue = this.getValue(edge);
-            if(edgeValue.getAttribute("label") != null) {
-                edgeValue.removeAttribute("label");
-                //update attribute if it general node
-                if (getshape(terminal.getStyle()) == "general")
-                    updateEdgesLabels(terminal, this, cellValue);
-            }
-        }
+        // if (isSource && getshape(terminal.getStyle()) == "general")
+        // {
+        //     var cellValue = this.getValue(terminal);
+        //         if (cellValue != null)
+        //             updateEdgesLabels(terminal, this, cellValue);
+        // }
 
         //	repaint eadge or shape in black
         if(terminal.repaint)
