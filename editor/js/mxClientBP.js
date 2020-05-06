@@ -144,6 +144,9 @@ function mxConnectionHandlerBP(graph, factoryMethod){
     mxConnectionHandler.call(this,graph, factoryMethod);
 };
 
+mxConnectionHandlerBP.defultExitPointX = 1;
+
+mxConnectionHandlerBP.defultExitPointY = 0.5;
 
 mxConnectionHandlerBP.prototype = Object.create(mxConnectionHandler.prototype);
 
@@ -434,6 +437,7 @@ mxConstraintHandlerBP.prototype.reset = function()
  */
 mxConstraintHandlerBP.prototype.destroyIcons = function()
 {
+    this.showConstraint();
     return;
 };
 
@@ -625,6 +629,9 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 
         for (var i = 0; i < this.constraints.length; i++)
         {
+            // hover a shape hide input icon when the shape is the source.
+            if(this.constraints[i].name == "I" && source)
+                continue;
             var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
 
@@ -672,6 +679,10 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
         }
 
         this.currentFocusArea.grow(this.getTolerance(me));
+    }
+    else {
+        this.destroyIcons();
+        this.destroyFocusHighlight();
     }
 };
 
