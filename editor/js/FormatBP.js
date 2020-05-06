@@ -323,7 +323,6 @@ FormatBP.prototype.refresh = function () {
         }
         if (graph.getModel().isEdge(cell)) {
 
-
         } else if (getshape(cell.getStyle()) == "bsync") {
                 var dlg = new BSyncForm(ui, cell);
                 //dlg.container.style.width="100%";

@@ -111,18 +111,18 @@ ToolbarBP.prototype.init = function () {
     elts[1].setAttribute('title','Execute');
     elts[1].childNodes[0].className = 'geDebug geDebug_run'
 
-    var elts = this.addItems(['-', 'debug_debug', 'debug_next', 'debug_back', 'debug_stop']);
-    elts[1].setAttribute('title','Start debugging');
-    elts[1].childNodes[0].className = 'geDebug geDebug_debug'
+    var elts = this.addItems(['debug_debug', 'debug_next', 'debug_back', 'debug_stop']);
+    elts[0].setAttribute('title','Start debugging');
+    elts[0].childNodes[0].className = 'geDebug geDebug_debug'
 
-    elts[2].setAttribute('title','Step forward');
-    elts[2].childNodes[0].className = 'geDebug geDebug_next'
+    elts[1].setAttribute('title','Step forward');
+    elts[1].childNodes[0].className = 'geDebug geDebug_next'
 
-    elts[3].setAttribute('title','Step back');
-    elts[3].childNodes[0].className = 'geDebug geDebug_back'
+    elts[2].setAttribute('title','Step back');
+    elts[2].childNodes[0].className = 'geDebug geDebug_back'
 
-    elts[4].setAttribute('title','Stop Debugging');
-    elts[4].childNodes[0].className = 'geDebug geDebug_stop'
+    elts[3].setAttribute('title','Stop Debugging');
+    elts[3].childNodes[0].className = 'geDebug geDebug_stop'
     var elts = this.addItems(['-', 'showConsole']);
     elts[1].setAttribute('title','Show Console');
 };
