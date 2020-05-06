@@ -66,7 +66,7 @@ mxGraphView.prototype.createState = function(cell)
     //initial special general node atributes
     if(getshape(cell.getStyle()) == "general"){
         cell.connection_points_labels = cell.connection_points_labels != null? cell.connection_points_labels : [] ;
-        cell.original_id = state.cell.id;
+        cell.original_id = cell.original_id != null ? cell.original_id : state.cell.id;
 
     }
     return state;
