@@ -21,7 +21,7 @@
 	<shape name="BSync" h="45" w="100" aspect="variable" strokewidth="inherit">
 		<connections>
 			<constraint x="1" y="0.5" perimeter="0" name="O" />
-			<constraint x="-0.02" y="0.5" perimeter="0" name="I" />
+			<constraint x="-0.04" y="0.5" perimeter="0" name="I" />
 		</connections>
 		<background>
 			<path>
@@ -41,7 +41,7 @@
 	<shape name="General" h="25" w="100" aspect="variable" strokewidth="inherit">
 		<connections>
 			<constraint x="1" y="0.5" perimeter="0" name="O" />
-			<constraint x="-0.02" y="0.5" perimeter="0" name="I" />
+			<constraint x="-0.04" y="0.5" perimeter="0" name="I" />
 		</connections>
 		<background>
 			<path>
@@ -60,7 +60,7 @@
 	<shape name="Console" h="25" w="100" aspect="variable" strokewidth="inherit">
 		<connections>
 			<constraint x="1" y="0.5" perimeter="0" name="O" />
-			<constraint x="-0.02" y="0.5" perimeter="0" name="I" />
+			<constraint x="-0.04" y="0.5" perimeter="0" name="I" />
 		</connections>
 		<background>
 			<path>

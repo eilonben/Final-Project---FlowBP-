@@ -399,7 +399,7 @@ mxConstraintHandlerBP.prototype = Object.create(mxConstraintHandler.prototype);
 mxConstraintHandlerBP.prototype.OutputPointImage = new mxImage(mxClient.imageBasePath + '/purple-point.png', 10, 10);
 
 
-mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input-point.png', 10, 10);
+mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input2.png', 10, 10);
 
 
 mxConstraintHandlerBP.prototype.highlightColor = '#808080';
