@@ -144,9 +144,13 @@ function mxConnectionHandlerBP(graph, factoryMethod){
     mxConnectionHandler.call(this,graph, factoryMethod);
 };
 
-mxConnectionHandlerBP.defultExitPointX = 1;
+mxConnectionHandlerBP.defultOutputX = 1;
 
-mxConnectionHandlerBP.defultExitPointY = 0.5;
+mxConnectionHandlerBP.defultOutputY = 0.5;
+
+mxConnectionHandlerBP.defultInputX = -0.3;
+
+mxConnectionHandlerBP.defultInputY = 0.5;
 
 mxConnectionHandlerBP.prototype = Object.create(mxConnectionHandler.prototype);
 

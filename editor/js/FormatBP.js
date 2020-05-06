@@ -25,8 +25,10 @@ function adjustConnectionPoints(cell, connection_number, graph) {
     var inputConstraint = cell.new_constraints.filter(x => x.name == "I");
     cell.new_constraints = [];
     var interval = 1 / (connection_number + 1);
-    for (var i = 1; i <= connection_number; i++)
-        cell.new_constraints.push(new mxConnectionConstraint(new mxPoint(mxConnectionHandlerBP.defultExitPointX, interval * i), true, "O", 1, interval * i));
+    for (var i = 1; i <= connection_number; i++) {
+        var point = new mxPoint(mxConnectionHandlerBP.defultOutputX, interval * i);
+        cell.new_constraints.push(new mxConnectionConstraint(point, true, "O", 1, interval * i));
+    }
     cell.new_constraints = cell.new_constraints.concat(inputConstraint);
     graph.connectionHandler.constraintHandler.showConstraint(graph.view.getState(cell,false));
 
