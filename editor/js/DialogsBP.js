@@ -208,6 +208,8 @@ var CodeEditorDialog = function (editorUi, cell) {
         });
 
         genericBtn.className = 'geBtn gePrimaryBtn';
+        genericBtn.style.display = "block";
+        genericBtn.style.marginTop = "15px";
         td.appendChild(genericBtn);
     }
 
@@ -409,6 +411,8 @@ var ConsoleBlockSidebar = function (editorUi, cell) {
         });
 
         genericBtn.className = 'geBtn gePrimaryBtn';
+        genericBtn.style.display = "block";
+        genericBtn.style.marginTop = "15px";
         td.appendChild(genericBtn);
     }
 
