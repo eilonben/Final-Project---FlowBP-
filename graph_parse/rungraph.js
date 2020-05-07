@@ -185,7 +185,8 @@ function getshape(str) {
     if(str == null || str == undefined)
         return "";
     let arr = str.split(";");
-    return arr[0].split("=")[1].split(".")[1];
+    arr = arr[0].split("=")[1] != null ? arr[0].split("=")[1].split(".")[1] : "";
+    return arr;
 }
 
 function* runInSameBT(c, payloads, bpEngine, model, scen) {

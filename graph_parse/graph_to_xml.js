@@ -1,4 +1,4 @@
-const colorOfInvalid = '#9A5688';
+const colorOfInvalid = '#CC0000';
 
 function paint_cells(graphModel, cells) {
     graphModel.beginUpdate();
