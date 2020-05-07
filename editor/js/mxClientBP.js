@@ -400,7 +400,7 @@ mxConstraintHandlerBP.prototype = Object.create(mxConstraintHandler.prototype);
 mxConstraintHandlerBP.prototype.OutputPointImage = new mxImage(mxClient.imageBasePath + '/purple-point.png', 10, 10);
 
 
-mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input2.png', 10, 10);
+mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input2.png', 20, 15);
 
 
 mxConstraintHandlerBP.prototype.highlightColor = '#808080';
@@ -408,10 +408,10 @@ mxConstraintHandlerBP.prototype.highlightColor = '#808080';
 
 mxConstraintHandlerBP.prototype.getImageForConstraint = function(state, constraint, point)
 {
-    if(constraint == null || constraint.name == "O")
-        return this.OutputPointImage;
-    else
+    if(constraint != null && constraint.name == "I")
         return this.InputPointImage;
+    else
+        return this.OutputPointImage;
 };
 
 
@@ -993,14 +993,6 @@ mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSourc
             return previous;
 
         terminal.insertEdge(edge, isSource);
-
-        // remove old label attribute of edge if exist or update it
-        // if (isSource && getshape(terminal.getStyle()) == "general")
-        // {
-        //     var cellValue = this.getValue(terminal);
-        //         if (cellValue != null)
-        //             updateEdgesLabels(terminal, this, cellValue);
-        // }
 
         //	repaint eadge or shape in black
         if(terminal.repaint)

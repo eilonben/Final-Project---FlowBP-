@@ -34,29 +34,20 @@ function adjustConnectionPoints(cell, connection_number, graph) {
 
 };
 
-//find the cell in the graph that represent the connection point label
-function findConnectionPointLabelCell(graph, labelId){
-    var allCells = Object.values(graph.getModel().cells);
-    for( var i=0; i< allCells.length; i++){
-        var cell = allCells[i];
-        if(cell.label_id != null && cell.label_id == labelId)
-            return cell;
-    }
-    return null;
-};
 
 //update the connection points labels
 function updateConnectionPointsLabels(graph, cell, labels){
     validateNewConstraint(cell, graph);
     graph.getModel().beginUpdate();
     try {
+        // labels related to cell connection points
+        var cell_labels_cells = cell.children != null ? cell.children : [];
         for (var i = 0; i < labels.length; i++) {
             var label = labels[i];
 
             // the label exist -> only change its value
-            if( cell.connection_points_labels[i] != null) {
-                var ConnectionPointLabelId =  cell.connection_points_labels[i];
-                var ConnectionPointLabelCell = findConnectionPointLabelCell(graph, ConnectionPointLabelId);
+            if( cell_labels_cells.length > i) {
+                var ConnectionPointLabelCell = cell_labels_cells[i];
                 ConnectionPointLabelCell.value = label;
             }
             // create new label
@@ -70,10 +61,8 @@ function updateConnectionPointsLabels(graph, cell, labels){
                 labelVertex.relative = true;
                 labelVertex.movable = false;
                 labelVertex.rotationEnabled = false;
+                // delete connection constraint for the label
                 labelVertex.new_constraints = [];
-                //special id
-                labelVertex.label_id = cell.original_id + "." + i;
-                cell.connection_points_labels.push(labelVertex.label_id);
             }
         }
         //fix labels locations
