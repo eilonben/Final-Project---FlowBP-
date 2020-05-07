@@ -131,7 +131,7 @@ var testRandomOrder = function () {
 }
 
 var testPayload =function () {
-    var expected = [3,4];
+    var expected = ["[{\"x\":3},{\"y\":4}]"];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/Payloads.xml");
     try {
@@ -145,7 +145,7 @@ var testPayload =function () {
 }
 
 var testPayloadChange =function () {
-    var expected = [5,6];
+    var expected = ["[{\"x\":5},{\"y\":6}]"];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/PayloadsChange.xml");
     try {
@@ -159,7 +159,7 @@ var testPayloadChange =function () {
 }
 
 var testPayloadsIfElse =function () {
-    var expected = [["3","undefined"],["undefined","3"]];
+    var expected = ["{\"x\":3}"];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/PayloadsIfElse.xml");
     try {
@@ -169,11 +169,7 @@ var testPayloadsIfElse =function () {
         console.log(e);
         return false;
     }
-    for (let i = 0; i < expected.length; i++) {
-        if (expected[i].toString() === resulte.toString())
-            return true;
-    }
-    return false;
+    return expected.toString() === resulte.toString();
 }
 
 function initConsole() {
