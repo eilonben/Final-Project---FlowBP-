@@ -100,38 +100,37 @@ function getRandomItem(set) {
 
 function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
     let edg = model.getEdges(c, false, true, true);
+
     if (edg.length > 0) {
         // Run extra followers in new threads
         for (let i = 1; i < edg.length; i++) {
             let target = edg[i].getTerminal(false);
             if (target !== undefined) {
-                let nextPayloads = payloads;
                 let edgeLabel = edg[i].getAttribute("label");
-                if(edgeLabel!==undefined && outputs!==undefined){
-                    if(outputs[edgeLabel]!== undefined) {
-                        nextPayloads = outputs[edgeLabel];
-                    }
-                    else{
-                        nextPayloads = [{}];
+                if (edgeLabel !== undefined && outputs !== undefined) {
+                    if (outputs[edgeLabel] !== undefined) {
+                        let nextPayloads = outputs[edgeLabel];
+                        runInNewBT(target, nextPayloads, bpEngine, model, window.debug.scenarios[scen].length);
                     }
                 }
-                runInNewBT(target, nextPayloads, bpEngine, model, window.debug.scenarios[scen].length);
             }
         }
         // Run the first follower in the same thread.
         let target = edg[0].getTerminal(false);
         if (target !== undefined) {
-            let nextPayloads = payloads;
-            let edgeLabel = edg[0].getAttribute("label");
-            if(edgeLabel!==undefined && outputs!==undefined) {
-                if (outputs[edgeLabel] !== undefined) {
-                    nextPayloads = outputs[edgeLabel];
-                }
-                else {
-                    nextPayloads = [{}];
+            let block = getshape(c.getStyle());
+            if (block !== "general") {
+                yield* runInSameBT(edg[0].getTerminal(false), JSON.parse(JSON.stringify(payloads)), bpEngine, model, scen);
+            }
+            else {
+                let edgeLabel = edg[0].getAttribute("label");
+                if (edgeLabel !== undefined && outputs !== undefined) {
+                    if (outputs[edgeLabel] !== undefined) {
+                        let nextPayloads = outputs[edgeLabel];
+                        yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model, scen);
+                    }
                 }
             }
-            yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model, scen);
         }
     }
 }
@@ -183,7 +182,7 @@ function runInNewBT(c, payloads, bpEngine, model, curTime) {
 };
 
 function getshape(str) {
-    if(str == null)
+    if(str == null || str == undefined)
         return "";
     let arr = str.split(";");
     return arr[0].split("=")[1].split(".")[1];
