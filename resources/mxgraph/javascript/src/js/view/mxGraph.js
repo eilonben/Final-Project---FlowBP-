@@ -11977,6 +11977,7 @@ mxGraph.prototype.setSelectionCell = function(cell)
 mxGraph.prototype.setSelectionCells = function(cells)
 {
 	this.getSelectionModel().setCells(cells);
+    this.connectionHandler.constraintHandler.showConstraint();
 };
 
 /**
