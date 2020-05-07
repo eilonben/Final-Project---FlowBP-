@@ -128,8 +128,10 @@ var CodeEditorDialog = function (editorUi, cell) {
     td = document.createElement('td');
     td.style.fontSize = '10pt';
     td.style.width = '100px';
-    mxUtils.write(td, "Code Editor: GeneralBlockFunction(payloads){");
-
+    var code =document.createElement("code");
+    code.innerText="Code Editor: GeneralBlockFunction(payloads){";
+    code.style.fontSize="14px";
+    td.appendChild(code);
     row.appendChild(td);
     tbody.appendChild(row);
 
@@ -333,7 +335,10 @@ var ConsoleBlockSidebar = function (editorUi, cell) {
     td = document.createElement('td');
     td.style.fontSize = '10pt';
     td.style.width = '100px';
-    mxUtils.write(td, "Console Code Editor: function(payloads){");
+    var code =document.createElement("code");
+    code.innerText="Console Code Editor: function(payloads){";
+    code.style.fontSize="14px";
+    td.appendChild(code);
     row.appendChild(td);
     tbody.appendChild(row);
 

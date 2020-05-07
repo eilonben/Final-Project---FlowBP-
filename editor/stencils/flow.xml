@@ -74,6 +74,7 @@
 		</background>
 		<foreground>
 			<fillstroke />
+			<text str="Console" x="50" y="12.5" valign="middle" align="center"/>
 		</foreground>
 	</shape>
 </shapes>
