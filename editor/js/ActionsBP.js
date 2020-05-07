@@ -9,6 +9,8 @@ ActionsBP.prototype.init = function (actions) {
     var mod = graph.getModel();
 
     var lastUndo = 0;
+    var lastLabels = {};
+    var lastCellsSizes = {};
 
     function showConsole() {
         if (this.consoleWindow === null || this.consoleWindow === undefined) {
@@ -101,36 +103,78 @@ ActionsBP.prototype.init = function (actions) {
     actions.addAction('debug_stop', function() {
 
         editor.undoManager.indexOfNextAdd = editor.undoManager.history.length;
-        var numOfNewUndos = editor.undoManager.history.length - lastUndo + 1;
+        var numOfNewUndos = editor.undoManager.history.length - lastUndo + 2;
         while (numOfNewUndos-- > 0) {
-            ui.undo()
+            ui.undo();
             editor.undoManager.history.pop()
         }
 
-        graph.clearSelection()
+        graph.clearSelection();
+
+        setLabels();
 
         ui.endDebugging();
 
     }, false, null);
 
-    function updateCell(cell, blocked, payload) {
+
+    function fixSizes(cell, content) {
+        var geo = mod.getGeometry(cell).clone();
+
+        if(content != undefined) {
+            geo.width += (content.width * 4);
+            geo.height += (content.height * 16);
+        }
+        else{
+            geo.width = lastCellsSizes[cell.id].width;
+            geo.height = lastCellsSizes[cell.id].width;
+        }
+
+        mod.setGeometry(cell, geo);
+    }
+
+    function convertPayloadToString(payload) {
+        let i = 0;
+        var res = "";
+        var width = 0;
+        payload.forEach(cur => {
+            var curRes = "Payloads[" + i++ + "]: " + JSON.stringify(cur) + "\n";
+            width = Math.max(width, curRes.length);
+            res += curRes;
+        })
+        return {text: res, width: width, height: i};
+    }
+
+    function updateCell(cell, payload) {//blocked, payload) {
+        var content;
         var val = cell.clone().getValue();
-        var style = cell.getStyle()
+        var style = cell.getStyle();
         //cell.setAttribute('payloadUpdated', '1');
-        if(blocked) {
-            val.setAttribute('Blocked', '1');
-            //style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
+        //if(blocked) {
+        //val.setAttribute('Blocked', '1');
+        //}
+        //else
+        val.setAttribute('label', "");
+        style = style.replace('fillColor=#ffff99', 'fillColor=#ffffff');
+        if (payload !== undefined) {
+            //val.setAttribute('Blocked', '0');
+            //val.setAttribute('Payloads', JSON.stringify(payload));
+            style = style.replace('fillColor=#ffffff', 'fillColor=#ffff99');
+            if (getshape(cell.getStyle()) !== "startnode") {
+                content = convertPayloadToString(payload);
+                val.setAttribute('label', content.text);
+            }
         }
-        else if(payload !== undefined){
-            val.setAttribute('Blocked', '0');
-            val.setAttribute('Payloads', JSON.stringify(payload));
-            style = style.replace('strokeColor=#000000', 'strokeColor=#ff0000');
-        }
-        else
-            //val.setAttribute('payloadUpdated', '0');
-            style = style.replace('strokeColor=#ff0000', 'strokeColor=#000000');
-        mod.setValue(cell, val);
         mod.setStyle(cell, style);
+        mod.setValue(cell, val);
+        fixSizes(cell, content);
+        //val.setAttribute('payloadUpdated', '0');
+        var ret = content !== undefined ? content.text : "";
+        return ret;
+    }
+
+    function fixView() {
+        new mxHierarchicalLayout(graph, mxConstants.DIRECTION_WEST).execute(graph.getDefaultParent(), null);
     }
 
     function updateVertexCells(record) {
@@ -139,26 +183,52 @@ ActionsBP.prototype.init = function (actions) {
         for (let i = 0; i < record.length; i++) {
             mod.beginUpdate();
 
-            let curBlocksToBlock = record[i].blockedBlocks;
+            //let curBlocksToBlock = record[i].blockedBlocks;
             let curStage = record[i].stages;
 
             cells.forEach(cell => {
-                updateCell(cell, curBlocksToBlock.includes(cell.id), curStage[cell.id])
+                updateCell(cell, curStage[cell.id]) //curBlocksToBlock.includes(cell.id), curStage[cell.id])
             });
+
+            fixView();
 
             mod.endUpdate();
         }
+    }
+
+    function getLabels() {
+        var res = {};
+
+        let cells = Object.values(mod.cells).filter(cell => cell.isVertex());
+        cells.forEach(cell => res[cell.id] = cell.getAttribute('label'));
+
+        return res;
+    }
+
+    function setLabels() {
+        let cells = Object.values(mod.cells).filter(cell => cell.isVertex());
+        cells.forEach(cell => cell.setAttribute('label', lastLabels[cell.id]));
+    }
+
+    function getCellsSizes() {
+        var res = {};
+        let cells = Object.values(mod.cells).filter(cell => cell.isVertex());
+        cells.forEach(cell => {
+            var geo = mod.getGeometry(cell);
+            res[cell.id] = {width: geo.width, height: geo.height}
+        })
+        return res;
     }
 
     actions.addAction('debug_debug', function() {
 
         fixValues(Object.values(mod.cells));
 
-        lastUndo = editor.undoManager.indexOfNextAdd + 1;
+        lastUndo = editor.undoManager.indexOfNextAdd + 2;
+        lastLabels = getLabels();
+        lastCellsSizes = getCellsSizes();
 
         ui.startDebugging();
-
-        lockLayers(graph, true)
 
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
         console.log(code);
@@ -172,6 +242,7 @@ ActionsBP.prototype.init = function (actions) {
         }
 
         lockLayers(graph, true)
+        fixView();
         parse_graph(code, graph);
 
         var record = getProgramRecord();
