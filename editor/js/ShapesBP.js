@@ -45,8 +45,8 @@ function GeneralShape()
 };
 mxUtils.extend(GeneralShape, FlowShape);
 
-GeneralShape.prototype.width = 80;
-GeneralShape.prototype.height = 20;
+GeneralShape.prototype.width = 110;
+GeneralShape.prototype.height = 25;
 GeneralShape.prototype.corner = 10;
 GeneralShape.prototype.getLabelMargins = function(rect)
 {
