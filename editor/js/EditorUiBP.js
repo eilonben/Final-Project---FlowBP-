@@ -146,3 +146,7 @@ EditorUiBP.prototype.saveFile = function(forceDialog)
         ExportDialog.saveLocalFile(this, mxUtils.getXml(this.editor.getGraphXml()), this.editor.getOrCreateFilename(), "xml");
     }
 };
+
+EditorUiBP.prototype.fixView = function() {
+    new mxHierarchicalLayout(graph, mxConstants.DIRECTION_WEST).execute(graph.getDefaultParent(), null);
+}
