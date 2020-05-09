@@ -77,7 +77,7 @@ var BSyncForm = function (editorUi, cell) {
         value.setAttribute("Block", linkInput["Block"].value);
         value.setAttribute("label","Request: "+linkInput["Request"].value+"\nWait: "+linkInput["Wait"].value+"\nBlock: "+linkInput["Block"].value);
         graph.getModel().setValue(cell, value);
-        //graph.updateCellSize(cell, true);
+        graph.updateCellSize(cell, true);
 
 
         editorUi.hideDialog();
@@ -128,9 +128,15 @@ var CodeEditorDialog = function (editorUi, cell) {
     td = document.createElement('td');
     td.style.fontSize = '10pt';
     td.style.width = '100px';
+    var title =document.createElement("div");
+    title.innerText="Code Editor:\n";
+    title.style.fontSize="18px";
+    td.appendChild(title);
     var code =document.createElement("code");
-    code.innerText="Code Editor: GeneralBlockFunction(payloads){";
+    code.innerText="GeneralBlockFunction(payloads){";
     code.style.fontSize="14px";
+    code.style.display = "block";
+    code.style.marginTop = "15px";
     td.appendChild(code);
     row.appendChild(td);
     tbody.appendChild(row);
@@ -335,10 +341,17 @@ var ConsoleBlockSidebar = function (editorUi, cell) {
     td = document.createElement('td');
     td.style.fontSize = '10pt';
     td.style.width = '100px';
+  //  mxUtils.write(td,"Console Code Editor:\n");
+    var title =document.createElement("div");
+    title.innerText="Console Code Editor:\n";
+    title.style.fontSize="18px";;
+    row.appendChild(title);
     var code =document.createElement("code");
-    code.innerText="Console Code Editor: function(payloads){";
+    code.innerText="function(payloads){";
     code.style.fontSize="14px";
-    td.appendChild(code);
+    code.style.display = "block";
+    code.style.marginTop = "15px";
+    row.appendChild(code);
     row.appendChild(td);
     tbody.appendChild(row);
 
