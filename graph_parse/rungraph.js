@@ -45,10 +45,11 @@ window.bpEngine = {
             //});
             //window.debug.blockedBlocks.push(curBlocked);
             ////////
+            fixStages();
             let e = getEvent();
             if (e === null)
                 yield 'waiting for an event';
-            fixStages(e);
+            addEvent(e);
             console.log(e + "\n");
             writeToConsole("event selected: " + e);
             window.bpEngine.BThreads.forEach(bt => {
@@ -258,14 +259,14 @@ function getProgramRecord() {
     var res = []
 
     for(let step = 0; step < getNumOfSteps(); step++){
-        var curStage = {stages: [], events: null}
+        var curStage = {stages: [], eventSelected: null}
         var scens = Object.values(window.debug.scenarios);
         curStage.stages = {};
         for (let j = 0; j < scens.length; j++) {
             curStage.stages[scens[j][step][0]] = scens[j][step][1];
         }
         if(window.debug.events[step] != -1)
-            curStage.events = window.debug.events[step];
+            curStage.eventSelected = window.debug.events[step];
         //if(Object.keys(curStage.stages).length > 0)
         res.push(curStage)
     }
@@ -275,9 +276,23 @@ function getProgramRecord() {
 
 function initDebug() {
     window.debug.scenarios = {}
+    window.debug.events = [];
 }
 
-function fixStages(event) {
+function fixStages() {
+    let scens = Object.values(window.debug.scenarios)
+    const lengths = scens.map(x => x.length);
+    let curTime = Math.max(...lengths)
+    for(let i = 0; i < scens.length; i++)
+    {
+        let curScen = scens[i];
+        let numOfFixes = curTime - curScen.length;
+        for (let j = 0; j < numOfFixes; j++)
+            curScen.push(curScen[curScen.length - 1]);
+    }
+}
+
+function addEvent(e) {
     let scens = Object.values(window.debug.scenarios)
     const lengths = scens.map(x => x.length);
     let curTime = Math.max(...lengths)
@@ -293,6 +308,7 @@ function fixStages(event) {
         window.debug.events.push(-1);
     window.debug.events.push(e);
 }
+
 
 
 // function f1(){}
