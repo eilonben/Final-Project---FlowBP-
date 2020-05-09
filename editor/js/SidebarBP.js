@@ -248,7 +248,7 @@ SidebarBP.prototype.addFlowBPPalette = function()
         this.createVertexTemplateEntry('shape=flow.startnode;whiteSpace=wrap;html=1;', 60, 60, null, 'Start Node', null, null, 'start'),
         this.createVertexTemplateEntry('shape=flow.bsync;whiteSpace=wrap;html=1;', 120, 80, 'Bsync', 'Bsync', null, null, 'bsync'),
         this.createVertexTemplateEntry('shape=flow.general;whiteSpace=wrap;html=1;', 120, 80, 'General', 'General', null, null, 'general'),
-        this.createVertexTemplateEntry('shape=flow.console;html=1;labelBackgroundColor=#ffffff;image=' + prefix + item +';', 120, 80, null, 'Console', null, null, 'console')
+        this.createVertexTemplateEntry('shape=flow.console;html=1;', 120, 80, 'Console', 'Console', null, null, 'console')
     ];
 
     this.addPaletteFunctions('Flow', 'Flow',  false, fns);

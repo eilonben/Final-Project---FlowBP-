@@ -13,42 +13,10 @@ FlowShape.prototype.constraints = [new mxConnectionConstraint(outputPoint, true,
     new mxConnectionConstraint(inputPoint, true, "I")]
 
 
-//*******************************start node*******************************
-function BsyncStartNosde()
-{
-    mxTriangle.call(this);
-};
-
-mxUtils.extend(BsyncStartNosde, FlowShape);
-mxUtils.extend(BsyncStartNosde, mxTriangle);
-
-BsyncStartNosde.prototype.constraints = [new mxConnectionConstraint(outputPoint, true, "O")];
-
-mxCellRenderer.registerShape('flow.startnode', BsyncStartNosde);
-
-
-//*******************************bsync node*******************************
-
-function BsyncShape()
-{
-    FlowShape.call(this);
-};
-mxUtils.extend(BsyncShape, FlowShape);
-
-mxCellRenderer.registerShape('flow.bsync', BsyncShape);
-
-
-//*******************************general node*******************************
-function GeneralShape()
-{
-    FlowShape.call(this);
-};
-mxUtils.extend(GeneralShape, FlowShape);
-
-GeneralShape.prototype.width = 110;
-GeneralShape.prototype.height = 25;
-GeneralShape.prototype.corner = 10;
-GeneralShape.prototype.getLabelMargins = function(rect)
+FlowShape.prototype.width = 110;
+FlowShape.prototype.height = 25;
+FlowShape.prototype.corner = 10;
+FlowShape.prototype.getLabelMargins = function(rect)
 {
     return new mxRectangle(0, 0,
         rect.width - (parseFloat(mxUtils.getValue(this.style, 'width', this.width) * this.scale)),
@@ -56,7 +24,7 @@ GeneralShape.prototype.getLabelMargins = function(rect)
 };
 
 
-GeneralShape.prototype.paintBackground = function(c, x, y, w, h)
+FlowShape.prototype.paintBackground = function(c, x, y, w, h)
 {
     var co = this.corner;
     var w0 = Math.min(w, Math.max(co, parseFloat(mxUtils.getValue(this.style, 'width', this.width))));
@@ -99,20 +67,52 @@ GeneralShape.prototype.paintBackground = function(c, x, y, w, h)
 };
 
 
+
+//*******************************start node*******************************
+function BsyncStartNosde()
+{
+    mxTriangle.call(this);
+};
+
+mxUtils.extend(BsyncStartNosde, FlowShape);
+mxUtils.extend(BsyncStartNosde, mxTriangle);
+
+BsyncStartNosde.prototype.constraints = [new mxConnectionConstraint(outputPoint, true, "O")];
+
+mxCellRenderer.registerShape('flow.startnode', BsyncStartNosde);
+
+
+//*******************************bsync node*******************************
+
+function BsyncShape()
+{
+    FlowShape.call(this);
+};
+mxUtils.extend(BsyncShape, FlowShape);
+
+mxCellRenderer.registerShape('flow.bsync', BsyncShape);
+
+
+//*******************************general node*******************************
+function GeneralShape()
+{
+    FlowShape.call(this);
+};
+mxUtils.extend(GeneralShape, FlowShape);
+
 mxCellRenderer.registerShape('flow.general', GeneralShape);
 
 
 //******************************************console***********************************************
 function ConsoleShape()
 {
-    mxImageShape.call(this);
+    // mxImageShape.call(this);
+    FlowShape.call(this);
 };
 
 
-//mxUtils.extend(ConsoleShape, FlowShape);
-mxUtils.extend(ConsoleShape, mxImageShape);
 
-ConsoleShape.prototype.constraints = [new mxConnectionConstraint(outputPoint, true, "O"),
-    new mxConnectionConstraint(inputPoint, true, "I")];
+mxUtils.extend(ConsoleShape, FlowShape);
+// mxUtils.extend(ConsoleShape, mxImageShape);
 
 mxCellRenderer.registerShape('flow.console', ConsoleShape);
