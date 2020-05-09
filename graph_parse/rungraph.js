@@ -1,6 +1,7 @@
 window.debug = {
     scenarios: {},
-    blockedBlocks: []
+    blockedBlocks: [],
+    events: []
 };
 
 function writeToConsole(message) {
@@ -33,7 +34,6 @@ window.bpEngine = {
 
     run: function* () {
         while (true) {
-            fixStages();
             ///////
             //let blockedEvents = getBlockedEvents();
             //let curBlocked = []
@@ -45,9 +45,11 @@ window.bpEngine = {
             //});
             //window.debug.blockedBlocks.push(curBlocked);
             ////////
+            fixStages();
             let e = getEvent();
             if (e === null)
                 yield 'waiting for an event';
+            addEvent(e);
             console.log(e + "\n");
             writeToConsole("event selected: " + e);
             window.bpEngine.BThreads.forEach(bt => {
@@ -257,19 +259,16 @@ function getProgramRecord() {
     var res = []
 
     for(let step = 0; step < getNumOfSteps(); step++){
-
-        var curStage = {stages:[]}//, blockedBlocks: []}
-        var scens = Object.values(window.debug.scenarios)
-        curStage.stages = {}
+        var curStage = {stages: [], eventSelected: null}
+        var scens = Object.values(window.debug.scenarios);
+        curStage.stages = {};
         for (let j = 0; j < scens.length; j++) {
-            let cur = scens[j];
-            if(cur[step][0] != -1)
-                curStage.stages[cur[step][0]] = cur[step][1];
+            curStage.stages[scens[j][step][0]] = scens[j][step][1];
         }
-        if(Object.keys(curStage.stages).length > 0)
-            res.push(curStage)
-        //if(window.debug.blockedBlocks[step] != -1)
-            //res.push({stages:{}, blockedBlocks: window.debug.blockedBlocks[step]});
+        if(window.debug.events[step] != -1)
+            curStage.eventSelected = window.debug.events[step];
+        //if(Object.keys(curStage.stages).length > 0)
+        res.push(curStage)
     }
 
     return res;
@@ -277,6 +276,7 @@ function getProgramRecord() {
 
 function initDebug() {
     window.debug.scenarios = {}
+    window.debug.events = [];
 }
 
 function fixStages() {
@@ -287,13 +287,28 @@ function fixStages() {
     {
         let curScen = scens[i];
         let numOfFixes = curTime - curScen.length;
-        for (let j = 0; j < numOfFixes + 1; j++)
-            curScen.push([-1, null]);
+        for (let j = 0; j < numOfFixes; j++)
+            curScen.push(curScen[curScen.length - 1]);
     }
-    //let numOfFixes = curTime - window.debug.blockedBlocks.length;
-    //for (let j = 0; j < numOfFixes; j++)
-        //window.debug.blockedBlocks.push(-1);
 }
+
+function addEvent(e) {
+    let scens = Object.values(window.debug.scenarios)
+    const lengths = scens.map(x => x.length);
+    let curTime = Math.max(...lengths)
+    for(let i = 0; i < scens.length; i++)
+    {
+        let curScen = scens[i];
+        let numOfFixes = curTime - curScen.length;
+        for (let j = 0; j < numOfFixes + 1; j++)
+            curScen.push(curScen[curScen.length - 1]);
+    }
+    let numOfFixes = curTime - window.debug.events.length;
+    for (let j = 0; j < numOfFixes; j++)
+        window.debug.events.push(-1);
+    window.debug.events.push(e);
+}
+
 
 
 // function f1(){}
