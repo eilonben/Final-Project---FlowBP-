@@ -121,7 +121,7 @@ function fixConnectionPointsLabelLocation(graph, cell) {
 
 // after changing number of output adjust the edges exit point accordingly
 function adjustEdges(cell, numOfOutputs, graphModel) {
-    var oldNumOfOutput =cell.new_constraints == null ? 1 : cell.new_constraints.length;
+   // var oldNumOfOutput =cell.new_constraints == null ? 1 : cell.new_constraints.length;
     //need to adjust old arrows to new location
     var outEdges = getOutEdges(cell);
     graphModel.beginUpdate();
