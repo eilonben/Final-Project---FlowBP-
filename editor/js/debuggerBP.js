@@ -162,11 +162,19 @@ debuggerBP.prototype.convertPayloadToString = function(payload) {
     let i = 0;
     var res = "";
     var width = 0;
-    payload.forEach(cur => {
-        var curRes = "Payloads[" + i + "]: " + JSON.stringify(cur) + "\n";
+    if(payload.constructor === Array) {
+        payload.forEach(cur => {
+            var curRes = "Payloads[" + i + "]: " + JSON.stringify(cur) + "\n";
+            width = Math.max(width, curRes.length);
+            res += curRes;
+        })
+
+    }
+    else{
+        var curRes = "Payload: " + JSON.stringify(payload) + "\n";
         width = Math.max(width, curRes.length);
         res += curRes;
-    })
+    }
     return {text: res, width: width, height: i};
 }
 
