@@ -18,6 +18,21 @@ function validateNewConstraint(cell, graph){
     }
 }
 
+//after debug all the graph moves - fix thr connection point labels and edges
+function fixconnectionRelatedBugs(graph){
+    var cells = graph.getModel().cells || [];
+    for( var i=0; i< cells.length; i++) {
+        var cell = cells[i];
+        fixConnectionPointsLabelLocation(graph, cell, true);
+        adjustEdges(cell, null, graph.getModel());
+    }
+};
+
+function getLabelsFromChildren(cell){
+    var children = cell.children || [];
+    var labels = children.filter(cell => cell.relative_label != null && cell.relative_label);
+    return labels;
+}
 // update connection point number
 function adjustConnectionPoints(cell, connection_number, graph) {
     validateNewConstraint(cell, graph);
@@ -41,7 +56,7 @@ function updateConnectionPointsLabels(graph, cell, labels){
     graph.getModel().beginUpdate();
     try {
         // labels related to cell connection points
-        var cell_labels_cells = cell.children != null ? cell.children : [];
+        var cell_labels_cells = getLabelsFromChildren(cell);
         for (var i = 0; i < labels.length; i++) {
             var label = labels[i];
 
@@ -61,6 +76,7 @@ function updateConnectionPointsLabels(graph, cell, labels){
                 labelVertex.relative = true;
                 labelVertex.movable = false;
                 labelVertex.rotationEnabled = false;
+                labelVertex.relative_label = true;
                 // delete connection constraint for the label
                 labelVertex.new_constraints = [];
             }
@@ -77,7 +93,7 @@ function updateConnectionPointsLabels(graph, cell, labels){
 // after changing number of output adjust the Connection PointsLabels accordingly
 function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
 {
-    var labels = cell.children || [];
+    var labels = getLabelsFromChildren(cell);
     newOutputNumber = cell.new_constraints.length;
     graph.getModel().beginUpdate();
     try {
@@ -100,27 +116,33 @@ function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
 };
 
 // relocate connection points labels according to connection points labels
-function fixConnectionPointsLabelLocation(graph, cell) {
+function fixConnectionPointsLabelLocation(graph, cell, update) {
     if (cell == null || cell.children == null)
         return;
-    var labels = cell.children;
+    var labels = getLabelsFromChildren(cell);
+    if (update)
+        graph.getModel().beginUpdate();
     for (var i = 0; i < labels.length; i++) {
-        var ConnectionPointLabelCell =  labels[i];
+        var ConnectionPointLabelCell = labels[i];
 
         var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
         var cp = cell.new_constraints[i].point;
 
         var newY = cp.y * cell.getGeometry().height - constraint_img_height;
         ConnectionPointLabelCell.geometry.y = newY;
+        var newX = cp.x * cell.getGeometry().width;
+        ConnectionPointLabelCell.geometry.x = newX;
     }
-
+    if (update)
+        graph.getModel().endUpdate();
 };
 
 // after changing number of output adjust the edges exit point accordingly
 function adjustEdges(cell, numOfOutputs, graphModel) {
-    var oldNumOfOutput =cell.new_constraints == null ? 1 : cell.new_constraints.length;
+
     //need to adjust old arrows to new location
     var outEdges = getOutEdges(cell);
+    var numOfOutputs = numOfOutputs != null ? numOfOutputs : outEdges.length;
     graphModel.beginUpdate();
     try {
         for (let i = 0; i < outEdges.length; i++) {
@@ -131,7 +153,7 @@ function adjustEdges(cell, numOfOutputs, graphModel) {
                 graphModel.remove(outEdges[i], true);
             else {
                 //    relocate edge exit location of edge
-                var newY = constraintNumber * (1 / (numOfOutputs + 1))
+                var newY = constraintNumber * (1 / (numOfOutputs + 1));
                 var new_style = mxUtils.setStyle(outEdges[i].style, 'exitY', newY);
                 graphModel.setStyle(outEdges[i], new_style);
             }

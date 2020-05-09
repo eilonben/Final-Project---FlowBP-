@@ -175,6 +175,7 @@ ActionsBP.prototype.init = function (actions) {
 
     function fixView() {
         new mxHierarchicalLayout(graph, mxConstants.DIRECTION_WEST).execute(graph.getDefaultParent(), null);
+        fixconnectionRelatedBugs(graph);
     }
 
     function updateVertexCells(record) {

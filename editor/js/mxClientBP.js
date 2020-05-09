@@ -443,6 +443,8 @@ mxConstraintHandlerBP.prototype.destroyIcons = function()
 
 mxConstraintHandlerBP.prototype.destroyIconsByState = function(state)
 {
+    if(state == null || state.cell == null)
+        return;
     var id = state.cell.id;
 
     if (this.focusIcons[id] != null)
@@ -1158,6 +1160,8 @@ mxGraphView.prototype.validate = function(cell)
 
 
     this.graph.connectionHandler.constraintHandler.showConstraint();
+    if(this.cells != null)
+        this.cells.foreach(x => fixConnectionPointsLabelLocation(this.graph,x));
 };
 
 
@@ -1253,7 +1257,7 @@ mxGraph.prototype.intersects = function(state, x, y)
 
 mxGraph.prototype.isValidConnection = function(source, target)
 {
-    if(getshape(target.getStyle())=="startnode" || source == null || target == null)
-        return false;
+    // if(getshape(target.getStyle())=="startnode" || source == null || target == null)
+    //     return false;
     return this.isValidSource(source) && this.isValidTarget(target);
 };
