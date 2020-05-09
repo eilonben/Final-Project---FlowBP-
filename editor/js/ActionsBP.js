@@ -46,7 +46,7 @@ ActionsBP.prototype.init = function (actions) {
         else
         {
             showConsole.call(this);
-            parse_graph(code);
+            parse_graph(code, null);
             mxUtils.alert("Code deployed");
         }
 
@@ -89,7 +89,7 @@ ActionsBP.prototype.init = function (actions) {
 
         try{
             var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
-            parse_graph(code, graph);
+            parse_graph(code, deb);
         }
         catch{
             return;
@@ -104,7 +104,9 @@ ActionsBP.prototype.init = function (actions) {
         // Moves the UI into debugging mode
         ui.startDebugging();
 
-        deb.startDebugging(getProgramRecord());
+        showConsole.call(this);
+
+        deb.startDebugging();
 
     }, null, null);
 

@@ -14,6 +14,9 @@ debuggerBP.prototype.lastLabels = {};
 debuggerBP.prototype.lastCellsSizes = {};
 debuggerBP.prototype.isFixed = 0;
 debuggerBP.prototype.isLocked = 0;
+debuggerBP.prototype.scenarios = {};
+debuggerBP.prototype.consoleSteps = [""];
+debuggerBP.prototype.events = [];
 
 
 // Saves pre-debugging info such as stencils sizes, last undo index in undo manager and cell labels
@@ -23,7 +26,15 @@ debuggerBP.prototype.savePreDebuggingInfo = function () {
     this.lastCellsSizes = this.getCellsSizes();
 }
 
-debuggerBP.prototype.startDebugging = function(record){
+debuggerBP.prototype.setConsoleSteps = function (rec) {
+    let i = 0;
+    rec.forEach(stage => {
+        let eventOcc = stage.eventSelected == null ? "" : "event selected: " + stage.eventSelected + "\n";
+        this.consoleSteps.push(this.consoleSteps[i++] + eventOcc);
+    });
+}
+
+debuggerBP.prototype.startDebugging = function(){
 
     this.savePreDebuggingInfo();
 
@@ -38,7 +49,9 @@ debuggerBP.prototype.startDebugging = function(record){
     this.ui.fixView();
     this.isFixed = this.editor.undoManager.indexOfNextAdd - isFixed;
 
-    this.updateVertexCells(record);
+    var rec = this.getProgramRecord()
+    this.updateVertexCells(rec);
+    this.setConsoleSteps(rec);
 
     let numOfUndos = this.editor.undoManager.indexOfNextAdd - this.lastUndo - this.isFixed - this.isLocked;
     for (let i = 0; i < numOfUndos; i++) {
@@ -75,10 +88,11 @@ debuggerBP.prototype.back = function () {
         this.mod.beginUpdate();
 
         this.ui.undo();
-        this.graph.clearSelection()
+        this.graph.clearSelection();
         this.ui.noUndoRedo();
 
         this.mod.endUpdate();
+        updateConsoleMessage(this.curConsoleMessage());
 
         if (this.editor.undoManager.indexOfNextAdd == this.lastUndo + this.isLocked + this.isFixed)
             this.ui.enableDebugBack(false);
@@ -87,14 +101,20 @@ debuggerBP.prototype.back = function () {
     }
 }
 
+debuggerBP.prototype.curConsoleMessage = function() {
+    let index = this.editor.undoManager.indexOfNextAdd - this.lastUndo - this.isFixed - this.isLocked;
+    return this.consoleSteps[index];
+}
+
 debuggerBP.prototype.next = function () {
     this.graph.getModel().beginUpdate();
 
     this.ui.redo();
-    this.graph.clearSelection()
+    this.graph.clearSelection();
     this.ui.noUndoRedo();
 
     this.graph.getModel().endUpdate();
+    updateConsoleMessage(this.curConsoleMessage());
 
     if (this.lastUndo + this.isLocked + this.isFixed == this.editor.undoManager.indexOfNextAdd - 1)
         this.ui.enableDebugBack(true);
@@ -116,24 +136,22 @@ debuggerBP.prototype.getLabels = function() {
 
 debuggerBP.prototype.getCellsSizes = function() {
     var res = {};
-    let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
+    let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex() && getshape(cell.getStyle()) !== undefined);
     cells.forEach(cell => {
         var geo = this.mod.getGeometry(cell);
         res[cell.id] = {width: geo.width, height: geo.height}
-    })
+    });
     return res;
 }
 
 debuggerBP.prototype.fixSizes = function(cell, content) {
     var geo = this.mod.getGeometry(cell).clone();
 
+    geo.width = this.lastCellsSizes[cell.id].width;
+    geo.height = this.lastCellsSizes[cell.id].width;
     if(content != undefined) {
         geo.width += (content.width * 4);
         geo.height += (content.height * 16);
-    }
-    else{
-        geo.width = this.lastCellsSizes[cell.id].width;
-        geo.height = this.lastCellsSizes[cell.id].width;
     }
 
     this.mod.setGeometry(cell, geo);
@@ -144,7 +162,7 @@ debuggerBP.prototype.convertPayloadToString = function(payload) {
     var res = "";
     var width = 0;
     payload.forEach(cur => {
-        var curRes = "Payloads[" + i++ + "]: " + JSON.stringify(cur) + "\n";
+        var curRes = "Payloads[" + i + "]: " + JSON.stringify(cur) + "\n";
         width = Math.max(width, curRes.length);
         res += curRes;
     })
@@ -172,7 +190,7 @@ debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
 }
 
 debuggerBP.prototype.updateVertexCells = function(record) {
-    let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
+    let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex() && getshape(cell.getStyle()) !== undefined);
 
     for (let i = 0; i < record.length; i++) {
         this.mod.beginUpdate();
@@ -195,5 +213,110 @@ debuggerBP.prototype.setLabels = function() {
     cells.forEach(cell => cell.setAttribute('label', this.lastLabels[cell.id]));
 }
 
+debuggerBP.prototype.fixStages = function() {
+    let scens = Object.values(this.scenarios)
+    const lengths = scens.map(x => x.length);
+    let curTime = Math.max(...lengths)
+    for (let i = 0; i < scens.length; i++) {
+        let curScen = scens[i];
+        let numOfFixes = curTime - curScen.length;
+        for (let j = 0; j < numOfFixes; j++)
+            curScen.push(curScen[curScen.length - 1]);
+    }
+}
+
+debuggerBP.prototype.addEvent = function(e) {
+    let scens = Object.values(this.scenarios)
+    const lengths = scens.map(x => x.length);
+    let curTime = Math.max(...lengths)
+    for (let i = 0; i < scens.length; i++) {
+        let curScen = scens[i];
+        let numOfFixes = curTime - curScen.length;
+        for (let j = 0; j < numOfFixes + 1; j++)
+            curScen.push(curScen[curScen.length - 1]);
+    }
+    let numOfFixes = curTime - this.events.length;
+    for (let j = 0; j < numOfFixes; j++)
+        this.events.push(-1);
+    this.events.push(e);
+}
 
 
+debuggerBP.prototype.getNumOfSteps = function(){
+    let scen = Object.values(this.scenarios);
+    if(scen.length > 0)
+        return scen[0].length;
+    return 0;
+}
+
+debuggerBP.prototype.getProgramRecord = function() {
+    var res = []
+
+    for(let step = 0; step < this.getNumOfSteps(); step++){
+        var curStage = {stages: [], eventSelected: null}
+        var scens = Object.values(this.scenarios);
+        curStage.stages = {};
+        for (let j = 0; j < scens.length; j++) {
+            curStage.stages[scens[j][step][0]] = scens[j][step][1];
+        }
+        if(this.events[step] != -1)
+            curStage.eventSelected = this.events[step];
+        res.push(curStage)
+    }
+
+    return res;
+}
+
+function updateConsoleMessage(msg) {
+    let myConsole = document.getElementById("ConsoleText1");
+    if (myConsole !== undefined && myConsole !== null) {
+        myConsole.value = msg;
+    }
+}
+
+debuggerBP.prototype.initDebug = function() {
+    this.consoleSteps = [""];
+    this.scenarios = {}
+    this.events = [];
+    updateConsoleMessage("");
+}
+
+debuggerBP.prototype.newScen = function(c, curTime, cloned) {
+    c.setAttribute("scenarioID", c.id);
+    this.scenarios[c.id] = [];
+    for (let i = 0; i < curTime; i++)
+        this.scenarios[c.id].push([-1, null]);
+    this.scenarios[c.id].push([c.id, cloned]);
+}
+
+debuggerBP.prototype.updateScen = function(scen, c, cloned) {
+    c.setAttribute("scenarioID", scen);
+    this.scenarios[scen].push([c.id, cloned]);
+}
+
+debuggerBP.prototype.getScenarioTime = function(scen) {
+    return this.scenarios[scen].length;
+}
+
+// function getBlockedEvents() {
+//     var res = []
+//     window.bpEngine.BThreads.forEach(bt => {
+//         bt.stmt.block.forEach(e => res.push(e));
+//     });
+//     return res;
+// }
+
+
+
+
+///////
+//let blockedEvents = getBlockedEvents();
+//let curBlocked = []
+//blockedEvents.forEach(e => {
+//window.bpEngine.BThreads.forEach(bt => {
+//if(isReqWait(bt, e))
+//curBlocked.push(bt.stmt.cellID);
+//});
+//});
+//window.debug.blockedBlocks.push(curBlocked);
+////////
