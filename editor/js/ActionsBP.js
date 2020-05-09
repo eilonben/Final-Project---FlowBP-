@@ -18,6 +18,15 @@ ActionsBP.prototype.init = function (actions) {
         }
     }
 
+    function hideConsole() {
+        if (this.consoleWindow === null || this.consoleWindow === undefined) {
+            this.consoleWindow = new myConsoleWindow(ui, document.body.offsetWidth - 480, 120, 420, 285);
+        }
+        else {
+            this.consoleWindow.window.setVisible(false);
+        }
+    }
+
     actions.addAction('showConsole', function () {
         showConsole.call(this);
     });
@@ -78,6 +87,8 @@ ActionsBP.prototype.init = function (actions) {
     actions.addAction('debug_stop', function() {
 
         deb.endDebugging();
+
+        hideConsole.call(this);
 
         ui.endDebugging();
 
