@@ -4,42 +4,63 @@ SidebarBP = function(editorUi, container)
 };
 
 SidebarBP.prototype = Object.create(Sidebar.prototype);
-SidebarBP.prototype.init = function(){
-        var dir = STENCIL_PATH;
 
-        this.addSearchPalette(true);
-        // this.addGeneralPalette(true);
-        // this.addMiscPalette(false);
-// this.addAdvancedPalette(false);
+/**
+ * Adds all palettes to the sidebar.
+ */
 
-// this.addBasicPalette(dir);
-        // this.addStencilPalette('arrows', mxResources.get('arrows'), dir +
-        // '/arrows.xml',
-        // ';whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2');
-        // this.addUmlPalette(false);
-// this.addBpmnPalette(dir, false);
+SidebarBP.prototype.init = function()
+{
+    var dir = STENCIL_PATH;
 
-        this.addStencilPalette('flow', 'Flow', dir + '/flow.xml',
-            ';whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2');
-        /*	this.addStencilPalette('flowchart', 'Flowchart', dir + '/flowchart.xml',
-            ';whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2');*/
+    this.addSearchPalette(true);
 
-// this.addImagePalette('clipart', mxResources.get('clipart'), dir +
-// '/clipart/', '_128x128.png',
-// ['Earth_globe', 'Empty_Folder', 'Full_Folder', 'Gear', 'Lock', 'Software',
-// 'Virus', 'Email',
-// 'Database', 'Router_Icon', 'iPad', 'iMac', 'Laptop', 'MacBook',
-// 'Monitor_Tower', 'Printer',
-// 'Server_Tower', 'Workstation', 'Firewall_02', 'Wireless_Router_N',
-// 'Credit_Card',
-// 'Piggy_Bank', 'Graph', 'Safe', 'Shopping_Cart', 'Suit1', 'Suit2', 'Suit3',
-// 'Pilot1',
-// 'Worker1', 'Soldier1', 'Doctor1', 'Tech1', 'Security1', 'Telesales1'], null,
-// {'Wireless_Router_N': 'wireless router switch wap wifi access point wlan',
-// 'Router_Icon': 'router switch'});
+    this.addFlowBPPalette();
+
 };
 
 
+/**
+ * Specifies the width of the thumbnails.
+ */
+SidebarBP.prototype.thumbWidth = 92;
+
+/**
+ * Specifies the height of the thumbnails.
+ */
+SidebarBP.prototype.thumbHeight = 92;
+
+/**
+ * Specifies the width of the thumbnails.
+ */
+SidebarBP.prototype.minThumbStrokeWidth = 0;
+
+/**
+ * Specifies the width of the thumbnails.
+ */
+SidebarBP.prototype.thumbAntiAlias = false;
+
+/**
+ * Specifies the padding for the thumbnails. Default is 3.
+ */
+SidebarBP.prototype.thumbPadding = 1;
+
+/**
+ * Specifies the delay for the tooltip. Default is 2 px.
+ */
+SidebarBP.prototype.thumbBorder = 2;
+
+
+SidebarBP.prototype.defaultImageWidth = 150;
+
+/**
+ * Specifies the height for clipart images. Default is 80.
+ */
+SidebarBP.prototype.defaultImageHeight = 100;
+
+/**
+ * Adds all palettes to the SidebarBP.
+ */
 //Duplication This function is designed to replace the call to Graph into GraphBP
 SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
 {
@@ -126,7 +147,7 @@ SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
                         this.tooltipTitle.style.overflow = 'hidden';
                         this.tooltipTitle.style.position = 'absolute';
                         this.tooltipTitle.style.paddingTop = '6px';
-                        this.tooltipTitle.style.bottom = '6px';
+                        this.tooltipTitle.style.bottom = '20px';
 
                         this.tooltip.appendChild(this.tooltipTitle);
                     }
@@ -214,5 +235,22 @@ SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
     }
 };
 
+/**
+ * Adds the general palette to the sidebar.
+ */
+SidebarBP.prototype.addFlowBPPalette = function()
+{
 
-// SidebarBP.prototype.constructor = Sidebar;
+    var prefix = mxClient.imageBasePath;
+    var item = '/console_2.png';
+
+    var fns = [
+        this.createVertexTemplateEntry('shape=flow.startnode;whiteSpace=wrap;html=1;', 60, 60, null, 'Start Node', null, null, 'start'),
+        this.createVertexTemplateEntry('shape=flow.bsync;whiteSpace=wrap;html=1;', 120, 80, 'Bsync', 'Bsync', null, null, 'bsync'),
+        this.createVertexTemplateEntry('shape=flow.general;whiteSpace=wrap;html=1;', 120, 80, 'General', 'General', null, null, 'general'),
+        this.createVertexTemplateEntry('shape=flow.console;html=1;labelBackgroundColor=#ffffff;image=' + prefix + item +';', 120, 80, null, 'Console', null, null, 'console')
+    ];
+
+    this.addPaletteFunctions('Flow', 'Flow',  false, fns);
+};
+

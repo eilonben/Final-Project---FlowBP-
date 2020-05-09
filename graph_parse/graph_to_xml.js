@@ -55,7 +55,6 @@ function parse_graph(xml_code) {
     codec.decode(doc.documentElement, model);
 
     startRunning(model);
-
 };
 
 
