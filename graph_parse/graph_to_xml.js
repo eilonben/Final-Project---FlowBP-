@@ -47,15 +47,14 @@ function findInvalidCells(model) {
 };
 
 //decode the xml string received from Actions.js
-function parse_graph(xml_code) {
+function parse_graph(xml_code, debug) {
     // console.log(xml_code);
     let doc = mxUtils.parseXml(xml_code);
     let codec = new mxCodec(doc);
     let model = new mxGraphModel();
     codec.decode(doc.documentElement, model);
 
-    startRunning(model);
-
+    startRunning(model, debug);
 };
 
 

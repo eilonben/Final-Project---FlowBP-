@@ -50,9 +50,8 @@ mxGraphView.prototype.removeState = function(cell)
             this.graph.cellRenderer.destroy(state);
             state.invalid = true;
             state.destroy();
+            this.graph.connectionHandler.constraintHandler.destroyIconsByState(state);
         }
-
-        this.graph.connectionHandler.constraintHandler.destroyIconsByState(state);
     }
 
     return state;

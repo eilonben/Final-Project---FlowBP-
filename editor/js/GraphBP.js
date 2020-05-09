@@ -166,6 +166,40 @@ GraphBP.prototype.getAllConnectionConstraints = function(terminal, source){
      return Graph.prototype.getAllConnectionConstraints(terminal, source)
 }
 
+GraphBP.prototype.lockLayers = function(lock) {
+
+    var mod = this.getModel()
+    mod.beginUpdate();
+
+    var locker;
+    lock ? locker = '1' : locker = '0';
+
+    mod.root.children.forEach(layer => {
+        if(mod.isLayer(layer)) {
+            var style = layer.getStyle()
+            var value = (mxUtils.getValue(style, 'locked', locker) == '1') ? locker : !locker;
+            this.setCellStyles('locked', value, [layer]);
+        }
+    });
+
+    mod.endUpdate();
+
+}
+
+GraphBP.prototype.fixValue = function(cell) {
+    let value = cell.getValue();
+
+    // Converts the value to an XML node
+    if (value == "") {
+        var doc = mxUtils.createXmlDocument();
+        var obj = doc.createElement('object');
+        obj.setAttribute('label', value || '');
+        value = obj;
+    }
+
+    cell.setValue(value);
+}
+
 GraphBP.prototype.shapeContains = function(state, x, y) {
     var size = this.view.scale;
     var contains = state.x <= x && state.x + state.width >= x &&
