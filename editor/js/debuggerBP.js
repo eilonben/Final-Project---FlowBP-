@@ -79,6 +79,7 @@ debuggerBP.prototype.endDebugging = function() {
     }
 
     this.graph.clearSelection();
+    updateConsoleMessage("");
 
     this.setLabels();
 }
