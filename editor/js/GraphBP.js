@@ -166,4 +166,29 @@ GraphBP.prototype.getAllConnectionConstraints = function(terminal, source){
      return Graph.prototype.getAllConnectionConstraints(terminal, source)
 }
 
+GraphBP.prototype.shapeContains = function(state, x, y) {
+    var size = this.view.scale;
+    var contains = state.x <= x && state.x + state.width >= x &&
+        state.y <= y && state.y + state.height >= y;
+    if (!contains) {
+        var constraints = this.getAllConnectionConstraints(state, true) || [];
+        for (var i = 0; i < constraints.length && !contains; i++) {
+            var constraint = constraints[i];
+            if (constraint.name == "I")
+                continue;
+            var constraintPoint = constraint.point;
+            var constraintPointX = state.x + constraintPoint.x * state.width;
+            var constraintPointY = state.y + constraintPoint.y * state.height;
+            var constaintImg = this.connectionHandler.constraintHandler.getImageForConstraint(state, constraint, constraintPoint);
+            var constraintWidth = constaintImg.width  * size;
+            var constraintHeight = constaintImg.height  * size;
+            contains = constraintPointX - constraintWidth <= x && constraintPointX + constraintWidth >= x &&
+                constraintPointY - constraintHeight <= y && constraintPointY + constraintHeight >= y;
+            if(contains)
+                return true;
+
+        }
+    }
+    return contains;
+};
 // GraphBP.prototype = Object.create(Graph.prototype);

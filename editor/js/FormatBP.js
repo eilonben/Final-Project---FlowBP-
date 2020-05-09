@@ -77,7 +77,7 @@ function updateConnectionPointsLabels(graph, cell, labels){
 // after changing number of output adjust the Connection PointsLabels accordingly
 function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
 {
-    var labels = cell.connection_points_labels;
+    var labels = cell.children || [];
     newOutputNumber = cell.new_constraints.length;
     graph.getModel().beginUpdate();
     try {
@@ -85,9 +85,7 @@ function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
         for (let i = 0; i < labels.length; i++) {
             // need to delete
             if (i >= newOutputNumber) {
-
-                var ConnectionPointLabelId =  cell.connection_points_labels[i];
-                var ConnectionPointLabelCell = findConnectionPointLabelCell(graph, ConnectionPointLabelId);
+                var ConnectionPointLabelCell =  cell.children[i];
                 graph.removeCells(ConnectionPointLabelCell);
             }
         }
@@ -103,12 +101,11 @@ function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
 
 // relocate connection points labels according to connection points labels
 function fixConnectionPointsLabelLocation(graph, cell) {
-    if (cell == null || cell.connection_points_labels == null)
+    if (cell == null || cell.children == null)
         return;
 
-    for (var i = 0; i < cell.connection_points_labels.length; i++) {
-        var ConnectionPointLabelId =  cell.connection_points_labels[i];
-        var ConnectionPointLabelCell = findConnectionPointLabelCell(graph, ConnectionPointLabelId);
+    for (var i = 0; i < cell.children.length; i++) {
+        var ConnectionPointLabelCell =  cell.children[i];
 
         var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
         var cp = cell.new_constraints[i].point;

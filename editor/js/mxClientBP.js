@@ -63,12 +63,6 @@ mxGraphView.prototype.createState = function(cell)
 {
 
     var state = new mxCellState(this, cell, this.graph.getCellStyle(cell));
-    //initial special general node atributes
-    if(getshape(cell.getStyle()) == "general"){
-        cell.connection_points_labels = cell.connection_points_labels != null? cell.connection_points_labels : [] ;
-        cell.original_id = cell.original_id != null ? cell.original_id : state.cell.id;
-
-    }
     return state;
 };
 
@@ -397,10 +391,10 @@ function mxConstraintHandlerBP(graph){
 mxConstraintHandlerBP.prototype = Object.create(mxConstraintHandler.prototype);
 
 
-mxConstraintHandlerBP.prototype.OutputPointImage = new mxImage(mxClient.imageBasePath + '/purple-point.png', 10, 10);
+mxConstraintHandlerBP.prototype.OutputPointImage = new mxImage(mxClient.imageBasePath + '/output-onlinepngtools (1).png', 10, 10);
 
 
-mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input2.png', 20, 15);
+mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input2.png', 10, 10);
 
 
 mxConstraintHandlerBP.prototype.highlightColor = '#808080';
@@ -643,7 +637,7 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
 
             var src = img.src;
-            var bounds = new mxRectangle(Math.round(cp.x - (img.width * size) / 2),
+            var bounds = new mxRectangle(Math.round(cp.x - (img.width * size)),
                 Math.round(cp.y - (img.height * size) / 2), img.width * size, img.height * size);
             var icon = new mxImageShape(bounds, src);
             icon.dialect = (this.graph.dialect != mxConstants.DIALECT_SVG) ?
@@ -728,7 +722,7 @@ mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
                 var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
                 var img = this.getImageForConstraint(state, this.constraints[i], cp);
                 var src = img.src;
-                var bounds = new mxRectangle(Math.round(cp.x - (img.width * size) / 2),
+                var bounds = new mxRectangle(Math.round(cp.x - (img.width * size) ),
                     Math.round(cp.y - (img.height * size) / 2), img.width * size, img.height * size);
                 var icon = new mxImageShape(bounds, src);
                 icon.dialect = (this.graph.dialect != mxConstants.DIALECT_SVG) ?
@@ -1206,4 +1200,60 @@ mxGraph.prototype.getConnectionConstraint = function(edge, terminal, source)
 
 
     return new mxConnectionConstraint(point, perimeter, null, dx, dy);
+};
+
+
+mxGraph.prototype.intersects = function(state, x, y)
+{
+    if (state != null)
+    {
+        var pts = state.absolutePoints;
+
+        if (pts != null)
+        {
+            var t2 = this.tolerance * this.tolerance;
+            var pt = pts[0];
+
+            for (var i = 1; i < pts.length; i++)
+            {
+                var next = pts[i];
+                var dist = mxUtils.ptSegDistSq(pt.x, pt.y, next.x, next.y, x, y);
+
+                if (dist <= t2)
+                {
+                    return true;
+                }
+
+                pt = next;
+            }
+        }
+        else
+        {
+            var alpha = mxUtils.toRadians(mxUtils.getValue(state.style, mxConstants.STYLE_ROTATION) || 0);
+
+            if (alpha != 0)
+            {
+                var cos = Math.cos(-alpha);
+                var sin = Math.sin(-alpha);
+                var cx = new mxPoint(state.getCenterX(), state.getCenterY());
+                var pt = mxUtils.getRotatedPoint(new mxPoint(x, y), cos, sin, cx);
+                x = pt.x;
+                y = pt.y;
+            }
+            //if (state.cell.contains(state, x, y))
+            if (this.shapeContains(state, x, y))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+};
+
+mxGraph.prototype.isValidConnection = function(source, target)
+{
+    if(getshape(target.getStyle())=="startnode" || source == null || target == null)
+        return false;
+    return this.isValidSource(source) && this.isValidTarget(target);
 };
