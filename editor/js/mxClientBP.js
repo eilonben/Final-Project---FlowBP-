@@ -582,6 +582,7 @@ mxConstraintHandlerBP.prototype.update = function(me, source, existingEdge, poin
  */
 mxConstraintHandlerBP.prototype.redraw = function()
 {
+    var size = this.graph.view.scale;
     if (this.currentFocus != null && this.constraints != null && this.focusIcons != null)
     {
         var state = this.graph.view.getState(this.currentFocus.cell);
@@ -595,8 +596,8 @@ mxConstraintHandlerBP.prototype.redraw = function()
             var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
 
-            var bounds = new mxRectangle(Math.round(cp.x - img.width / 2),
-                Math.round(cp.y - img.height / 2), img.width, img.height);
+            var bounds = new mxRectangle(Math.round(cp.x - img.width * size),
+                Math.round(cp.y - img.height * size / 2), img.width, img.height);
             allIcons[i].bounds = bounds;
             allIcons[i].redraw();
             this.currentFocusArea.add(allIcons[i].bounds);

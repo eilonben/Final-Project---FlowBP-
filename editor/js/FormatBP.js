@@ -289,7 +289,8 @@ FormatBP.prototype.refresh = function () {
 
         var getshape = function (str) {
             var arr = str.split(";");
-            var styleShape = arr[0].split("=")[1].split(".")[1];
+            var styleShape = arr[0].split("=")[1] ;
+            styleShape = styleShape != null? styleShape.split(".")[1] : '';
             return styleShape;
 
         };
