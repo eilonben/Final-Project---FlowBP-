@@ -148,5 +148,5 @@ EditorUiBP.prototype.saveFile = function(forceDialog)
 };
 
 EditorUiBP.prototype.fixView = function() {
-    new mxHierarchicalLayout(graph, mxConstants.DIRECTION_WEST).execute(graph.getDefaultParent(), null);
+    new mxHierarchicalLayout(this.editor.graph, mxConstants.DIRECTION_WEST).execute(this.editor.graph.getDefaultParent(), null);
 }

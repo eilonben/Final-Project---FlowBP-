@@ -1,11 +1,3 @@
-debuggerBP.prototype.ui = null;
-debuggerBP.prototype.editor = null;
-debuggerBP.prototype.graph = null;
-debuggerBP.prototype.mod = null;
-debuggerBP.prototype.lastUndo = 0;
-debuggerBP.prototype.lastLabels = {};
-debuggerBP.prototype.lastCellsSizes = {};
-
 function debuggerBP(ui){
     this.ui = ui;
     this.editor = ui.editor;
@@ -13,20 +5,42 @@ function debuggerBP(ui){
     this.mod = this.graph.getModel();
 }
 
+debuggerBP.prototype.ui = null;
+debuggerBP.prototype.editor = null;
+debuggerBP.prototype.graph = null;
+debuggerBP.prototype.mod = null;
+debuggerBP.prototype.lastUndo = 0;
+debuggerBP.prototype.lastLabels = {};
+debuggerBP.prototype.lastCellsSizes = {};
+debuggerBP.prototype.isFixed = 0;
+debuggerBP.prototype.isLocked = 0;
+
+
 // Saves pre-debugging info such as stencils sizes, last undo index in undo manager and cell labels
-debuggerBP.prototype.savePreDebuggingInfo = function (editor) {
-    this.lastUndo = editor.undoManager.indexOfNextAdd + 2;
-    this.lastLabels = getLabels();
-    this.lastCellsSizes = getCellsSizes();
+debuggerBP.prototype.savePreDebuggingInfo = function () {
+    this.lastUndo = this.editor.undoManager.indexOfNextAdd;
+    this.lastLabels = this.getLabels();
+    this.lastCellsSizes = this.getCellsSizes();
 }
 
 debuggerBP.prototype.startDebugging = function(record){
 
+    this.savePreDebuggingInfo();
+
+    let undoAdd = 0;
+
+    // Locks all layers
+    let isLocked = this.editor.undoManager.indexOfNextAdd;
+    this.graph.lockLayers(true);
+    this.isLocked = this.editor.undoManager.indexOfNextAdd - isLocked;
+
+    let isFixed = this.editor.undoManager.indexOfNextAdd;
     this.ui.fixView();
+    this.isFixed = this.editor.undoManager.indexOfNextAdd - isFixed;
 
-    updateVertexCells(record);
+    this.updateVertexCells(record);
 
-    let numOfUndos = editor.undoManager.indexOfNextAdd - this.lastUndo;
+    let numOfUndos = this.editor.undoManager.indexOfNextAdd - this.lastUndo - this.isFixed - this.isLocked;
     for (let i = 0; i < numOfUndos; i++) {
         this.mod.beginUpdate();
 
@@ -35,7 +49,8 @@ debuggerBP.prototype.startDebugging = function(record){
         this.mod.endUpdate();
     }
 
-    graph.clearSelection();
+    this.graph.clearSelection();
+    this.ui.noUndoRedo();
 
     if (numOfUndos == 0)
         this.ui.enableDebugNext(false);
@@ -43,8 +58,8 @@ debuggerBP.prototype.startDebugging = function(record){
 
 debuggerBP.prototype.endDebugging = function() {
 
-    editor.undoManager.indexOfNextAdd = editor.undoManager.history.length;
-    var numOfNewUndos = editor.undoManager.history.length - this.lastUndo + 2;
+    this.editor.undoManager.indexOfNextAdd = this.editor.undoManager.history.length;
+    var numOfNewUndos = this.editor.undoManager.history.length - this.lastUndo;
     while (numOfNewUndos-- > 0) {
         this.ui.undo();
         this.editor.undoManager.history.pop()
@@ -52,7 +67,7 @@ debuggerBP.prototype.endDebugging = function() {
 
     this.graph.clearSelection();
 
-    setLabels();
+    this.setLabels();
 }
 
 debuggerBP.prototype.back = function () {
@@ -65,9 +80,9 @@ debuggerBP.prototype.back = function () {
 
         this.mod.endUpdate();
 
-        if (this.editor.undoManager.indexOfNextAdd == this.lastUndo)
+        if (this.editor.undoManager.indexOfNextAdd == this.lastUndo + this.isLocked + this.isFixed)
             this.ui.enableDebugBack(false);
-        else if(this.editor.undoManager.indexOfNextAdd + 1 == this.editor.undoManager.history.length)
+        else if(this.editor.undoManager.indexOfNextAdd + this.isFixed == this.editor.undoManager.history.length)
             this.ui.enableDebugNext(true);
     }
 }
@@ -81,22 +96,25 @@ debuggerBP.prototype.next = function () {
 
     this.graph.getModel().endUpdate();
 
-    if (this.lastUndo + 1 == this.editor.undoManager.indexOfNextAdd)
+    if (this.lastUndo + this.isLocked + this.isFixed == this.editor.undoManager.indexOfNextAdd - 1)
         this.ui.enableDebugBack(true);
     else if (this.editor.undoManager.indexOfNextAdd == this.editor.undoManager.history.length)
         this.ui.enableDebugNext(false);
 }
 
-function getLabels() {
+debuggerBP.prototype.getLabels = function() {
     var res = {};
 
     let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
-    cells.forEach(cell => res[cell.id] = cell.getAttribute('label'));
+    cells.forEach(cell => {
+        let label = cell.getAttribute('label');
+        res[cell.id] = label != undefined ? label : ""
+    });
 
     return res;
 }
 
-function getCellsSizes() {
+debuggerBP.prototype.getCellsSizes = function() {
     var res = {};
     let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
     cells.forEach(cell => {
@@ -106,7 +124,7 @@ function getCellsSizes() {
     return res;
 }
 
-function fixSizes(cell, content) {
+debuggerBP.prototype.fixSizes = function(cell, content) {
     var geo = this.mod.getGeometry(cell).clone();
 
     if(content != undefined) {
@@ -121,7 +139,7 @@ function fixSizes(cell, content) {
     this.mod.setGeometry(cell, geo);
 }
 
-function convertPayloadToString(payload) {
+debuggerBP.prototype.convertPayloadToString = function(payload) {
     let i = 0;
     var res = "";
     var width = 0;
@@ -133,7 +151,7 @@ function convertPayloadToString(payload) {
     return {text: res, width: width, height: i};
 }
 
-function updateCell(cell, payload) {//blocked, payload) {
+debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
     var content;
     var val = cell.clone().getValue();
     var style = cell.getStyle();
@@ -142,18 +160,18 @@ function updateCell(cell, payload) {//blocked, payload) {
     if (payload !== undefined) {
         style = style.replace('fillColor=#ffffff', 'fillColor=#ffff99');
         if (getshape(cell.getStyle()) !== "startnode") {
-            content = convertPayloadToString(payload);
+            content = this.convertPayloadToString(payload);
             val.setAttribute('label', content.text);
         }
     }
     this.mod.setStyle(cell, style);
     this.mod.setValue(cell, val);
-    fixSizes(cell, content);
+    this.fixSizes(cell, content);
     var ret = content !== undefined ? content.text : "";
     return ret;
 }
 
-function updateVertexCells(record) {
+debuggerBP.prototype.updateVertexCells = function(record) {
     let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
 
     for (let i = 0; i < record.length; i++) {
@@ -163,7 +181,7 @@ function updateVertexCells(record) {
 
         cells.forEach(cell => {
             this.graph.fixValue(cell);
-            updateCell(cell, curStage[cell.id])
+            this.updateCell(cell, curStage[cell.id])
         });
 
         this.ui.fixView();
@@ -172,7 +190,7 @@ function updateVertexCells(record) {
     }
 }
 
-function setLabels() {
+debuggerBP.prototype.setLabels = function() {
     let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
     cells.forEach(cell => cell.setAttribute('label', this.lastLabels[cell.id]));
 }

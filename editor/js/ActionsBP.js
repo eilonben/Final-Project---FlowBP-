@@ -7,7 +7,7 @@ ActionsBP.prototype.init = function (actions) {
     var editor = ui.editor;
     var graph = editor.graph;
     var mod = graph.getModel();
-    debuggerBP(ui);
+    var deb = new debuggerBP(ui);
 
     function showConsole() {
         if (this.consoleWindow === null || this.consoleWindow === undefined) {
@@ -65,19 +65,19 @@ ActionsBP.prototype.init = function (actions) {
 
     actions.addAction('debug_next', function() {
 
-        debuggerBP.next();
+        deb.next();
 
     }, false, null);
 
     actions.addAction('debug_back', function() {
 
-        debuggerBP.back();
+        deb.back();
 
     }, false, null);
 
     actions.addAction('debug_stop', function() {
 
-        debuggerBP.endDebugging();
+        deb.endDebugging();
 
         ui.endDebugging();
 
@@ -88,6 +88,7 @@ ActionsBP.prototype.init = function (actions) {
     actions.addAction('debug_debug', function() {
 
         try{
+            var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
             parse_graph(code, graph);
         }
         catch{
@@ -103,10 +104,7 @@ ActionsBP.prototype.init = function (actions) {
         // Moves the UI into debugging mode
         ui.startDebugging();
 
-        // Locks all layers
-        graph.lockLayers(true);
-
-        debuggerBP.startDebugging(getProgramRecord());
+        deb.startDebugging(getProgramRecord());
 
     }, null, null);
 
