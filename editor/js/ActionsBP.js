@@ -46,7 +46,7 @@ ActionsBP.prototype.init = function (actions) {
         else
         {
             showConsole.call(this);
-            parse_graph(code);
+                parse_graph(code);
             mxUtils.alert("Code deployed");
         }
 
