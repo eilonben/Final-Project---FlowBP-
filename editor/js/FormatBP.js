@@ -85,7 +85,7 @@ function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
         for (let i = 0; i < labels.length; i++) {
             // need to delete
             if (i >= newOutputNumber) {
-                var ConnectionPointLabelCell =  cell.children[i];
+                var ConnectionPointLabelCell =  labels[i];
                 graph.removeCells(ConnectionPointLabelCell);
             }
         }
@@ -103,9 +103,9 @@ function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
 function fixConnectionPointsLabelLocation(graph, cell) {
     if (cell == null || cell.children == null)
         return;
-
-    for (var i = 0; i < cell.children.length; i++) {
-        var ConnectionPointLabelCell =  cell.children[i];
+    var labels = cell.children;
+    for (var i = 0; i < labels.length; i++) {
+        var ConnectionPointLabelCell =  labels[i];
 
         var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
         var cp = cell.new_constraints[i].point;
