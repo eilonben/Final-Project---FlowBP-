@@ -12,25 +12,28 @@ function deletePrevLabels(cell, value, graph) {
 };
 
 function validateNewConstraint(cell, graph){
-    if(cell.new_constraints == null){
+    if(cell != null && cell.new_constraints == null){
         var state = graph.view.getState(cell, false);
         cell.new_constraints = graph.getAllConnectionConstraints(state, true);
     }
 }
 
 //after debug all the graph moves - fix thr connection point labels and edges
-function fixconnectionRelatedBugs(graph){
-    var cells = graph.getModel().cells || [];
+function fixConnectionRelatedBugs(graph){
+    var cells = Object.values(graph.getModel().cells) || [];
     for( var i=0; i< cells.length; i++) {
         var cell = cells[i];
-        fixConnectionPointsLabelLocation(graph, cell, true);
-        adjustEdges(cell, null, graph.getModel());
+        if(getshape(cell.getStyle()) == "general") {
+            graph.getModel().beginUpdate();
+            fixConnectionPointsLabelLocation(graph, cell, cell.geometry.x, cell.geometry.y);
+            graph.getModel().endUpdate();
+        }
     }
 };
 
 function getLabelsFromChildren(cell){
     var children = cell.children || [];
-    var labels = children.filter(cell => cell.label_index != null);
+    var labels = children.filter(x => x.label_index != null);
     labels = labels.sort(function(a, b) {return a.label_index - b.label_index});
     return labels;
 }
@@ -115,25 +118,25 @@ function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
 };
 
 // relocate connection points labels according to connection points labels
-function fixConnectionPointsLabelLocation(graph, cell, update) {
+function fixConnectionPointsLabelLocation(graph, cell, x, y) {
     if (cell == null || cell.children == null)
         return;
     var labels = getLabelsFromChildren(cell);
-    if (update)
-        graph.getModel().beginUpdate();
+    x = x || 0;
+    y = y || 0;
+
     for (var i = 0; i < labels.length; i++) {
         var ConnectionPointLabelCell = labels[i];
 
         var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
         var cp = cell.new_constraints[i].point;
 
-        var newY = cp.y * cell.getGeometry().height - constraint_img_height;
+        var newY = x + cp.y * cell.getGeometry().height - constraint_img_height;
         ConnectionPointLabelCell.geometry.y = newY;
-        var newX = cp.x * cell.getGeometry().width;
+        var newX = y + cp.x * cell.getGeometry().width;
         ConnectionPointLabelCell.geometry.x = newX;
     }
-    if (update)
-        graph.getModel().endUpdate();
+
 };
 
 // after changing number of output adjust the edges exit point accordingly
