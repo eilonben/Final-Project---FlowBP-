@@ -1381,6 +1381,15 @@ mxCodecRegistry.register(function()
 }());
 
 
+function mxGraphBP(container, model, renderHint, stylesheet){
+    mxGraph.call(this, container, model, renderHint, stylesheet);
+
+};
+
+
+mxGraphBP.prototype = Object.create(mxGraph.prototype);
+
+
 // mxGraph
 mxGraph.prototype.insertEdge = function(parent, id, value, source, target, style, state)
 {
@@ -1570,3 +1579,405 @@ mxGraph.prototype.createGraphView = function()
 {
     return new mxGraphViewBP(this);
 };
+
+
+mxCodecRegistry.register(function()
+{
+    /**
+     * Class: mxGraphCodec
+     *
+     * Codec for <mxGraph>s. This class is created and registered
+     * dynamically at load time and used implicitely via <mxCodec>
+     * and the <mxCodecRegistry>.
+     *
+     * Transient Fields:
+     *
+     * - graphListeners
+     * - eventListeners
+     * - view
+     * - container
+     * - cellRenderer
+     * - editor
+     * - selection
+     */
+    return new mxObjectCodec(new mxGraphBP(),
+        ['graphListeners', 'eventListeners', 'view', 'container',
+            'cellRenderer', 'editor', 'selection']);
+
+}());
+
+
+
+//duplicate this object for repaint edges or shapes in black after they were painted in red
+function mxOutlineBP(source, container){
+    mxOutline.call(this, source, container);
+
+};
+
+
+mxOutlineBP.prototype = Object.create(mxOutline.prototype);
+
+
+
+mxOutlineBP.prototype.createGraph = function(container)
+{
+    var graph = new mxGraphBP(container, this.source.getModel(), this.graphRenderHint, this.source.getStylesheet());
+    graph.foldingEnabled = false;
+    graph.autoScroll = false;
+
+    return graph;
+};
+
+function mxEditorBP(config){
+    mxEditor.call(this, config);
+
+};
+
+
+mxEditorBP.prototype = Object.create(mxEditor.prototype);
+
+
+
+mxEditor.prototype.createGraph = function ()
+{
+    var graph = new mxGraphBP(null, null, this.graphRenderHint);
+
+    // Enables rubberband, tooltips, panning
+    graph.setTooltips(true);
+    graph.setPanning(true);
+
+    // Overrides the dblclick method on the graph to
+    // invoke the dblClickAction for a cell and reset
+    // the selection tool in the toolbar
+    this.installDblClickHandler(graph);
+
+    // Installs the command history
+    this.installUndoHandler(graph);
+
+    // Installs the handlers for the root event
+    this.installDrillHandler(graph);
+
+    // Installs the handler for validation
+    this.installChangeHandler(graph);
+
+    // Installs the handler for calling the
+    // insert function and consume the
+    // event if an insert function is defined
+    this.installInsertHandler(graph);
+
+    // Redirects the function for creating the
+    // popupmenu items
+    graph.popupMenuHandler.factoryMethod =
+        mxUtils.bind(this, function(menu, cell, evt)
+        {
+            return this.createPopupMenu(menu, cell, evt);
+        });
+
+    // Redirects the function for creating
+    // new connections in the diagram
+    graph.connectionHandler.factoryMethod =
+        mxUtils.bind(this, function(source, target)
+        {
+            return this.createEdge(source, target);
+        });
+
+    // Maintains swimlanes and installs autolayout
+    this.createSwimlaneManager(graph);
+    this.createLayoutManager(graph);
+
+    return graph;
+};
+
+
+mxEditor.prototype.showOutline = function ()
+{
+    var create = this.outline == null;
+
+    if (create)
+    {
+        var div = document.createElement('div');
+
+        div.style.overflow = 'hidden';
+        div.style.position = 'relative';
+        div.style.width = '100%';
+        div.style.height = '100%';
+        div.style.background = 'white';
+        div.style.cursor = 'move';
+
+        if (document.documentMode == 8)
+        {
+            div.style.filter = 'progid:DXImageTransform.Microsoft.alpha(opacity=100)';
+        }
+
+        var wnd = new mxWindow(
+            mxResources.get(this.outlineResource) ||
+            this.outlineResource,
+            div, 600, 480, 200, 200, false);
+
+        // Creates the outline in the specified div
+        // and links it to the existing graph
+        var outline = new mxOutlineBP(this.graph, div);
+        wnd.setClosable(true);
+        wnd.setResizable(true);
+        wnd.destroyOnClose = false;
+
+        wnd.addListener(mxEvent.RESIZE_END, function()
+        {
+            outline.update();
+        });
+
+        this.outline = wnd;
+        this.outline.outline = outline;
+    }
+
+    // Finally shows the outline
+    this.outline.setVisible(true);
+    this.outline.outline.update(true);
+};
+
+
+/**
+ * Copyright (c) 2006-2015, JGraph Ltd
+ * Copyright (c) 2006-2015, Gaudenz Alder
+ */
+mxCodecRegistry.register(function()
+{
+    /**
+     * Class: mxEditorCodec
+     *
+     * Codec for <mxEditor>s. This class is created and registered
+     * dynamically at load time and used implicitely via <mxCodec>
+     * and the <mxCodecRegistry>.
+     *
+     * Transient Fields:
+     *
+     * - modified
+     * - lastSnapshot
+     * - ignoredChanges
+     * - undoManager
+     * - graphContainer
+     * - toolbarContainer
+     */
+    var codec = new mxObjectCodec(new mxEditorBP(),
+        ['modified', 'lastSnapshot', 'ignoredChanges',
+            'undoManager', 'graphContainer', 'toolbarContainer']);
+
+    /**
+     * Function: beforeDecode
+     *
+     * Decodes the ui-part of the configuration node by reading
+     * a sequence of the following child nodes and attributes
+     * and passes the control to the default decoding mechanism:
+     *
+     * Child Nodes:
+     *
+     * stylesheet - Adds a CSS stylesheet to the document.
+     * resource - Adds the basename of a resource bundle.
+     * add - Creates or configures a known UI element.
+     *
+     * These elements may appear in any order given that the
+     * graph UI element is added before the toolbar element
+     * (see Known Keys).
+     *
+     * Attributes:
+     *
+     * as - Key for the UI element (see below).
+     * element - ID for the element in the document.
+     * style - CSS style to be used for the element or window.
+     * x - X coordinate for the new window.
+     * y - Y coordinate for the new window.
+     * width - Width for the new window.
+     * height - Optional height for the new window.
+     * name - Name of the stylesheet (absolute/relative URL).
+     * basename - Basename of the resource bundle (see <mxResources>).
+     *
+     * The x, y, width and height attributes are used to create a new
+     * <mxWindow> if the element attribute is not specified in an add
+     * node. The name and basename are only used in the stylesheet and
+     * resource nodes, respectively.
+     *
+     * Known Keys:
+     *
+     * graph - Main graph element (see <mxEditor.setGraphContainer>).
+     * title - Title element (see <mxEditor.setTitleContainer>).
+     * toolbar - Toolbar element (see <mxEditor.setToolbarContainer>).
+     * status - Status bar element (see <mxEditor.setStatusContainer>).
+     *
+     * Example:
+     *
+     * (code)
+     * <ui>
+     *   <stylesheet name="css/process.css"/>
+     *   <resource basename="resources/app"/>
+     *   <add as="graph" element="graph"
+     *     style="left:70px;right:20px;top:20px;bottom:40px"/>
+     *   <add as="status" element="status"/>
+     *   <add as="toolbar" x="10" y="20" width="54"/>
+     * </ui>
+     * (end)
+     */
+    codec.afterDecode = function(dec, node, obj)
+    {
+        // Assigns the specified templates for edges
+        var defaultEdge = node.getAttribute('defaultEdge');
+
+        if (defaultEdge != null)
+        {
+            node.removeAttribute('defaultEdge');
+            obj.defaultEdge = obj.templates[defaultEdge];
+        }
+
+        // Assigns the specified templates for groups
+        var defaultGroup = node.getAttribute('defaultGroup');
+
+        if (defaultGroup != null)
+        {
+            node.removeAttribute('defaultGroup');
+            obj.defaultGroup = obj.templates[defaultGroup];
+        }
+
+        return obj;
+    };
+
+    /**
+     * Function: decodeChild
+     *
+     * Overrides decode child to handle special child nodes.
+     */
+    codec.decodeChild = function(dec, child, obj)
+    {
+        if (child.nodeName == 'Array')
+        {
+            var role = child.getAttribute('as');
+
+            if (role == 'templates')
+            {
+                this.decodeTemplates(dec, child, obj);
+                return;
+            }
+        }
+        else if (child.nodeName == 'ui')
+        {
+            this.decodeUi(dec, child, obj);
+            return;
+        }
+
+        mxObjectCodec.prototype.decodeChild.apply(this, arguments);
+    };
+
+    /**
+     * Function: decodeTemplates
+     *
+     * Decodes the cells from the given node as templates.
+     */
+    codec.decodeUi = function(dec, node, editor)
+    {
+        var tmp = node.firstChild;
+        while (tmp != null)
+        {
+            if (tmp.nodeName == 'add')
+            {
+                var as = tmp.getAttribute('as');
+                var elt = tmp.getAttribute('element');
+                var style = tmp.getAttribute('style');
+                var element = null;
+
+                if (elt != null)
+                {
+                    element = document.getElementById(elt);
+
+                    if (element != null && style != null)
+                    {
+                        element.style.cssText += ';' + style;
+                    }
+                }
+                else
+                {
+                    var x = parseInt(tmp.getAttribute('x'));
+                    var y = parseInt(tmp.getAttribute('y'));
+                    var width = tmp.getAttribute('width');
+                    var height = tmp.getAttribute('height');
+
+                    // Creates a new window around the element
+                    element = document.createElement('div');
+                    element.style.cssText = style;
+
+                    var wnd = new mxWindow(mxResources.get(as) || as,
+                        element, x, y, width, height, false, true);
+                    wnd.setVisible(true);
+                }
+
+                // TODO: Make more generic
+                if (as == 'graph')
+                {
+                    editor.setGraphContainer(element);
+                }
+                else if (as == 'toolbar')
+                {
+                    editor.setToolbarContainer(element);
+                }
+                else if (as == 'title')
+                {
+                    editor.setTitleContainer(element);
+                }
+                else if (as == 'status')
+                {
+                    editor.setStatusContainer(element);
+                }
+                else if (as == 'map')
+                {
+                    editor.setMapContainer(element);
+                }
+            }
+            else if (tmp.nodeName == 'resource')
+            {
+                mxResources.add(tmp.getAttribute('basename'));
+            }
+            else if (tmp.nodeName == 'stylesheet')
+            {
+                mxClient.link('stylesheet', tmp.getAttribute('name'));
+            }
+
+            tmp = tmp.nextSibling;
+        }
+    };
+
+    /**
+     * Function: decodeTemplates
+     *
+     * Decodes the cells from the given node as templates.
+     */
+    codec.decodeTemplates = function(dec, node, editor)
+    {
+        if (editor.templates == null)
+        {
+            editor.templates = [];
+        }
+
+        var children = mxUtils.getChildNodes(node);
+        for (var j=0; j<children.length; j++)
+        {
+            var name = children[j].getAttribute('as');
+            var child = children[j].firstChild;
+
+            while (child != null && child.nodeType != 1)
+            {
+                child = child.nextSibling;
+            }
+
+            if (child != null)
+            {
+                // LATER: Only single cells means you need
+                // to group multiple cells within another
+                // cell. This should be changed to support
+                // arrays of cells, or the wrapper must
+                // be automatically handled in this class.
+                editor.templates[name] = dec.decodeCell(child);
+            }
+        }
+    };
+
+    // Returns the codec into the registry
+    return codec;
+
+}());

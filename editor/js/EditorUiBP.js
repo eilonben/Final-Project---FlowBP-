@@ -151,3 +151,25 @@ EditorUiBP.prototype.fixView = function() {
     new mxHierarchicalLayout(this.editor.graph, mxConstants.DIRECTION_WEST).execute(this.editor.graph.getDefaultParent(), null);
     fixConnectionRelatedBugs(this.editor.graph);
 }
+
+
+/**
+ * Creates the keyboard event handler for the current graph and history.
+ */
+EditorUiBP.prototype.createOutline = function(wnd)
+{
+    var outline = new mxOutlineBP(this.editor.graph);
+    outline.border = 20;
+
+    mxEvent.addListener(window, 'resize', function()
+    {
+        outline.update();
+    });
+
+    this.addListener('pageFormatChanged', function()
+    {
+        outline.update();
+    });
+
+    return outline;
+};
