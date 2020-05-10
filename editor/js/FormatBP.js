@@ -30,7 +30,8 @@ function fixconnectionRelatedBugs(graph){
 
 function getLabelsFromChildren(cell){
     var children = cell.children || [];
-    var labels = children.filter(cell => cell.relative_label != null && cell.relative_label);
+    var labels = children.filter(cell => cell.label_index != null);
+    labels = labels.sort(function(a, b) {return a.label_index - b.label_index});
     return labels;
 }
 // update connection point number
@@ -69,16 +70,14 @@ function updateConnectionPointsLabels(graph, cell, labels){
             else {
                 var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
                 var cp = cell.new_constraints[i].point;
-                var prefix = 'shape=label;';
+                var prefix = 'shape=flow.label;';
                 var x = cp.x * cell.getGeometry().width;
                 var y = cp.y * cell.getGeometry().height - constraint_img_height;
                 var labelVertex = graph.insertVertex(cell, null, label, x, y, 0, 0, prefix + 'labelPosition=right;align=left');
-                labelVertex.relative = true;
-                labelVertex.movable = false;
+                labelVertex.selectable = false;
                 labelVertex.rotationEnabled = false;
-                labelVertex.relative_label = true;
+                labelVertex.label_index = i;
                 // delete connection constraint for the label
-                labelVertex.new_constraints = [];
             }
         }
         //fix labels locations
@@ -94,7 +93,7 @@ function updateConnectionPointsLabels(graph, cell, labels){
 function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
 {
     var labels = getLabelsFromChildren(cell);
-    newOutputNumber = cell.new_constraints.length;
+    newOutputNumber = newOutputNumber != null ? newOutputNumber : cell.new_constraints.length ;
     graph.getModel().beginUpdate();
     try {
         // delete labels
@@ -102,7 +101,7 @@ function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
             // need to delete
             if (i >= newOutputNumber) {
                 var ConnectionPointLabelCell =  labels[i];
-                graph.removeCells(ConnectionPointLabelCell);
+                graph.removeCells([ConnectionPointLabelCell]);
             }
         }
         //fix labels locations
@@ -417,9 +416,9 @@ FormatBP.prototype.refresh = function () {
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
                 var outputNumber = parseInt(NumberOfOutPutBox.value);
+                adjustConnectionPoints(cell, outputNumber, graph);
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 adjustEdges(cell, outputNumber, graph.getModel());
-                adjustConnectionPoints(cell, outputNumber, graph);
                 adjustConnectionPointsLabels(graph, cell, outputNumber);
 
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);

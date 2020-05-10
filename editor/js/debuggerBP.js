@@ -179,6 +179,11 @@ debuggerBP.prototype.convertPayloadToString = function(payload) {
 }
 
 debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
+
+    var field = new mxCell('nothing important', new mxGeometry(0, 0, 100, 26), 'text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;');
+    field.vertex = true;
+    cell.insert(field)
+    field.getValue().setAttribute('label', payload);
     var content;
     var val = cell.clone().getValue();
     var style = cell.getStyle();

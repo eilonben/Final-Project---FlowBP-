@@ -10,7 +10,7 @@ var outputPoint = new mxPoint(mxConnectionHandlerBP.defultOutputX, mxConnectionH
 var inputPoint = new mxPoint(mxConnectionHandlerBP.defultInputX, mxConnectionHandlerBP.defultInputY);
 
 FlowShape.prototype.constraints = [new mxConnectionConstraint(outputPoint, true, "O"),
-    new mxConnectionConstraint(inputPoint, true, "I")]
+    new mxConnectionConstraint(inputPoint, true, "I")];
 
 
 FlowShape.prototype.width = 110;
@@ -67,7 +67,6 @@ FlowShape.prototype.paintBackground = function(c, x, y, w, h)
 };
 
 
-
 //*******************************start node*******************************
 function BsyncStartNosde()
 {
@@ -80,6 +79,7 @@ mxUtils.extend(BsyncStartNosde, mxTriangle);
 BsyncStartNosde.prototype.constraints = [new mxConnectionConstraint(outputPoint, true, "O")];
 
 mxCellRenderer.registerShape('flow.startnode', BsyncStartNosde);
+
 
 
 //*******************************bsync node*******************************
@@ -100,6 +100,9 @@ function GeneralShape()
 };
 mxUtils.extend(GeneralShape, FlowShape);
 
+//filed only in general constraints
+BsyncShape.prototype.constraints[0].index = 0;
+
 mxCellRenderer.registerShape('flow.general', GeneralShape);
 
 
@@ -116,3 +119,51 @@ mxUtils.extend(ConsoleShape, FlowShape);
 // mxUtils.extend(ConsoleShape, mxImageShape);
 
 mxCellRenderer.registerShape('flow.console', ConsoleShape);
+
+
+//******************************************text***********************************************
+function TextSBP()
+{
+    // mxImageShape.call(this);
+    mxText.call(this);
+};
+
+
+
+mxUtils.extend(TextSBP, mxText);
+
+mxText.prototype.constraints = [];
+TextSBP.prototype.constraints = [];
+
+mxCellRenderer.registerShape('flow.text', TextSBP);
+
+
+//******************************************labele***********************************************
+function LabelBP()
+{
+    // mxImageShape.call(this);
+    mxLabel.call(this);
+};
+
+
+
+mxUtils.extend(LabelBP, mxLabel);
+
+LabelBP.prototype.constraints = [];
+
+mxCellRenderer.registerShape('flow.label', LabelBP);
+
+//******************************************line***********************************************
+function LineBP()
+{
+    // mxImageShape.call(this);
+    mxLine.call(this);
+};
+
+
+
+mxUtils.extend(LineBP, mxLine);
+
+LineBP.prototype.constraints = [];
+
+mxCellRenderer.registerShape('flow.line', LineBP);

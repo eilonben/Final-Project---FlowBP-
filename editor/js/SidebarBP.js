@@ -244,8 +244,89 @@ SidebarBP.prototype.addFlowBPPalette = function()
     var prefix = mxClient.imageBasePath;
     var item = '/console_2.png';
 
+    var sb = this;
+
+    // Reusable cells
+    var field = new mxCell('free line', new mxGeometry(0, 0, 100, 26), 'shape=text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;');
+    field.vertex = true;
+
+    var divider = new mxCell('', new mxGeometry(0, 0, 40, 8), 'shape=flow.line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;');
+    divider.vertex = true;
+
+    // Default tags
+    var dt = 'uml static class ';
+
     var fns = [
         this.createVertexTemplateEntry('shape=flow.startnode;whiteSpace=wrap;html=1;', 60, 60, null, 'Start Node', null, null, 'start'),
+
+
+        // this.addEntry('', function()
+        // {
+        //     var cell = new mxCell('Bsync', new mxGeometry(0, 0, 160, 90),
+        //         'swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;');
+        //
+        //     cell.vertex = true;
+        //     cell.insert(field.clone());
+        //
+        //
+        //     cell.insert(sb.cloneCell(field, '+ method(type): type'));
+        //     cell.insert(divider.clone());
+        //     cell.insert(sb.cloneCell(field, '+ method(type): type'));
+        //
+        //     return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Class');
+        // }),
+        // this.addEntry(dt + 'section subsection', function()
+        // {
+        //     var cell = new mxCell('Classname', new mxGeometry(0, 0, 140, 110),
+        //         'swimlane;shape=bsync;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;');
+        //     cell.vertex = true;
+        //     cell.insert(field.clone());
+        //     cell.insert(field.clone());
+        //     cell.insert(field.clone());
+        //
+        //     return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Class 2');
+        // }),
+        //
+        //
+        //
+        // this.addEntry('hadas', function()
+        // {
+        //     var cell = new mxCell('Bsync', new mxGeometry(0, 0, 160, 90),
+        //         'shape=flow.bsync;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;');
+        //     cell.vertex = true;
+        //     cell.insert(field.clone());
+        //     cell.insert(divider.clone());
+        //     cell.insert(sb.cloneCell(field, 'payload'));
+        //
+        //     return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Bsync');
+        // }),
+        // this.addEntry('hadas', function()
+        // {
+        //     var cell = new mxCell('Console', new mxGeometry(0, 0, 140, 110),
+        //         'swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;');
+        //     cell.vertex = true;
+        //     cell.insert(field.clone());
+        //
+        //     return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Console');
+        // }),
+        // this.addEntry(dt + 'section subsection', function()
+        // {
+        //     var cell = new mxCell('General', new mxGeometry(0, 0, 140, 110),
+        //         'swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;');
+        //     cell.vertex = true;
+        //     cell.insert(field.clone());
+        //
+        //     return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'General');
+        // }),
+        // this.addEntry(dt + 'section subsection', function()
+        // {
+        //     var cell = new mxCell('General', new mxGeometry(0, 0, 140, 110),
+        //         'swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;');
+        //     cell.vertex = true;
+        //     cell.insert(field.clone());
+        //
+        //     return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'General');
+        // }),
         this.createVertexTemplateEntry('shape=flow.bsync;whiteSpace=wrap;html=1;', 120, 80, 'Bsync', 'Bsync', null, null, 'bsync'),
         this.createVertexTemplateEntry('shape=flow.general;whiteSpace=wrap;html=1;', 120, 80, 'General', 'General', null, null, 'general'),
         this.createVertexTemplateEntry('shape=flow.console;html=1;', 120, 80, 'Console', 'Console', null, null, 'console')

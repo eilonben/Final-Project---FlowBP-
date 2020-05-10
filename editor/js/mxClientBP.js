@@ -1260,3 +1260,10 @@ mxGraph.prototype.isValidConnection = function(source, target)
     //     return false;
     return this.isValidSource(source) && this.isValidTarget(target);
 };
+
+mxGraph.prototype.isCellSelectable = function(cell)
+{
+    if(cell != null && cell.selectable != null && !cell.selectable)
+        return false;
+    return this.isCellsSelectable();
+};
