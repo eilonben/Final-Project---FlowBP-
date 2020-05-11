@@ -76,9 +76,9 @@ function updateConnectionPointsLabels(graph, cell, labels){
                 var prefix = 'shape=flow.label;';
                 var x = cp.x * cell.getGeometry().width;
                 var y = cp.y * cell.getGeometry().height - constraint_img_height;
-                var labelVertex = graph.insertVertex(cell, null, label, x, y, 0, 0, prefix + 'labelPosition=right;align=left');
+                var labelVertex = graph.insertVertex(cell, null, label, x, y, 0, 0, prefix + 'labelPosition=right;align=left;childLayout=stackLayout;');
                 labelVertex.selectable = false;
-                labelVertex.rotationEnabled = false;
+                labelVertex.lock = true;
                 labelVertex.label_index = i;
                 // delete connection constraint for the label
             }
@@ -131,9 +131,9 @@ function fixConnectionPointsLabelLocation(graph, cell, x, y) {
         var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
         var cp = cell.new_constraints[i].point;
 
-        var newY = x + cp.y * cell.getGeometry().height - constraint_img_height;
+        var newY = y + cp.y * cell.getGeometry().height - constraint_img_height;
         ConnectionPointLabelCell.geometry.y = newY;
-        var newX = y + cp.x * cell.getGeometry().width;
+        var newX = x + cp.x * cell.getGeometry().width;
         ConnectionPointLabelCell.geometry.x = newX;
     }
 
@@ -609,5 +609,36 @@ FormatBP.prototype.refresh = function () {
     }
 
 };
+
+//
+// FormatBP.prototype.roundableShapes = ['label', 'rectangle', 'internalStorage', 'corner',
+//     'parallelogram', 'swimlane', 'triangle', 'trapezoid',
+//     'ext', 'step', 'tee', 'process', 'link',
+//     'rhombus', 'offPageConnector', 'loopLimit', 'hexagon',
+//     'manualInput', 'curlyBracket', 'singleArrow', 'callout',
+//     'doubleArrow', 'flexArrow', 'card', 'umlLifeline','flow.hadas'];
+//
+// /**
+//  * Returns information about the current selection.
+//  */
+// FormatBP.prototype.isComicState = function(state)
+// {
+//     var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
+//
+//     return mxUtils.indexOf(['label', 'rectangle', 'internalStorage', 'corner', 'parallelogram', 'note', 'collate',
+//         'swimlane', 'triangle', 'trapezoid', 'ext', 'step', 'tee', 'process', 'link', 'rhombus',
+//         'offPageConnector', 'loopLimit', 'hexagon', 'manualInput', 'singleArrow', 'doubleArrow',
+//         'flexArrow', 'filledEdge', 'card', 'umlLifeline', 'connector', 'folder', 'component', 'sortShape',
+//         'cross', 'umlFrame', 'cube', 'isoCube', 'isoRectangle', 'partialRectangle', 'flow.hadas'], shape) >= 0;
+// };
+//
+// Format.prototype.isGlassState = function(state)
+// {
+//     var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
+//
+//     return (shape == 'label' || shape == 'rectangle' || shape == 'internalStorage' ||
+//         shape == 'ext' || shape == 'umlLifeline' || shape == 'swimlane' ||
+//         shape == 'process' || shape == 'flow.hadas');
+// };
 
 // FormatBP.prototype.constructor = Format;

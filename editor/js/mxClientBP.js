@@ -760,13 +760,29 @@ function mxGraphHandlerBP(graph){
 
 mxGraphHandlerBP.prototype = Object.create(mxGraphHandler.prototype);
 
+
+mxGraphHandlerBP.prototype.getMovableCells= function(cells){
+    //cells without lock or
+    var unlockedCells = cells.filter(cell => !(cell.lock != null && cell.lock));
+    var lockedCells = cells.filter(cell => cell.lock != null && cell.lock);
+    //the locked cells that their parents also include
+    var validCells = lockedCells.filter(cell => cell.parent != null && cells.includes(cell.parent))
+    var tmp =  unlockedCells.concat(validCells);
+    return tmp;
+}
+
 //This is for preventing moving only an edge without its source and target
 mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, evt) {
-    //this is new
+
+    cells = this.getMovableCells(cells);
+    if (cells.length == 0)
+        return ;
+    // //this is new
     const edges = cells.filter(cell => cell.getStyle().includes("edgeStyle"));
     const shapes = cells.filter(cell => cell.getStyle().includes('shape'));
     var validEdges = edges.filter(edge => (cells.includes(edge.target) && cells.includes(edge.source)));
     cells = shapes.concat(validEdges);
+
 
     //this is old
     if (clone) {
@@ -1565,8 +1581,43 @@ mxGraph.prototype.isCellSelectable = function(cell)
     return this.isCellsSelectable();
 };
 
+mxGraph.prototype.isCellEditable = function(cell)
+{
+    if(cell != null && cell.lock != null && !cell.lock)
+        return false;
+
+    var state = this.view.getState(cell);
+    var style = (state != null) ? state.style : this.getCellStyle(cell);
+
+    return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
+};
+
+
 
 mxGraph.prototype.createGraphView = function()
 {
     return new mxGraphViewBP(this);
+};
+
+
+function mxTextBP(value, bounds, align, valign, color,
+                family,	size, fontStyle, spacing, spacingTop, spacingRight,
+                spacingBottom, spacingLeft, horizontal, background, border,
+                wrap, clipped, overflow, labelPadding, textDirection)
+{
+
+    mxText.call(this, value, bounds, align, valign, color,
+        family,	size, fontStyle, spacing, spacingTop, spacingRight,
+        spacingBottom, spacingLeft, horizontal, background, border,
+        wrap, clipped, overflow, labelPadding, textDirection);
+
+};
+
+
+mxTextBP.prototype = Object.create(mxText.prototype);
+
+
+mxTextBP.prototype.getTextRotation = function()
+{
+    return 0;
 };
