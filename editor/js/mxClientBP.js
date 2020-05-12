@@ -876,6 +876,7 @@ mxConstraintHandlerBP.prototype.redraw = function()
 
 mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 {
+
     var size = this.graph.view.scale;
     this.constraints = (state != null && !this.isStateIgnored(state, source) &&
         this.graph.isCellConnectable(state.cell)) ? ((this.isEnabled()) ?
@@ -1864,12 +1865,28 @@ mxGraph.prototype.isCellEditable = function(cell)
     return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
 };
 
-mxGraph.prototype.setAllVisible = function(){
+// sett all sells in graph unvisible
+
+mxGraph.prototype.setAllCellsVisible = function(){
     var cells = [];
     if(this.getModel() != null && this.getModel().cells != null)
         cells = Object.values(this.getModel().cells);
 
-    cells.map(cell => (cell != null && cell.visible != null) ? cell.visible =true : null);
+    cells.map(cell => (cell != null && cell.visible != null) ? cell.visible = true : null);
+
+}
+
+// set the dividers and payloads cells unvisible
+mxGraph.prototype.setCellsUnvisible = function(){
+    var cells = [];
+    if(this.getModel() != null && this.getModel().cells != null)
+        cells = Object.values(this.getModel().cells);
+
+    for(var i=0; i <= cells.length ; i++){
+        var cell = cells[i];
+        if(cell.bp_type != null && (cell.bp_type == 'divider' || cell.bp_type == 'payloads'))
+            cell.visible = false;
+    }
 
 }
 

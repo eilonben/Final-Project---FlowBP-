@@ -251,7 +251,7 @@ SidebarBP.prototype.createBPShape = function(name, shape)
     divider.lock = true;
     divider.selectable = false;
     divider.bp_type = 'divider';
-    // divider.visible = false;
+    divider.visible = false;
 
     var payload = this.cloneCell(data, 'payloads');
     payload.geometry.y = 55;
