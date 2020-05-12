@@ -281,21 +281,28 @@ SidebarBP.prototype.addFlowBPPalette = function()
     var sb = this;
 
     var fns = [
-        this.createVertexTemplateEntry('shape=flow.startnode;whiteSpace=wrap;html=1;', 60, 60, null, 'Start Node', null, null, 'start'),
 
-        this.addEntry('', function()
+        this.addEntry('start', function()
+        {
+            var cell = new mxCell(name, new mxGeometry(0, 0, 60, 60), 'shape=flow.startnode;whiteSpace=wrap;html=1;');
+            cell.vertex = true;
+            cell.bp_type = 'startnode';
+            return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Start Node');
+        }),
+
+               this.addEntry('bsync', function()
         {
             var cell = sb.createBPShape('BSync', 'flow.bsync');
             return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'BSync');
         }),
 
-        this.addEntry('', function()
+        this.addEntry('general', function()
         {
             var cell = sb.createBPShape('General', 'flow.general');
             return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'General');
         }),
 
-        this.addEntry('', function()
+        this.addEntry('console', function()
         {
             var cell = sb.createBPShape('Console', 'flow.console');
             return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Console');
