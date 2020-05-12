@@ -148,6 +148,8 @@ EditorUiBP.prototype.saveFile = function(forceDialog)
 };
 
 EditorUiBP.prototype.fixView = function() {
+    this.editor.graph.selectAllForDebugging(null, true);
     new mxHierarchicalLayout(this.editor.graph, mxConstants.DIRECTION_WEST).execute(this.editor.graph.getDefaultParent(), null);
     fixConnectionRelatedBugs(this.editor.graph);
+    this.editor.graph.clearSelection();
 }

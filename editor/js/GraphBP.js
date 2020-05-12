@@ -225,4 +225,11 @@ GraphBP.prototype.shapeContains = function(state, x, y) {
     }
     return contains;
 };
+
+Graph.prototype.selectAllForDebugging = function() {
+    this.cells.forEach(cell =>{
+        if(cell.bp_type == "start")
+            mxGraph.prototype.selectAll.apply(this, arguments);
+    })
+};
 // GraphBP.prototype = Object.create(Graph.prototype);

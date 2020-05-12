@@ -180,23 +180,29 @@ debuggerBP.prototype.convertPayloadToString = function(payload) {
 
 debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
 
-    var content;
-    var val = cell.clone().getValue();
-    var style = cell.getStyle();
-    val.setAttribute('label', "");
-    style = style.replace('fillColor=#ffff99', 'fillColor=#ffffff');
+    // var content;
+    // var val = cell.clone().getValue();
+    // var style = cell.getStyle();
+    // val.setAttribute('label', "");
+    // style = style.replace('fillColor=#ffff99', 'fillColor=#ffffff');
+    // if (payload !== undefined) {
+    //     style = style.replace('fillColor=#ffffff', 'fillColor=#ffff99');
+    //     if (getshape(cell.getStyle()) !== "startnode") {
+    //         content = this.convertPayloadToString(payload);
+    //         val.setAttribute('label', content.text);
+    //     }
+    // }
+    // this.mod.setStyle(cell, style);
+    // this.mod.setValue(cell, val);
+    // this.fixSizes(cell, content);
+    // var ret = content !== undefined ? content.text : "";
+    // return ret;
     if (payload !== undefined) {
-        style = style.replace('fillColor=#ffffff', 'fillColor=#ffff99');
         if (getshape(cell.getStyle()) !== "startnode") {
-            content = this.convertPayloadToString(payload);
-            val.setAttribute('label', content.text);
+            var content = this.convertPayloadToString(payload);
+            this.mod.setValue(cell.children[2], content.text);
         }
     }
-    this.mod.setStyle(cell, style);
-    this.mod.setValue(cell, val);
-    this.fixSizes(cell, content);
-    var ret = content !== undefined ? content.text : "";
-    return ret;
 }
 
 debuggerBP.prototype.updateVertexCells = function(record) {

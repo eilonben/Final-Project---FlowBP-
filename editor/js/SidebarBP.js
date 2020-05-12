@@ -240,12 +240,12 @@ SidebarBP.prototype.createBPShape = function(name, shape)
 {
 
     //initial cells
-    var data = new mxCell('empty', new mxGeometry(0, 25, 100, 26), 'text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[];');
+    var data = new mxCell('', new mxGeometry(0, 25, 100, 26), 'text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[];');
     data.vertex = true;
     data.lock = true;
     data.selectable = false;
 
-    var payload = this.cloneCell(data, 'payloads');
+    var payload = this.cloneCell(data, '');
     payload.geometry.y = 55;
 
     // divider line
