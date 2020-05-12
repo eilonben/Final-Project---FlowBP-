@@ -12,12 +12,31 @@ function deletePrevLabels(cell, value, graph) {
 };
 
 function validateNewConstraint(cell, graph){
-    if(cell.new_constraints == null){
+    if(cell != null && cell.new_constraints == null){
         var state = graph.view.getState(cell, false);
         cell.new_constraints = graph.getAllConnectionConstraints(state, true);
     }
 }
 
+//after debug all the graph moves - fix thr connection point labels and edges
+function fixConnectionRelatedBugs(graph){
+    var cells = Object.values(graph.getModel().cells) || [];
+    for( var i=0; i< cells.length; i++) {
+        var cell = cells[i];
+        if(getshape(cell.getStyle()) == "general") {
+            graph.getModel().beginUpdate();
+            fixConnectionPointsLabelLocation(graph, cell, cell.geometry.x, cell.geometry.y);
+            graph.getModel().endUpdate();
+        }
+    }
+};
+
+function getLabelsFromChildren(cell){
+    var children = cell.children || [];
+    var labels = children.filter(x => x.label_index != null);
+    labels = labels.sort(function(a, b) {return a.label_index - b.label_index});
+    return labels;
+}
 // update connection point number
 function adjustConnectionPoints(cell, connection_number, graph) {
     validateNewConstraint(cell, graph);
@@ -41,7 +60,7 @@ function updateConnectionPointsLabels(graph, cell, labels){
     graph.getModel().beginUpdate();
     try {
         // labels related to cell connection points
-        var cell_labels_cells = cell.children != null ? cell.children : [];
+        var cell_labels_cells = getLabelsFromChildren(cell);
         for (var i = 0; i < labels.length; i++) {
             var label = labels[i];
 
@@ -54,15 +73,14 @@ function updateConnectionPointsLabels(graph, cell, labels){
             else {
                 var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
                 var cp = cell.new_constraints[i].point;
-                var prefix = 'shape=label;';
+                var prefix = 'shape=flow.label;';
                 var x = cp.x * cell.getGeometry().width;
                 var y = cp.y * cell.getGeometry().height - constraint_img_height;
-                var labelVertex = graph.insertVertex(cell, null, label, x, y, 0, 0, prefix + 'labelPosition=right;align=left');
-                labelVertex.relative = true;
-                labelVertex.movable = false;
-                labelVertex.rotationEnabled = false;
+                var labelVertex = graph.insertVertex(cell, null, label, x, y, 0, 0, prefix + 'labelPosition=right;align=left;childLayout=stackLayout;');
+                labelVertex.selectable = false;
+                labelVertex.lock = true;
+                labelVertex.label_index = i;
                 // delete connection constraint for the label
-                labelVertex.new_constraints = [];
             }
         }
         //fix labels locations
@@ -77,18 +95,16 @@ function updateConnectionPointsLabels(graph, cell, labels){
 // after changing number of output adjust the Connection PointsLabels accordingly
 function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
 {
-    var labels = cell.connection_points_labels;
-    newOutputNumber = cell.new_constraints.length;
+    var labels = getLabelsFromChildren(cell);
+    newOutputNumber = newOutputNumber != null ? newOutputNumber : cell.new_constraints.length ;
     graph.getModel().beginUpdate();
     try {
         // delete labels
         for (let i = 0; i < labels.length; i++) {
             // need to delete
             if (i >= newOutputNumber) {
-
-                var ConnectionPointLabelId =  cell.connection_points_labels[i];
-                var ConnectionPointLabelCell = findConnectionPointLabelCell(graph, ConnectionPointLabelId);
-                graph.removeCells(ConnectionPointLabelCell);
+                var ConnectionPointLabelCell =  labels[i];
+                graph.removeCells([ConnectionPointLabelCell]);
             }
         }
         //fix labels locations
@@ -102,28 +118,33 @@ function adjustConnectionPointsLabels(graph, cell, newOutputNumber)
 };
 
 // relocate connection points labels according to connection points labels
-function fixConnectionPointsLabelLocation(graph, cell) {
-    if (cell == null || cell.connection_points_labels == null)
+function fixConnectionPointsLabelLocation(graph, cell, x, y) {
+    if (cell == null || cell.children == null)
         return;
+    var labels = getLabelsFromChildren(cell);
+    x = x || 0;
+    y = y || 0;
 
-    for (var i = 0; i < cell.connection_points_labels.length; i++) {
-        var ConnectionPointLabelId =  cell.connection_points_labels[i];
-        var ConnectionPointLabelCell = findConnectionPointLabelCell(graph, ConnectionPointLabelId);
+    for (var i = 0; i < labels.length; i++) {
+        var ConnectionPointLabelCell = labels[i];
 
         var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
         var cp = cell.new_constraints[i].point;
 
-        var newY = cp.y * cell.getGeometry().height - constraint_img_height;
+        var newY = y + cp.y * cell.getGeometry().height - constraint_img_height;
         ConnectionPointLabelCell.geometry.y = newY;
+        var newX = x + cp.x * cell.getGeometry().width;
+        ConnectionPointLabelCell.geometry.x = newX;
     }
 
 };
 
 // after changing number of output adjust the edges exit point accordingly
 function adjustEdges(cell, numOfOutputs, graphModel) {
-   // var oldNumOfOutput =cell.new_constraints == null ? 1 : cell.new_constraints.length;
+
     //need to adjust old arrows to new location
     var outEdges = getOutEdges(cell);
+    var numOfOutputs = numOfOutputs != null ? numOfOutputs : outEdges.length;
     graphModel.beginUpdate();
     try {
         for (let i = 0; i < outEdges.length; i++) {
@@ -134,7 +155,7 @@ function adjustEdges(cell, numOfOutputs, graphModel) {
                 graphModel.remove(outEdges[i], true);
             else {
                 //    relocate edge exit location of edge
-                var newY = constraintNumber * (1 / (numOfOutputs + 1))
+                var newY = constraintNumber * (1 / (numOfOutputs + 1));
                 var new_style = mxUtils.setStyle(outEdges[i].style, 'exitY', newY);
                 graphModel.setStyle(outEdges[i], new_style);
             }
@@ -289,7 +310,8 @@ FormatBP.prototype.refresh = function () {
 
         var getshape = function (str) {
             var arr = str.split(";");
-            var styleShape = arr[0].split("=")[1].split(".")[1];
+            var styleShape = arr[0].split("=")[1] ;
+            styleShape = styleShape != null? styleShape.split(".")[1] : '';
             return styleShape;
 
         };
@@ -397,9 +419,9 @@ FormatBP.prototype.refresh = function () {
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
                 var outputNumber = parseInt(NumberOfOutPutBox.value);
+                adjustConnectionPoints(cell, outputNumber, graph);
                 deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 adjustEdges(cell, outputNumber, graph.getModel());
-                adjustConnectionPoints(cell, outputNumber, graph);
                 adjustConnectionPointsLabels(graph, cell, outputNumber);
 
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
@@ -587,5 +609,36 @@ FormatBP.prototype.refresh = function () {
     }
 
 };
+
+//
+// FormatBP.prototype.roundableShapes = ['label', 'rectangle', 'internalStorage', 'corner',
+//     'parallelogram', 'swimlane', 'triangle', 'trapezoid',
+//     'ext', 'step', 'tee', 'process', 'link',
+//     'rhombus', 'offPageConnector', 'loopLimit', 'hexagon',
+//     'manualInput', 'curlyBracket', 'singleArrow', 'callout',
+//     'doubleArrow', 'flexArrow', 'card', 'umlLifeline','flow.hadas'];
+//
+// /**
+//  * Returns information about the current selection.
+//  */
+// FormatBP.prototype.isComicState = function(state)
+// {
+//     var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
+//
+//     return mxUtils.indexOf(['label', 'rectangle', 'internalStorage', 'corner', 'parallelogram', 'note', 'collate',
+//         'swimlane', 'triangle', 'trapezoid', 'ext', 'step', 'tee', 'process', 'link', 'rhombus',
+//         'offPageConnector', 'loopLimit', 'hexagon', 'manualInput', 'singleArrow', 'doubleArrow',
+//         'flexArrow', 'filledEdge', 'card', 'umlLifeline', 'connector', 'folder', 'component', 'sortShape',
+//         'cross', 'umlFrame', 'cube', 'isoCube', 'isoRectangle', 'partialRectangle', 'flow.hadas'], shape) >= 0;
+// };
+//
+// Format.prototype.isGlassState = function(state)
+// {
+//     var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
+//
+//     return (shape == 'label' || shape == 'rectangle' || shape == 'internalStorage' ||
+//         shape == 'ext' || shape == 'umlLifeline' || shape == 'swimlane' ||
+//         shape == 'process' || shape == 'flow.hadas');
+// };
 
 // FormatBP.prototype.constructor = Format;

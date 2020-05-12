@@ -62,12 +62,6 @@ mxGraphView.prototype.createState = function(cell)
 {
 
     var state = new mxCellState(this, cell, this.graph.getCellStyle(cell));
-    //initial special general node atributes
-    if(getshape(cell.getStyle()) == "general"){
-        cell.connection_points_labels = cell.connection_points_labels != null? cell.connection_points_labels : [] ;
-        cell.original_id = cell.original_id != null ? cell.original_id : state.cell.id;
-
-    }
     return state;
 };
 
@@ -396,10 +390,10 @@ function mxConstraintHandlerBP(graph){
 mxConstraintHandlerBP.prototype = Object.create(mxConstraintHandler.prototype);
 
 
-mxConstraintHandlerBP.prototype.OutputPointImage = new mxImage(mxClient.imageBasePath + '/purple-point.png', 10, 10);
+mxConstraintHandlerBP.prototype.OutputPointImage = new mxImage(mxClient.imageBasePath + '/output-onlinepngtools (1).png', 10, 10);
 
 
-mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input2.png', 20, 15);
+mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input2.png', 10, 10);
 
 
 mxConstraintHandlerBP.prototype.highlightColor = '#808080';
@@ -448,6 +442,8 @@ mxConstraintHandlerBP.prototype.destroyIcons = function()
 
 mxConstraintHandlerBP.prototype.destroyIconsByState = function(state)
 {
+    if(state == null || state.cell == null)
+        return;
     var id = state.cell.id;
 
     if (this.focusIcons[id] != null)
@@ -581,6 +577,7 @@ mxConstraintHandlerBP.prototype.update = function(me, source, existingEdge, poin
  */
 mxConstraintHandlerBP.prototype.redraw = function()
 {
+    var size = this.graph.view.scale;
     if (this.currentFocus != null && this.constraints != null && this.focusIcons != null)
     {
         var state = this.graph.view.getState(this.currentFocus.cell);
@@ -594,8 +591,8 @@ mxConstraintHandlerBP.prototype.redraw = function()
             var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
 
-            var bounds = new mxRectangle(Math.round(cp.x - img.width / 2),
-                Math.round(cp.y - img.height / 2), img.width, img.height);
+            var bounds = new mxRectangle(Math.round(cp.x - img.width * size),
+                Math.round(cp.y - img.height * size / 2), img.width, img.height);
             allIcons[i].bounds = bounds;
             allIcons[i].redraw();
             this.currentFocusArea.add(allIcons[i].bounds);
@@ -641,7 +638,7 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
 
             var src = img.src;
-            var bounds = new mxRectangle(Math.round(cp.x - (img.width * size) / 2),
+            var bounds = new mxRectangle(Math.round(cp.x - (img.width * size)),
                 Math.round(cp.y - (img.height * size) / 2), img.width * size, img.height * size);
             var icon = new mxImageShape(bounds, src);
             icon.dialect = (this.graph.dialect != mxConstants.DIALECT_SVG) ?
@@ -726,7 +723,7 @@ mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
                 var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
                 var img = this.getImageForConstraint(state, this.constraints[i], cp);
                 var src = img.src;
-                var bounds = new mxRectangle(Math.round(cp.x - (img.width * size) / 2),
+                var bounds = new mxRectangle(Math.round(cp.x - (img.width * size) ),
                     Math.round(cp.y - (img.height * size) / 2), img.width * size, img.height * size);
                 var icon = new mxImageShape(bounds, src);
                 icon.dialect = (this.graph.dialect != mxConstants.DIALECT_SVG) ?
@@ -763,13 +760,29 @@ function mxGraphHandlerBP(graph){
 
 mxGraphHandlerBP.prototype = Object.create(mxGraphHandler.prototype);
 
+
+mxGraphHandlerBP.prototype.getMovableCells= function(cells){
+    //cells without lock or
+    var unlockedCells = cells.filter(cell => !(cell.lock != null && cell.lock));
+    var lockedCells = cells.filter(cell => cell.lock != null && cell.lock);
+    //the locked cells that their parents also include
+    var validCells = lockedCells.filter(cell => cell.parent != null && cells.includes(cell.parent))
+    var tmp =  unlockedCells.concat(validCells);
+    return tmp;
+}
+
 //This is for preventing moving only an edge without its source and target
 mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, evt) {
-    //this is new
+
+    cells = this.getMovableCells(cells);
+    if (cells.length == 0)
+        return ;
+    // //this is new
     const edges = cells.filter(cell => cell.getStyle().includes("edgeStyle"));
     const shapes = cells.filter(cell => cell.getStyle().includes('shape'));
     var validEdges = edges.filter(edge => (cells.includes(edge.target) && cells.includes(edge.source)));
     cells = shapes.concat(validEdges);
+
 
     //this is old
     if (clone) {
@@ -979,8 +992,20 @@ mxGraphHandlerBP.prototype.updateLivePreview = function(dx, dy)
 };
 
 
+
+//duplicate this object for repaint edges or shapes in black after they were painted in red
+function mxGraphModelBP(root){
+    mxGraphModel.call(this, root);
+
+};
+
+
+mxGraphModelBP.prototype = Object.create(mxGraphModel.prototype);
+
+
+
 //repaint edges or shapes in black after they were painted in red
-mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSource)
+mxGraphModelBP.prototype.terminalForCellChanged = function(edge, terminal, isSource)
 {
 
     var previous = this.getTerminal(edge, isSource);
@@ -1018,88 +1043,98 @@ mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSourc
     return previous;
 };
 
-// mxGraph
-mxGraph.prototype.insertEdge = function(parent, id, value, source, target, style, state)
-{
 
-    var edge = this.createEdge(parent, id, value, source, target, style, state);
-    if( edge==null)
-        return null;
-    return this.addEdge(edge, parent, source, target);
+//change the call to new mxGraphModelBP
+mxCodecRegistry.register(function()
+{
+    /**
+     * Class: mxModelCodec
+     *
+     * Codec for <mxGraphModel>s. This class is created and registered
+     * dynamically at load time and used implicitely via <mxCodec>
+     * and the <mxCodecRegistry>.
+     */
+    var codec = new mxObjectCodec(new mxGraphModelBP());
+
+    /**
+     * Function: encodeObject
+     *
+     * Encodes the given <mxGraphModel> by writing a (flat) XML sequence of
+     * cell nodes as produced by the <mxCellCodec>. The sequence is
+     * wrapped-up in a node with the name root.
+     */
+    codec.encodeObject = function(enc, obj, node)
+    {
+        var rootNode = enc.document.createElement('root');
+        enc.encodeCell(obj.getRoot(), rootNode);
+        node.appendChild(rootNode);
+    };
+
+    /**
+     * Function: decodeChild
+     *
+     * Overrides decode child to handle special child nodes.
+     */
+    codec.decodeChild = function(dec, child, obj)
+    {
+        if (child.nodeName == 'root')
+        {
+            this.decodeRoot(dec, child, obj);
+        }
+        else
+        {
+            mxObjectCodec.prototype.decodeChild.apply(this, arguments);
+        }
+    };
+
+    /**
+     * Function: decodeRoot
+     *
+     * Reads the cells into the graph model. All cells
+     * are children of the root element in the node.
+     */
+    codec.decodeRoot = function(dec, root, model)
+    {
+        var rootCell = null;
+        var tmp = root.firstChild;
+
+        while (tmp != null)
+        {
+            var cell = dec.decodeCell(tmp);
+
+            if (cell != null && cell.getParent() == null)
+            {
+                rootCell = cell;
+            }
+
+            tmp = tmp.nextSibling;
+        }
+
+        // Sets the root on the model if one has been decoded
+        if (rootCell != null)
+        {
+            model.setRoot(rootCell);
+        }
+    };
+
+    // Returns the codec into the registry
+    return codec;
+
+}());
+
+
+
+//duplicate this object for repaint edges or shapes in black after they were painted in red
+function mxGraphViewBP(graph){
+    mxGraphView.call(this, graph);
+
 };
 
 
-mxGraph.prototype.createGraphHandler = function()
-{
-    return new mxGraphHandlerBP(this);
-};
+mxGraphViewBP.prototype = Object.create(mxGraphView.prototype);
 
 
-mxGraph.prototype.createVertexHandler = function(state)
-{
-    return new mxVertexHandlerBP(state);
-};
-
-
-mxGraph.prototype.createConnectionHandler = function()
-{
-    return new mxConnectionHandlerBP(this);
-};
-
-
-mxGraph.prototype.createEdge = function(parent, id, value, source, target, style, state)
-{
-    // Creates the edge
-    var edge = new mxCell(value, new mxGeometry(), style);
-    edge.setId(id);
-    edge.setEdge(true);
-    edge.geometry.relative = true;
-
-    //check basic legal Edge
-    if(source!=null && ( target ==null || getshape(target.getStyle())=="startnode"))
-        return null;
-
-    //cases by nodes
-    if(source!=null && getshape(source.getStyle())=="general" ){
-        var numberOfOutEdges = getNumOfOutEdges(source);
-        // if(numberOfOutEdges >= source.getAttribute('numberOfOutputs',1))
-        //     return null;
-        var indexLabel =findCurrLabel(source, state);
-        var label = source.getAttribute('Outputnumber'+(indexLabel),' ');
-
-        var doc = mxUtils.createXmlDocument();
-        var obj = doc.createElement('object');
-        obj.setAttribute('label','');
-        var value = obj;
-
-        value.setAttribute('labelNum',indexLabel);
-        value.setAttribute('label',label);
-        edge.setValue(value);
-
-    }else
-        if(source!=null && getshape(source.getStyle())=="bsync" ){
-        var numberOfOutEdges = getNumOfOutEdges(source);
-        if(numberOfOutEdges >= 1)
-            return null;
-
-    }else if(source!=null && getshape(source.getStyle())=="startnode" ){
-        var numberOfOutEdges = getNumOfOutEdges(source);
-        if(numberOfOutEdges >= 1)
-            return null;
-    }
-    return edge;
-};
-
-
-mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
-{
-    var output =  this.resizeCells([cell], [bounds], recurse)[0];
-    fixConnectionPointsLabelLocation(this, cell);
-    return output;
-};
-
-
-mxGraphView.prototype.validate = function(cell)
+mxGraphViewBP.prototype.validate = function(cell)
 {
     var t0 = mxLog.enter('mxGraphView.validate');
     window.status = mxResources.get(this.updatingDocumentResource) ||
@@ -1162,8 +1197,285 @@ mxGraphView.prototype.validate = function(cell)
 
 
     this.graph.connectionHandler.constraintHandler.showConstraint();
+    // if(this.cells != null)
+    //     this.cells.foreach(x => fixConnectionPointsLabelLocation(this.graph,x));
 };
 
+
+mxCodecRegistry.register(function()
+{
+    /**
+     * Class: mxGraphViewCodec
+     *
+     * Custom encoder for <mxGraphView>s. This class is created
+     * and registered dynamically at load time and used implicitely via
+     * <mxCodec> and the <mxCodecRegistry>. This codec only writes views
+     * into a XML format that can be used to create an image for
+     * the graph, that is, it contains absolute coordinates with
+     * computed perimeters, edge styles and cell styles.
+     */
+    var codec = new mxObjectCodec(new mxGraphViewBP());
+
+    /**
+     * Function: encode
+     *
+     * Encodes the given <mxGraphView> using <encodeCell>
+     * starting at the model's root. This returns the
+     * top-level graph node of the recursive encoding.
+     */
+    codec.encode = function(enc, view)
+    {
+        return this.encodeCell(enc, view,
+            view.graph.getModel().getRoot());
+    };
+
+    /**
+     * Function: encodeCell
+     *
+     * Recursively encodes the specifed cell. Uses layer
+     * as the default nodename. If the cell's parent is
+     * null, then graph is used for the nodename. If
+     * <mxGraphModel.isEdge> returns true for the cell,
+     * then edge is used for the nodename, else if
+     * <mxGraphModel.isVertex> returns true for the cell,
+     * then vertex is used for the nodename.
+     *
+     * <mxGraph.getLabel> is used to create the label
+     * attribute for the cell. For graph nodes and vertices
+     * the bounds are encoded into x, y, width and height.
+     * For edges the points are encoded into a points
+     * attribute as a space-separated list of comma-separated
+     * coordinate pairs (eg. x0,y0 x1,y1 ... xn,yn). All
+     * values from the cell style are added as attribute
+     * values to the node.
+     */
+    codec.encodeCell = function(enc, view, cell)
+    {
+        var model = view.graph.getModel();
+        var state = view.getState(cell);
+        var parent = model.getParent(cell);
+
+        if (parent == null || state != null)
+        {
+            var childCount = model.getChildCount(cell);
+            var geo = view.graph.getCellGeometry(cell);
+            var name = null;
+
+            if (parent == model.getRoot())
+            {
+                name = 'layer';
+            }
+            else if (parent == null)
+            {
+                name = 'graph';
+            }
+            else if (model.isEdge(cell))
+            {
+                name = 'edge';
+            }
+            else if (childCount > 0 && geo != null)
+            {
+                name = 'group';
+            }
+            else if (model.isVertex(cell))
+            {
+                name = 'vertex';
+            }
+
+            if (name != null)
+            {
+                var node = enc.document.createElement(name);
+                var lab = view.graph.getLabel(cell);
+
+                if (lab != null)
+                {
+                    node.setAttribute('label', view.graph.getLabel(cell));
+
+                    if (view.graph.isHtmlLabel(cell))
+                    {
+                        node.setAttribute('html', true);
+                    }
+                }
+
+                if (parent == null)
+                {
+                    var bounds = view.getGraphBounds();
+
+                    if (bounds != null)
+                    {
+                        node.setAttribute('x', Math.round(bounds.x));
+                        node.setAttribute('y', Math.round(bounds.y));
+                        node.setAttribute('width', Math.round(bounds.width));
+                        node.setAttribute('height', Math.round(bounds.height));
+                    }
+
+                    node.setAttribute('scale', view.scale);
+                }
+                else if (state != null && geo != null)
+                {
+                    // Writes each key, value in the style pair to an attribute
+                    for (var i in state.style)
+                    {
+                        var value = state.style[i];
+
+                        // Tries to turn objects and functions into strings
+                        if (typeof(value) == 'function' &&
+                            typeof(value) == 'object')
+                        {
+                            value = mxStyleRegistry.getName(value);
+                        }
+
+                        if (value != null &&
+                            typeof(value) != 'function' &&
+                            typeof(value) != 'object')
+                        {
+                            node.setAttribute(i, value);
+                        }
+                    }
+
+                    var abs = state.absolutePoints;
+
+                    // Writes the list of points into one attribute
+                    if (abs != null && abs.length > 0)
+                    {
+                        var pts = Math.round(abs[0].x) + ',' + Math.round(abs[0].y);
+
+                        for (var i=1; i<abs.length; i++)
+                        {
+                            pts += ' ' + Math.round(abs[i].x) + ',' +
+                                Math.round(abs[i].y);
+                        }
+
+                        node.setAttribute('points', pts);
+                    }
+
+                    // Writes the bounds into 4 attributes
+                    else
+                    {
+                        node.setAttribute('x', Math.round(state.x));
+                        node.setAttribute('y', Math.round(state.y));
+                        node.setAttribute('width', Math.round(state.width));
+                        node.setAttribute('height', Math.round(state.height));
+                    }
+
+                    var offset = state.absoluteOffset;
+
+                    // Writes the offset into 2 attributes
+                    if (offset != null)
+                    {
+                        if (offset.x != 0)
+                        {
+                            node.setAttribute('dx', Math.round(offset.x));
+                        }
+
+                        if (offset.y != 0)
+                        {
+                            node.setAttribute('dy', Math.round(offset.y));
+                        }
+                    }
+                }
+
+                for (var i=0; i<childCount; i++)
+                {
+                    var childNode = this.encodeCell(enc,
+                        view, model.getChildAt(cell, i));
+
+                    if (childNode != null)
+                    {
+                        node.appendChild(childNode);
+                    }
+                }
+            }
+        }
+
+        return node;
+    };
+
+    // Returns the codec into the registry
+    return codec;
+
+}());
+
+
+// mxGraph
+mxGraph.prototype.insertEdge = function(parent, id, value, source, target, style, state)
+{
+
+    var edge = this.createEdge(parent, id, value, source, target, style, state);
+    if( edge==null)
+        return null;
+    return this.addEdge(edge, parent, source, target);
+};
+
+
+mxGraph.prototype.createGraphHandler = function()
+{
+    return new mxGraphHandlerBP(this);
+};
+
+
+mxGraph.prototype.createVertexHandler = function(state)
+{
+    return new mxVertexHandlerBP(state);
+};
+
+
+mxGraph.prototype.createConnectionHandler = function()
+{
+    return new mxConnectionHandlerBP(this);
+};
+
+
+mxGraph.prototype.createEdge = function(parent, id, value, source, target, style, state)
+{
+    // Creates the edge
+    var edge = new mxCell(value, new mxGeometry(), style);
+    edge.setId(id);
+    edge.setEdge(true);
+    edge.geometry.relative = true;
+
+    //check basic legal Edge
+    if(source!=null && ( target ==null || getshape(target.getStyle())=="startnode"))
+        return null;
+
+    //cases by nodes
+    if(source!=null && getshape(source.getStyle())=="general" ){
+        var numberOfOutEdges = getNumOfOutEdges(source);
+        // if(numberOfOutEdges >= source.getAttribute('numberOfOutputs',1))
+        //     return null;
+        var indexLabel =findCurrLabel(source, state);
+        var label = source.getAttribute('Outputnumber'+(indexLabel),' ');
+
+        var doc = mxUtils.createXmlDocument();
+        var obj = doc.createElement('object');
+        obj.setAttribute('label','');
+        var value = obj;
+
+        value.setAttribute('labelNum',indexLabel);
+        value.setAttribute('label',label);
+        edge.setValue(value);
+
+    }else
+    if(source!=null && getshape(source.getStyle())=="bsync" ){
+        var numberOfOutEdges = getNumOfOutEdges(source);
+        if(numberOfOutEdges >= 1)
+            return null;
+
+    }else if(source!=null && getshape(source.getStyle())=="startnode" ){
+        var numberOfOutEdges = getNumOfOutEdges(source);
+        if(numberOfOutEdges >= 1)
+            return null;
+    }
+    return edge;
+};
+
+
+mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
+{
+    var output =  this.resizeCells([cell], [bounds], recurse)[0];
+    fixConnectionPointsLabelLocation(this, cell, 0, 0);
+    return output;
+};
 
 // edge entry from left only
 mxGraph.prototype.getConnectionConstraint = function(edge, terminal, source)
@@ -1204,4 +1516,108 @@ mxGraph.prototype.getConnectionConstraint = function(edge, terminal, source)
 
 
     return new mxConnectionConstraint(point, perimeter, null, dx, dy);
+};
+
+
+mxGraph.prototype.intersects = function(state, x, y)
+{
+    if (state != null)
+    {
+        var pts = state.absolutePoints;
+
+        if (pts != null)
+        {
+            var t2 = this.tolerance * this.tolerance;
+            var pt = pts[0];
+
+            for (var i = 1; i < pts.length; i++)
+            {
+                var next = pts[i];
+                var dist = mxUtils.ptSegDistSq(pt.x, pt.y, next.x, next.y, x, y);
+
+                if (dist <= t2)
+                {
+                    return true;
+                }
+
+                pt = next;
+            }
+        }
+        else
+        {
+            var alpha = mxUtils.toRadians(mxUtils.getValue(state.style, mxConstants.STYLE_ROTATION) || 0);
+
+            if (alpha != 0)
+            {
+                var cos = Math.cos(-alpha);
+                var sin = Math.sin(-alpha);
+                var cx = new mxPoint(state.getCenterX(), state.getCenterY());
+                var pt = mxUtils.getRotatedPoint(new mxPoint(x, y), cos, sin, cx);
+                x = pt.x;
+                y = pt.y;
+            }
+            //if (state.cell.contains(state, x, y))
+            if (this.shapeContains(state, x, y))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+};
+
+mxGraph.prototype.isValidConnection = function(source, target)
+{
+    // if(getshape(target.getStyle())=="startnode" || source == null || target == null)
+    //     return false;
+    return this.isValidSource(source) && this.isValidTarget(target);
+};
+
+mxGraph.prototype.isCellSelectable = function(cell)
+{
+    if(cell != null && cell.selectable != null && !cell.selectable)
+        return false;
+    return this.isCellsSelectable();
+};
+
+mxGraph.prototype.isCellEditable = function(cell)
+{
+    if(cell != null && cell.lock != null && !cell.lock)
+        return false;
+
+    var state = this.view.getState(cell);
+    var style = (state != null) ? state.style : this.getCellStyle(cell);
+
+    return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
+};
+
+
+
+mxGraph.prototype.createGraphView = function()
+{
+    return new mxGraphViewBP(this);
+};
+
+
+function mxTextBP(value, bounds, align, valign, color,
+                family,	size, fontStyle, spacing, spacingTop, spacingRight,
+                spacingBottom, spacingLeft, horizontal, background, border,
+                wrap, clipped, overflow, labelPadding, textDirection)
+{
+
+    mxText.call(this, value, bounds, align, valign, color,
+        family,	size, fontStyle, spacing, spacingTop, spacingRight,
+        spacingBottom, spacingLeft, horizontal, background, border,
+        wrap, clipped, overflow, labelPadding, textDirection);
+
+};
+
+
+mxTextBP.prototype = Object.create(mxText.prototype);
+
+
+mxTextBP.prototype.getTextRotation = function()
+{
+    return 0;
 };

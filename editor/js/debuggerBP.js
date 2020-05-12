@@ -179,6 +179,7 @@ debuggerBP.prototype.convertPayloadToString = function(payload) {
 }
 
 debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
+
     var content;
     var val = cell.clone().getValue();
     var style = cell.getStyle();

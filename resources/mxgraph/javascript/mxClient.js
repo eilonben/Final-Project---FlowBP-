@@ -46678,18 +46678,18 @@ mxGraphSelectionModel.prototype.setCell = function(cell)
  */
 mxGraphSelectionModel.prototype.setCells = function(cells)
 {
+    var u =0;
 	if (cells != null)
 	{
 		if (this.singleSelection)
 		{
 			cells = [this.getFirstSelectableCell(cells)];
 		}
-	
 		var tmp = [];
 		
 		for (var i = 0; i < cells.length; i++)
 		{
-			if (this.graph.isCellSelectable(cells[i]))
+            if (this.graph.isCellSelectable(cells[i]))
 			{
 				tmp.push(cells[i]);
 			}	

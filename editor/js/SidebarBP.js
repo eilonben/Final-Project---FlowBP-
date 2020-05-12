@@ -235,22 +235,75 @@ SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
     }
 };
 
+// create bp shape
+SidebarBP.prototype.createBPShape = function(name, shape)
+{
+
+    //initial cells
+    var data = new mxCell('empty', new mxGeometry(0, 25, 100, 26), 'text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[];');
+    data.vertex = true;
+    data.lock = true;
+    data.selectable = false;
+
+    var payload = this.cloneCell(data, 'payloads');
+    payload.geometry.y = 55;
+
+    // divider line
+    var divider = new mxCell('', new mxGeometry(0, 50, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];');
+    divider.vertex = true;
+    divider.lock = true;
+    divider.selectable = false;
+    // divider.visible = false;
+
+    var cellStyle = 'shape=' + shape + ';swimlane;fontStyle=1;align=center;verticalAlign=top;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rotatable=0;';
+
+    // shape
+    var cell = new mxCell(name, new mxGeometry(0, 0, 160, 90), cellStyle);
+    cell.vertex = true;
+
+
+    data.bp_type = 'data';
+    cell.insert(data);
+
+    cell.insert(divider);
+
+    payload.bp_type = 'payloads';
+    // payload.visible = false;
+    cell.insert(payload);
+
+    return cell;
+
+};
+
 /**
  * Adds the general palette to the sidebar.
  */
 SidebarBP.prototype.addFlowBPPalette = function()
 {
-
-    var prefix = mxClient.imageBasePath;
-    var item = '/console_2.png';
+    var sb = this;
 
     var fns = [
         this.createVertexTemplateEntry('shape=flow.startnode;whiteSpace=wrap;html=1;', 60, 60, null, 'Start Node', null, null, 'start'),
-        this.createVertexTemplateEntry('shape=flow.bsync;whiteSpace=wrap;html=1;', 120, 80, 'Bsync', 'Bsync', null, null, 'bsync'),
-        this.createVertexTemplateEntry('shape=flow.general;whiteSpace=wrap;html=1;', 120, 80, 'General', 'General', null, null, 'general'),
-        this.createVertexTemplateEntry('shape=flow.console;html=1;labelBackgroundColor=#ffffff;image=' + prefix + item +';', 120, 80, null, 'Console', null, null, 'console')
+
+        this.addEntry('', function()
+        {
+            var cell = sb.createBPShape('BSync', 'flow.bsync');
+            return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'BSync');
+        }),
+
+        this.addEntry('', function()
+        {
+            var cell = sb.createBPShape('General', 'flow.general');
+            return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'General');
+        }),
+
+        this.addEntry('', function()
+        {
+            var cell = sb.createBPShape('Console', 'flow.console');
+            return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Console');
+        }),
+
     ];
 
     this.addPaletteFunctions('Flow', 'Flow',  false, fns);
 };
-
