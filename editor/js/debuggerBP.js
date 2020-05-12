@@ -200,6 +200,7 @@ debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
     if (payload !== undefined) {
         if (getshape(cell.getStyle()) !== "startnode") {
             var content = this.convertPayloadToString(payload);
+            cell.children[2].setVisible(true);
             this.mod.setValue(cell.children[2], content.text);
         }
     }

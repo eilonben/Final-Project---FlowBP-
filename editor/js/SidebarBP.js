@@ -239,7 +239,7 @@ SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
 SidebarBP.prototype.createBPShape = function(name, shape)
 {
     //initial cells
-    var data = new mxCell('', new mxGeometry(0, 25, 100, 26), 'text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[];');
+    var data = new mxCell('dddddd', new mxGeometry(0, 25, 100, 26), 'text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[];');
     data.vertex = true;
     data.lock = true;
     data.selectable = false;

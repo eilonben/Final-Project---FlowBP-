@@ -148,7 +148,9 @@ EditorUiBP.prototype.saveFile = function(forceDialog)
 };
 
 EditorUiBP.prototype.fixView = function() {
-    this.editor.graph.selectAllForDebugging(null, true);
+    var cells = Object.values(this.editor.graph.model.cells).filter(cell =>
+        cell.bp_type == "BSync" || cell.bp_type == "BSync")
+    this.editor.graph.setSelectionCells(cells);
     new mxHierarchicalLayout(this.editor.graph, mxConstants.DIRECTION_WEST).execute(this.editor.graph.getDefaultParent(), null);
     fixConnectionRelatedBugs(this.editor.graph);
     this.editor.graph.clearSelection();
