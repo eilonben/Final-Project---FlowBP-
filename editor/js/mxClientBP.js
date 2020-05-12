@@ -229,6 +229,275 @@ mxConnectionHandlerBP.prototype.checkAndFixBorder = function(edge) {
 
 }
 
+
+mxConnectionHandler.prototype.mouseMove = function(sender, me)
+{
+    if (!me.isConsumed() && (this.ignoreMouseDown || this.first != null || !this.graph.isMouseDown))
+    {
+        // Handles special case when handler is disabled during highlight
+        if (!this.isEnabled() && this.currentState != null)
+        {
+            this.destroyIcons();
+            this.currentState = null;
+        }
+
+        var view = this.graph.getView();
+        var scale = view.scale;
+        var tr = view.translate;
+        var point = new mxPoint(me.getGraphX(), me.getGraphY());
+        this.error = null;
+
+        if (this.graph.isGridEnabledEvent(me.getEvent()))
+        {
+            point = new mxPoint((this.graph.snap(point.x / scale - tr.x) + tr.x) * scale,
+                (this.graph.snap(point.y / scale - tr.y) + tr.y) * scale);
+        }
+
+        this.snapToPreview(me, point);
+        this.currentPoint = point;
+
+        if ((this.first != null || (this.isEnabled() && this.graph.isEnabled())) &&
+            (this.shape != null || this.first == null ||
+                Math.abs(me.getGraphX() - this.first.x) > this.graph.tolerance ||
+                Math.abs(me.getGraphY() - this.first.y) > this.graph.tolerance))
+        {
+            this.updateCurrentState(me, point);
+        }
+
+        if (this.first != null)
+        {
+            var constraint = null;
+            var current = point;
+
+            // Uses the current point from the constraint handler if available
+            if (this.constraintHandler.currentConstraint != null &&
+                this.constraintHandler.currentFocus != null &&
+                this.constraintHandler.currentPoint != null)
+            {
+                constraint = this.constraintHandler.currentConstraint;
+                current = this.constraintHandler.currentPoint.clone();
+            }
+            else if (this.previous != null && !this.graph.isIgnoreTerminalEvent(me.getEvent()) &&
+                mxEvent.isShiftDown(me.getEvent()))
+            {
+                if (Math.abs(this.previous.getCenterX() - point.x) <
+                    Math.abs(this.previous.getCenterY() - point.y))
+                {
+                    point.x = this.previous.getCenterX();
+                }
+                else
+                {
+                    point.y = this.previous.getCenterY();
+                }
+            }
+
+            var pt2 = this.first;
+
+            // Moves the connect icon with the mouse
+            if (this.selectedIcon != null)
+            {
+                var w = this.selectedIcon.bounds.width;
+                var h = this.selectedIcon.bounds.height;
+
+                if (this.currentState != null && this.targetConnectImage)
+                {
+                    var pos = this.getIconPosition(this.selectedIcon, this.currentState);
+                    this.selectedIcon.bounds.x = pos.x;
+                    this.selectedIcon.bounds.y = pos.y;
+                }
+                else
+                {
+                    var bounds = new mxRectangle(me.getGraphX() + this.connectIconOffset.x,
+                        me.getGraphY() + this.connectIconOffset.y, w, h);
+                    this.selectedIcon.bounds = bounds;
+                }
+
+                this.selectedIcon.redraw();
+            }
+
+            // Uses edge state to compute the terminal points
+            if (this.edgeState != null)
+            {
+                this.updateEdgeState(current, constraint);
+                current = this.edgeState.absolutePoints[this.edgeState.absolutePoints.length - 1];
+                pt2 = this.edgeState.absolutePoints[0];
+            }
+            else
+            {
+                if (this.currentState != null)
+                {
+                    if (this.constraintHandler.currentConstraint == null)
+                    {
+                        var tmp = this.getTargetPerimeterPoint(this.currentState, me);
+
+                        if (tmp != null)
+                        {
+                            current = tmp;
+                        }
+                    }
+                }
+
+                // Computes the source perimeter point
+                if (this.sourceConstraint == null && this.previous != null)
+                {
+                    var next = (this.waypoints != null && this.waypoints.length > 0) ?
+                        this.waypoints[0] : current;
+                    var tmp = this.getSourcePerimeterPoint(this.previous, next, me);
+
+                    if (tmp != null)
+                    {
+                        pt2 = tmp;
+                    }
+                }
+            }
+
+            // Makes sure the cell under the mousepointer can be detected
+            // by moving the preview shape away from the mouse. This
+            // makes sure the preview shape does not prevent the detection
+            // of the cell under the mousepointer even for slow gestures.
+            if (this.currentState == null && this.movePreviewAway)
+            {
+                var tmp = pt2;
+
+                if (this.edgeState != null && this.edgeState.absolutePoints.length >= 2)
+                {
+                    var tmp2 = this.edgeState.absolutePoints[this.edgeState.absolutePoints.length - 2];
+
+                    if (tmp2 != null)
+                    {
+                        tmp = tmp2;
+                    }
+                }
+
+                var dx = current.x - tmp.x;
+                var dy = current.y - tmp.y;
+
+                var len = Math.sqrt(dx * dx + dy * dy);
+
+                if (len == 0)
+                {
+                    return;
+                }
+
+                // Stores old point to reuse when creating edge
+                this.originalPoint = current.clone();
+                current.x -= dx * 4 / len;
+                current.y -= dy * 4 / len;
+            }
+            else
+            {
+                this.originalPoint = null;
+            }
+
+            // Creates the preview shape (lazy)
+            if (this.shape == null)
+            {
+                var dx = Math.abs(me.getGraphX() - this.first.x);
+                var dy = Math.abs(me.getGraphY() - this.first.y);
+
+                if (dx > this.graph.tolerance || dy > this.graph.tolerance)
+                {
+                    this.shape = this.createShape();
+
+                    if (this.edgeState != null)
+                    {
+                        this.shape.apply(this.edgeState);
+                    }
+
+                    // Revalidates current connection
+                    this.updateCurrentState(me, point);
+                }
+            }
+
+            // Updates the points in the preview edge
+            if (this.shape != null)
+            {
+                if (this.edgeState != null)
+                {
+                    this.shape.points = this.edgeState.absolutePoints;
+                }
+                else
+                {
+                    var pts = [pt2];
+
+                    if (this.waypoints != null)
+                    {
+                        pts = pts.concat(this.waypoints);
+                    }
+
+                    pts.push(current);
+                    this.shape.points = pts;
+                }
+
+                this.drawPreview();
+            }
+
+            // Makes sure endpoint of edge is visible during connect
+            if (this.cursor != null)
+            {
+                this.graph.container.style.cursor = this.cursor;
+            }
+
+            mxEvent.consume(me.getEvent());
+            me.consume();
+        }
+        else if (!this.isEnabled() || !this.graph.isEnabled())
+        {
+            this.constraintHandler.reset();
+        }
+        else if (this.previous != this.currentState && this.edgeState == null)
+        {
+            this.destroyIcons();
+
+            // Sets the cursor on the current shape
+            if (this.currentState != null && this.error == null && this.constraintHandler.currentConstraint == null)
+            {
+                this.icons = this.createIcons(this.currentState);
+
+                if (this.icons == null)
+                {
+                    this.currentState.setCursor(mxConstants.CURSOR_CONNECT);
+                    me.consume();
+                }
+            }
+
+            this.previous = this.currentState;
+        }
+        else if (this.previous == this.currentState && this.currentState != null && this.icons == null &&
+            !this.graph.isMouseDown)
+        {
+            // Makes sure that no cursors are changed
+            me.consume();
+        }
+
+        if (!this.graph.isMouseDown && this.currentState != null && this.icons != null)
+        {
+            var hitsIcon = false;
+            var target = me.getSource();
+
+            for (var i = 0; i < this.icons.length && !hitsIcon; i++)
+            {
+                hitsIcon = target == this.icons[i].node || target.parentNode == this.icons[i].node;
+            }
+
+            if (!hitsIcon)
+            {
+                this.updateIcons(this.currentState, this.icons, me);
+            }
+        }
+    }
+    else
+    {
+        this.constraintHandler.reset();
+    }
+};
+
+
+mxConnectionHandlerBP.prototype.isInnerChild = function(cell){
+    return (cell != null && cell.bp_type != null && cell.bp_type == 'data');
+};
+
+
 //this is for labels per constraint point
 mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarget) {
 
@@ -238,6 +507,9 @@ mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarg
         var model = this.graph.getModel();
         var terminalInserted = false;
         var edge = null;
+
+        if (this.isInnerChild(target))
+            target = target.parent;
 
         model.beginUpdate();
         try {
@@ -1583,7 +1855,7 @@ mxGraph.prototype.isCellSelectable = function(cell)
 
 mxGraph.prototype.isCellEditable = function(cell)
 {
-    if(cell != null && cell.lock != null && !cell.lock)
+    if(cell != null && cell.lock != null && cell.lock)
         return false;
 
     var state = this.view.getState(cell);
@@ -1592,6 +1864,14 @@ mxGraph.prototype.isCellEditable = function(cell)
     return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
 };
 
+mxGraph.prototype.setAllVisible = function(){
+    var cells = [];
+    if(this.getModel() != null && this.getModel().cells != null)
+        cells = Object.values(this.getModel().cells);
+
+    cells.map(cell => (cell != null && cell.visible != null) ? cell.visible =true : null);
+
+}
 
 
 mxGraph.prototype.createGraphView = function()
@@ -1620,4 +1900,27 @@ mxTextBP.prototype = Object.create(mxText.prototype);
 mxTextBP.prototype.getTextRotation = function()
 {
     return 0;
+};
+
+mxGraphSelectionModel.prototype.setCells = function(cells)
+{
+    if (cells != null)
+    {
+        if (this.singleSelection)
+        {
+            cells = [this.getFirstSelectableCell(cells)];
+        }
+        var tmp = [];
+
+        for (var i = 0; i < cells.length; i++)
+        {
+            // if(cell[i].pa)
+            if (this.graph.isCellSelectable(cells[i]))
+            {
+                tmp.push(cells[i]);
+            }
+        }
+
+        this.changeSelection(tmp, this.cells);
+    }
 };
