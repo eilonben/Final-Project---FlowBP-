@@ -244,6 +244,7 @@ SidebarBP.prototype.createBPShape = function(name, shape)
     data.lock = true;
     data.selectable = false;
     data.bp_type = 'data';
+    data.bp_cell = false;
 
     // divider line
     var divider = new mxCell('', new mxGeometry(0, 50, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];resizeParent=1;');
@@ -252,17 +253,20 @@ SidebarBP.prototype.createBPShape = function(name, shape)
     divider.selectable = false;
     divider.bp_type = 'divider';
     divider.visible = false;
+    divider.bp_cell = false;
 
     var payload = this.cloneCell(data, 'payloads');
     payload.geometry.y = 55;
     payload.bp_type = 'payloads';
     payload.visible = false;
+    payload.bp_cell = false;
 
     var cellStyle = 'shape=' + shape + ';swimlane;fontStyle=1;align=center;verticalAlign=top;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rotatable=0;';
 
     // shape
     var cell = new mxCell(name, new mxGeometry(0, 0, 160, 90), cellStyle);
     cell.vertex = true;
+    cell.bp_cell = true;
     cell.bp_type = name;
 
     cell.insert(data);
@@ -287,6 +291,7 @@ SidebarBP.prototype.addFlowBPPalette = function()
             var cell = new mxCell(name, new mxGeometry(0, 0, 60, 60), 'shape=flow.startnode;whiteSpace=wrap;html=1;');
             cell.vertex = true;
             cell.bp_type = 'startnode';
+            cell.bp_cell = true;
             return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Start Node');
         }),
 
