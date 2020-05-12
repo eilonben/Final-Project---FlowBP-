@@ -218,6 +218,10 @@ GraphBP.prototype.shapeContains = function(state, x, y) {
             var constraintHeight = constaintImg.height  * size;
             contains = constraintPointX - constraintWidth <= x && constraintPointX + constraintWidth >= x &&
                 constraintPointY - constraintHeight <= y && constraintPointY + constraintHeight >= y;
+            var t =constraintPointX - constraintWidth;
+            var u = constraintPointX + constraintWidth;
+            var look =  constraintPointX - constraintWidth <= x && constraintPointX + constraintWidth >= x;
+            // console.log(""+ t +" <=" +  x + "<=" + u +look );
             if(contains)
                 return true;
 
@@ -225,4 +229,52 @@ GraphBP.prototype.shapeContains = function(state, x, y) {
     }
     return contains;
 };
+
+// get the bp cell in (x,y) cordinate
+Graph.prototype.getScaledCellAt = function(x, y, parent, vertices, edges, ignoreFn)
+{
+    vertices = (vertices != null) ? vertices : true;
+    edges = (edges != null) ? edges : true;
+
+    if (parent == null)
+    {
+        parent = this.getCurrentRoot();
+
+        if (parent == null)
+        {
+            parent = this.getModel().getRoot();
+        }
+    }
+
+    if (parent != null)
+    {
+        var childCount = this.model.getChildCount(parent);
+
+        for (var i = childCount - 1; i >= 0; i--)
+        {
+            var cell = this.model.getChildAt(parent, i);
+            var result = this.getScaledCellAt(x, y, cell, vertices, edges, ignoreFn);
+
+            if (result != null)
+            {
+                return result;
+            }
+            else if (this.isCellVisible(cell) && (edges && this.model.isEdge(cell) ||
+                vertices && this.model.isVertex(cell)))
+            {
+                var state = this.view.getState(cell);
+
+                if (state != null && (ignoreFn == null || !ignoreFn(state, x, y)) &&
+                    this.intersects(state, x, y))
+                {
+                    if(cell.bp_cell == null || (cell.bp_cell != null && cell.bp_cell))
+                        return cell;
+                }
+            }
+        }
+    }
+
+    return null;
+};
+
 // GraphBP.prototype = Object.create(Graph.prototype);

@@ -46678,7 +46678,6 @@ mxGraphSelectionModel.prototype.setCell = function(cell)
  */
 mxGraphSelectionModel.prototype.setCells = function(cells)
 {
-    var u =0;
 	if (cells != null)
 	{
 		if (this.singleSelection)

@@ -1,79 +1,16 @@
 
-function isOutEdge(source,edge){
-    return edge.source.getId()==source.getId();
-};
 
-function getNumOfOutEdges(source){
-    var result = 0 ;
-    for(var i=0 ; i<source.getEdgeCount() ; i++){
-        if (isOutEdge(source,source.edges[i]))
-            result++;
-    }
-    return result;
-};
-
-
-function findCurrLabel(source, state) {
-    //there is only one constraint point
-    if(source.new_constraints == null)
-        return 1;
-    //search for the source constraint of the edge
-    var index = 0;
-    for(; index <= source.new_constraints.length; index++){
-        var constraint = source.new_constraints[index];
-        if(constraint.point.x == state.exitX && constraint.point.y == state.exitY)
-            break;
-    }
-    return index+1;
-}
-function getOutEdges(source) {
-    var outEdges = [];
-    for (let i = 0; i < source.getEdgeCount(); i++) {
-        if (isOutEdge(source, source.edges[i]))
-            outEdges.push(source.edges[i])
-    }
-    outEdges.sort((edge)=>edge.getAttribute('labelNum'));
-    return outEdges;
-}
-
-
-mxGraphView.prototype.removeState = function(cell)
-{
-    var state = null;
-
-    if (cell != null)
-    {
-        state = this.states.remove(cell);
-
-        if (state != null)
-        {
-            this.graph.cellRenderer.destroy(state);
-            state.invalid = true;
-            state.destroy();
-            this.graph.connectionHandler.constraintHandler.destroyIconsByState(state);
-        }
-    }
-
-    return state;
-};
-
-
-mxGraphView.prototype.createState = function(cell)
-{
-
-    var state = new mxCellState(this, cell, this.graph.getCellStyle(cell));
-    return state;
-};
-
-
+// DELETE - do nothing
 function mxVertexHandlerBP(state){
     mxVertexHandler.call(this, state);
 };
 
 mxVertexHandlerBP.prototype = Object.create(mxVertexHandler.prototype);
 
-//when resizing shape move her connection point
-mxVertexHandlerBP.prototype.updateLivePreview = function(me) {
+
+// delete (when resizing shape move her connection point)
+mxVertexHandlerBP.prototype.updateLivePreview = function(me)
+{
     // TODO: Apply child offset to children in live preview
     var scale = this.graph.view.scale;
     var tr = this.graph.view.translate;
@@ -123,15 +60,10 @@ mxVertexHandlerBP.prototype.updateLivePreview = function(me) {
         this.state.control.node.style.visibility = 'hidden';
     }
 
-    //the only change
-    // this.graph.connectionHandler.constraintHandler.showConstraint(this.state);
     // Restores current state
     this.state.setState(tempState);
-
-    // adjustEdges(this.state.cell, null, this.graph.getModel());
-
-
 };
+
 
 
 function mxConnectionHandlerBP(graph, factoryMethod){
@@ -148,7 +80,7 @@ mxConnectionHandlerBP.defultInputY = 0.5;
 
 mxConnectionHandlerBP.prototype = Object.create(mxConnectionHandler.prototype);
 
-
+// when adding new edge - set the edge label if needed
 mxConnectionHandlerBP.prototype.insertEdge = function(parent, id, value, source, target, style, state)
 {
     if (this.factoryMethod == null)
@@ -157,6 +89,7 @@ mxConnectionHandlerBP.prototype.insertEdge = function(parent, id, value, source,
     }
     else
     {
+
         var edge = this.createEdge(value, source, target, style);
         edge = this.graph.addEdge(edge, parent, source, target);
 
@@ -164,7 +97,7 @@ mxConnectionHandlerBP.prototype.insertEdge = function(parent, id, value, source,
     }
 };
 
-//this is for change constraintHandler to mxConstraintHandlerBP
+// change definition of constraintHandler to mxConstraintHandlerBP
 mxConnectionHandlerBP.prototype.init = function()
 {
     this.graph.addMouseListener(this);
@@ -206,8 +139,7 @@ mxConnectionHandlerBP.prototype.init = function()
     this.graph.getView().addListener(mxEvent.UP, this.drillHandler);
 };
 
-
-
+// after connecting edge into vertex redefine the target connection point to the left side
 mxConnectionHandlerBP.prototype.checkAndFixBorder = function(edge) {
     var styles = edge.style.trim().split(";");
     styles=styles.map(x=>x.split("="));
@@ -219,6 +151,7 @@ mxConnectionHandlerBP.prototype.checkAndFixBorder = function(edge) {
     for (let i = 0; i < styles.length-1; i++) {
         toDictionary(styles[i][0],styles[i][1])
     }
+
     stylesDic["entryX"]="0";
     stylesDic["entryY"]= "0.5";
     var newStyle="";
@@ -229,7 +162,7 @@ mxConnectionHandlerBP.prototype.checkAndFixBorder = function(edge) {
 
 }
 
-
+// Not resolved yet - might help when you placeing the mouse on the child to mark his parent
 mxConnectionHandler.prototype.mouseMove = function(sender, me)
 {
     if (!me.isConsumed() && (this.ignoreMouseDown || this.first != null || !this.graph.isMouseDown))
@@ -492,13 +425,13 @@ mxConnectionHandler.prototype.mouseMove = function(sender, me)
     }
 };
 
-
+//
 mxConnectionHandlerBP.prototype.isInnerChild = function(cell){
     return (cell != null && cell.bp_type != null && cell.bp_type == 'data');
 };
 
 
-//this is for labels per constraint point
+// when connecting into child of bp -> connect to his parent
 mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarget) {
 
     if (target != null || this.isCreateTarget(evt) || this.graph.allowDanglingEdges) {
@@ -508,6 +441,7 @@ mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarg
         var terminalInserted = false;
         var edge = null;
 
+        //If this is a bp child connect to his parent
         if (this.isInnerChild(target))
             target = target.parent;
 
@@ -644,14 +578,13 @@ mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarg
     }
 };
 
-
+// do not destroy connection icons
 mxConnectionHandlerBP.prototype.destroyIcons = function()
 {
     return;
 };
 
-
-
+// Make the connection points visible (not only when mouse is on the shape)
 function mxConstraintHandlerBP(graph){
     mxConstraintHandler.call(this, graph);
     this.focusIcons = {};
@@ -670,7 +603,7 @@ mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBase
 
 mxConstraintHandlerBP.prototype.highlightColor = '#808080';
 
-
+// get diffrent images per diffrent types of constraints
 mxConstraintHandlerBP.prototype.getImageForConstraint = function(state, constraint, point)
 {
     if(constraint != null && constraint.name == "I")
@@ -679,12 +612,7 @@ mxConstraintHandlerBP.prototype.getImageForConstraint = function(state, constrai
         return this.OutputPointImage;
 };
 
-
-/**
- * Function: reset
- *
- * Resets the state of this handler.
- */
+// do not delete connection points icons
 mxConstraintHandlerBP.prototype.reset = function()
 {
     if (this.focusHighlight != null)
@@ -700,18 +628,14 @@ mxConstraintHandlerBP.prototype.reset = function()
     this.focusPoints = null;
 };
 
-/**
- * Function: destroyIcons
- *
- * Destroys the <focusIcons> if they exist.
- */
+// when destroing shape focuse -> redraw all connection icons of all shapes
 mxConstraintHandlerBP.prototype.destroyIcons = function()
 {
     this.showConstraint();
     return;
 };
 
-
+// destroy spesific shape icon (use when deleteing shape)
 mxConstraintHandlerBP.prototype.destroyIconsByState = function(state)
 {
     if(state == null || state.cell == null)
@@ -730,13 +654,7 @@ mxConstraintHandlerBP.prototype.destroyIconsByState = function(state)
     }
 };
 
-
-/**
- * Function: update
- *
- * Updates the state of this handler based on the given <mxMouseEvent>.
- * Source is a boolean indicating if the cell is a source or target.
- */
+// foucus on shape also when the mouse is on the shape connection points
 mxConstraintHandlerBP.prototype.update = function(me, source, existingEdge, point)
 {
     if (this.isEnabled() && !this.isEventIgnored(me))
@@ -757,7 +675,8 @@ mxConstraintHandlerBP.prototype.update = function(me, source, existingEdge, poin
         var y = (point != null) ? point.y : me.getGraphY();
         var grid = new mxRectangle(x - tol, y - tol, 2 * tol, 2 * tol);
         var mouse = new mxRectangle(me.getGraphX() - tol, me.getGraphY() - tol, 2 * tol, 2 * tol);
-        var state = this.graph.view.getState(this.getCellForEvent(me, point));
+        /*this.graph.getCellAt(x,y) - the change*/
+        var state = this.graph.view.getState(this.graph.getCellAt(x,y));
 
         // Keeps focus icons visible while over vertex bounds and no other cell under mouse or shift is pressed
         if (!this.isKeepFocusEvent(me) && (this.currentFocusArea == null || this.currentFocus == null ||
@@ -839,14 +758,36 @@ mxConstraintHandlerBP.prototype.update = function(me, source, existingEdge, poin
     }
 };
 
+//unused yet - may help setting focus on shape when mouse on the his child or connection points
+mxConstraintHandlerBP.prototype.getCellForEvent = function(me, point)
+{
+    var cell = me.getCell();
 
-/**
- * Function: redraw
- *
- * Transfers the focus to the given state as a source or target terminal. If
- * the handler is not enabled then the outline is painted, but the constraints
- * are ignored.
- */
+    // Gets cell under actual point if different from event location
+    if (cell == null && point != null && (me.getGraphX() != point.x || me.getGraphY() != point.y))
+    {
+        cell = this.graph.getCellAt(point.x, point.y);
+    }
+
+    // Uses connectable parent vertex if one exists
+    if (cell != null && !this.graph.isCellConnectable(cell))
+    {
+        var parent = this.graph.getModel().getParent(cell);
+
+        if (this.graph.getModel().isVertex(parent) && this.graph.isCellConnectable(parent))
+        {
+            cell = parent;
+        }
+    }
+
+
+    cell = (this.graph.isCellLocked(cell)) ? null : cell;
+    if(cell != null)
+        return cell;
+    return null;
+};
+
+// Adjust for mxConstraintHandlerbp changes
 mxConstraintHandlerBP.prototype.redraw = function()
 {
     var size = this.graph.view.scale;
@@ -873,7 +814,22 @@ mxConstraintHandlerBP.prototype.redraw = function()
     }
 };
 
+// define the connection points by the type of connection
+mxConstraintHandlerBP.prototype.getConstraintLocation = function (state, constraints, size){
+    var cp = this.graph.getConnectionPoint(state, constraints);
+    var img = this.getImageForConstraint(state, constraints, cp);
+    var cell = state.cell;
+    var point  = new mxPoint();
 
+    if( (cell.bp_type != null && cell.bp_type == 'startnode') || (constraints != null && constraints.name == 'I'))
+        point.x = Math.round(cp.x - (img.width * size));
+    else
+        point.x = cp.x;
+    point.y =  Math.round(cp.y - (img.height * size) / 2);
+    return point;
+};
+
+// hide input connection points
 mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 {
 
@@ -911,8 +867,10 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
 
             var src = img.src;
-            var bounds = new mxRectangle(Math.round(cp.x - (img.width * size)),
-                Math.round(cp.y - (img.height * size) / 2), img.width * size, img.height * size);
+            var imgPoint = this.getConstraintLocation(state, this.constraints[i], size);
+
+            var bounds = new mxRectangle(imgPoint.x , imgPoint.y, img.width * size, img.height * size);
+
             var icon = new mxImageShape(bounds, src);
             icon.dialect = (this.graph.dialect != mxConstants.DIALECT_SVG) ?
                 mxConstants.DIALECT_MIXEDHTML : mxConstants.DIALECT_SVG;
@@ -963,7 +921,7 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 
 
 
-//state is optional
+//state is optional - drow all connection points for all shapes
 mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
 {
     var size = this.graph.view.scale;
@@ -996,8 +954,11 @@ mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
                 var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
                 var img = this.getImageForConstraint(state, this.constraints[i], cp);
                 var src = img.src;
-                var bounds = new mxRectangle(Math.round(cp.x - (img.width * size) ),
-                    Math.round(cp.y - (img.height * size) / 2), img.width * size, img.height * size);
+
+                var imgPoint = this.getConstraintLocation(state, this.constraints[i], size);
+                var bounds = new mxRectangle(imgPoint.x , imgPoint.y, img.width * size, img.height * size);
+
+
                 var icon = new mxImageShape(bounds, src);
                 icon.dialect = (this.graph.dialect != mxConstants.DIALECT_SVG) ?
                     mxConstants.DIALECT_MIXEDHTML : mxConstants.DIALECT_SVG;
@@ -1030,6 +991,12 @@ function mxGraphHandlerBP(graph){
 
 };
 
+// do not remove any child from his parent
+mxGraphHandler.prototype.isRemoveCellsFromParent = function(value)
+{
+    return false;
+};
+
 
 mxGraphHandlerBP.prototype = Object.create(mxGraphHandler.prototype);
 
@@ -1044,7 +1011,8 @@ mxGraphHandlerBP.prototype.getMovableCells= function(cells){
     return tmp;
 }
 
-//This is for preventing moving only an edge without its source and target
+// This is for preventing moving only an edge without its source and target
+// and preventing move locks cells
 mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, evt) {
 
     cells = this.getMovableCells(cells);
@@ -1128,7 +1096,7 @@ mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, ev
 };
 
 
-//when changing shape location relocate her connection point
+// unused
 mxGraphHandlerBP.prototype.updateLivePreview = function(dx, dy)
 {
     if (!this.suspended)
@@ -1258,8 +1226,6 @@ mxGraphHandlerBP.prototype.updateLivePreview = function(dx, dy)
 
         this.graph.view.validate();
         this.redrawHandles(states);
-        //the only change
-        // this.graph.connectionHandler.constraintHandler.showConstraint(states[1]);
         this.resetPreviewStates(states);
     }
 };
@@ -1317,7 +1283,7 @@ mxGraphModelBP.prototype.terminalForCellChanged = function(edge, terminal, isSou
 };
 
 
-//change the call to new mxGraphModelBP
+// change initial codec to mxGraphModelBP
 mxCodecRegistry.register(function()
 {
     /**
@@ -1397,16 +1363,40 @@ mxCodecRegistry.register(function()
 
 
 
-//duplicate this object for repaint edges or shapes in black after they were painted in red
+/*
+Objectives:
+1. delete connection points icons
+2. drow connection points of all bp shapes (call show constraint)
+ */
 function mxGraphViewBP(graph){
     mxGraphView.call(this, graph);
 
 };
 
+// delete connection points icons
+mxGraphView.prototype.removeState = function(cell)
+{
+    var state = null;
+
+    if (cell != null)
+    {
+        state = this.states.remove(cell);
+
+        if (state != null)
+        {
+            this.graph.cellRenderer.destroy(state);
+            state.invalid = true;
+            state.destroy();
+            this.graph.connectionHandler.constraintHandler.destroyIconsByState(state);
+        }
+    }
+
+    return state;
+};
 
 mxGraphViewBP.prototype = Object.create(mxGraphView.prototype);
 
-
+// drow connection points of all bp shapes (call show constraint)
 mxGraphViewBP.prototype.validate = function(cell)
 {
     var t0 = mxLog.enter('mxGraphView.validate');
@@ -1469,12 +1459,13 @@ mxGraphViewBP.prototype.validate = function(cell)
     mxLog.leave('mxGraphView.validate', t0);
 
 
+    console.log('validate');
+    // the only change
     this.graph.connectionHandler.constraintHandler.showConstraint();
-    // if(this.cells != null)
-    //     this.cells.foreach(x => fixConnectionPointsLabelLocation(this.graph,x));
+
 };
 
-
+// initial codec to mxGraphViewBP
 mxCodecRegistry.register(function()
 {
     /**
@@ -1670,12 +1661,57 @@ mxCodecRegistry.register(function()
 }());
 
 
-// mxGraph
+/*
+Objectives
+1. set edge label by his source connection point
+2. Block connection to start node
+3. after resizing cell fix his connection point label location
+ */
+
+mxGraph.prototype.isOutEdge = function(source,edge){
+    return edge.source.getId()==source.getId();
+};
+
+mxGraph.prototype.getNumOfOutEdges = function(source){
+    var result = 0 ;
+    for(var i=0 ; i<source.getEdgeCount() ; i++){
+        if (this.isOutEdge(source,source.edges[i]))
+            result++;
+    }
+    return result;
+};
+
+
+mxGraph.prototype.findCurrLabel = function(source, state) {
+    //there is only one constraint point
+    if(source.new_constraints == null)
+        return 1;
+    //search for the source constraint of the edge
+    var index = 0;
+    for(; index <= source.new_constraints.length; index++){
+        var constraint = source.new_constraints[index];
+        if(constraint.point.x == state.exitX && constraint.point.y == state.exitY)
+            break;
+    }
+    return index+1;
+}
+
+
+mxGraph.prototype.getOutEdges = function(source) {
+    var outEdges = [];
+    for (let i = 0; i < source.getEdgeCount(); i++) {
+        if (this.isOutEdge(source, source.edges[i]))
+            outEdges.push(source.edges[i])
+    }
+    outEdges.sort((edge)=>edge.getAttribute('labelNum'));
+    return outEdges;
+}
+
+// set edge label by his source connection point
 mxGraph.prototype.insertEdge = function(parent, id, value, source, target, style, state)
 {
-
     var edge = this.createEdge(parent, id, value, source, target, style, state);
-    if( edge==null)
+    if (edge == null)
         return null;
     return this.addEdge(edge, parent, source, target);
 };
@@ -1698,7 +1734,7 @@ mxGraph.prototype.createConnectionHandler = function()
     return new mxConnectionHandlerBP(this);
 };
 
-
+// Block connection to start node, and set edge label
 mxGraph.prototype.createEdge = function(parent, id, value, source, target, style, state)
 {
     // Creates the edge
@@ -1713,10 +1749,10 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
 
     //cases by nodes
     if(source!=null && getshape(source.getStyle())=="general" ){
-        var numberOfOutEdges = getNumOfOutEdges(source);
+        var numberOfOutEdges = this.getNumOfOutEdges(source);
         // if(numberOfOutEdges >= source.getAttribute('numberOfOutputs',1))
         //     return null;
-        var indexLabel =findCurrLabel(source, state);
+        var indexLabel =this.findCurrLabel(source, state);
         var label = source.getAttribute('Outputnumber'+(indexLabel),' ');
 
         var doc = mxUtils.createXmlDocument();
@@ -1730,24 +1766,33 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
 
     }else
     if(source!=null && getshape(source.getStyle())=="bsync" ){
-        var numberOfOutEdges = getNumOfOutEdges(source);
+        var numberOfOutEdges = this.getNumOfOutEdges(source);
         if(numberOfOutEdges >= 1)
             return null;
 
     }else if(source!=null && getshape(source.getStyle())=="startnode" ){
-        var numberOfOutEdges = getNumOfOutEdges(source);
+        var numberOfOutEdges = this.getNumOfOutEdges(source);
         if(numberOfOutEdges >= 1)
             return null;
     }
     return edge;
 };
 
-
+// after resizing cell fix his connection point label location
 mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
 {
     var output =  this.resizeCells([cell], [bounds], recurse)[0];
     fixConnectionPointsLabelLocation(this, cell, 0, 0);
     return output;
+};
+
+// use lock attribute
+mxGraph.prototype.isCellLocked = function(cell)
+{
+    var geometry = this.model.getGeometry(cell);
+
+    return this.isCellsLocked() || (geometry != null && this.model.isVertex(cell) && geometry.relative) ||
+        (cell.lock != null && cell.lock);
 };
 
 // edge entry from left only
@@ -1792,6 +1837,7 @@ mxGraph.prototype.getConnectionConstraint = function(edge, terminal, source)
 };
 
 
+// consider connection points as part of the shape when mouse is hover
 mxGraph.prototype.intersects = function(state, x, y)
 {
     if (state != null)
@@ -1830,6 +1876,7 @@ mxGraph.prototype.intersects = function(state, x, y)
                 y = pt.y;
             }
             //if (state.cell.contains(state, x, y))
+            //change if function
             if (this.shapeContains(state, x, y))
             {
                 return true;
@@ -1840,6 +1887,13 @@ mxGraph.prototype.intersects = function(state, x, y)
     return false;
 };
 
+//
+mxGraph.prototype.hitsSwimlaneContent = function(swimlane, x, y)
+{
+    return false;
+};
+
+// unsed -> may use to prevent connect start node as target
 mxGraph.prototype.isValidConnection = function(source, target)
 {
     // if(getshape(target.getStyle())=="startnode" || source == null || target == null)
@@ -1865,8 +1919,7 @@ mxGraph.prototype.isCellEditable = function(cell)
     return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
 };
 
-// sett all sells in graph unvisible
-
+// set all cells in graph visitable
 mxGraph.prototype.setAllCellsVisible = function(){
     var cells = [];
     if(this.getModel() != null && this.getModel().cells != null)
@@ -1876,7 +1929,7 @@ mxGraph.prototype.setAllCellsVisible = function(){
 
 }
 
-// set the dividers and payloads cells unvisible
+// set the dividers and payloads cells invisible
 mxGraph.prototype.setCellsUnvisible = function(){
     var cells = [];
     if(this.getModel() != null && this.getModel().cells != null)
@@ -1896,29 +1949,7 @@ mxGraph.prototype.createGraphView = function()
     return new mxGraphViewBP(this);
 };
 
-
-function mxTextBP(value, bounds, align, valign, color,
-                family,	size, fontStyle, spacing, spacingTop, spacingRight,
-                spacingBottom, spacingLeft, horizontal, background, border,
-                wrap, clipped, overflow, labelPadding, textDirection)
-{
-
-    mxText.call(this, value, bounds, align, valign, color,
-        family,	size, fontStyle, spacing, spacingTop, spacingRight,
-        spacingBottom, spacingLeft, horizontal, background, border,
-        wrap, clipped, overflow, labelPadding, textDirection);
-
-};
-
-
-mxTextBP.prototype = Object.create(mxText.prototype);
-
-
-mxTextBP.prototype.getTextRotation = function()
-{
-    return 0;
-};
-
+// when selecting child of bp shape select his parent
 mxGraphSelectionModel.prototype.setCells = function(cells)
 {
     if (cells != null)
