@@ -12,6 +12,7 @@ debuggerBP.prototype.mod = null;
 debuggerBP.prototype.lastUndo = 0;
 debuggerBP.prototype.lastLabels = {};
 debuggerBP.prototype.lastCellsSizes = {};
+debuggerBP.prototype.lastCellValues = {};
 debuggerBP.prototype.isFixed = 0;
 debuggerBP.prototype.isLocked = 0;
 debuggerBP.prototype.scenarios = {};
@@ -24,6 +25,20 @@ debuggerBP.prototype.savePreDebuggingInfo = function () {
     this.lastUndo = this.editor.undoManager.indexOfNextAdd;
     this.lastLabels = this.getLabels();
     this.lastCellsSizes = this.getCellsSizes();
+    this.lastCellValues = this.getValues();
+}
+
+debuggerBP.prototype.getValues = function(){
+    var res = {};
+
+    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
+    cells.forEach(cell => {
+        if (cell.children !== null && cell.children !== undefined)
+            cell.children.forEach(child => res[child.id] = child.getValue())
+        res[cell.id] = cell.getValue();
+    });
+
+    return res;
 }
 
 debuggerBP.prototype.setConsoleSteps = function (rec) {
@@ -34,11 +49,27 @@ debuggerBP.prototype.setConsoleSteps = function (rec) {
     });
 }
 
+debuggerBP.prototype.makePayloadSectionsVisible = function (bool) {
+    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
+    cells.forEach(cell => {
+        if (cell.children !== null && cell.children !== undefined) {
+            cell.children.forEach(child => child.setVisible(bool));
+        }
+    })
+}
+
+debuggerBP.prototype.fixCellsChildrenSizes = function(){
+    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
+    cells.forEach(cell => {
+        this.setToOriginal(cell)
+    })
+}
+
 debuggerBP.prototype.startDebugging = function(){
 
     this.savePreDebuggingInfo();
+    this.makePayloadSectionsVisible(true);
 
-    let undoAdd = 0;
 
     // Locks all layers
     let isLocked = this.editor.undoManager.indexOfNextAdd;
@@ -46,6 +77,7 @@ debuggerBP.prototype.startDebugging = function(){
     this.isLocked = this.editor.undoManager.indexOfNextAdd - isLocked;
 
     let isFixed = this.editor.undoManager.indexOfNextAdd;
+    this.fixCellsChildrenSizes();
     this.ui.fixView();
     this.isFixed = this.editor.undoManager.indexOfNextAdd - isFixed;
 
@@ -82,6 +114,7 @@ debuggerBP.prototype.endDebugging = function() {
     updateConsoleMessage("");
 
     this.setLabels();
+    this.makePayloadSectionsVisible(false);
 }
 
 debuggerBP.prototype.back = function () {
@@ -97,7 +130,7 @@ debuggerBP.prototype.back = function () {
 
         if (this.editor.undoManager.indexOfNextAdd == this.lastUndo + this.isLocked + this.isFixed)
             this.ui.enableDebugBack(false);
-        else if(this.editor.undoManager.indexOfNextAdd + this.isFixed == this.editor.undoManager.history.length)
+        else if(this.editor.undoManager.indexOfNextAdd == this.editor.undoManager.history.length - 1)
             this.ui.enableDebugNext(true);
     }
 }
@@ -137,24 +170,29 @@ debuggerBP.prototype.getLabels = function() {
 
 debuggerBP.prototype.getCellsSizes = function() {
     var res = {};
-    let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex() && getshape(cell.getStyle()) !== undefined);
+    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
     cells.forEach(cell => {
         var geo = this.mod.getGeometry(cell);
         res[cell.id] = {width: geo.width, height: geo.height}
+        if (cell.children !== null && cell.children !== undefined) {
+            cell.children.forEach(child => {
+                var cgeo = this.mod.getGeometry(child);
+                res[child.id] = {width: geo.width, height: cgeo.height}
+            })
+        }
     });
     return res;
 }
 
-debuggerBP.prototype.fixSizes = function(cell, content) {
-    var geo = this.mod.getGeometry(cell).clone();
+debuggerBP.prototype.fixSizes = function(cell, width, height) {
 
-    geo.width = this.lastCellsSizes[cell.id].width;
-    geo.height = this.lastCellsSizes[cell.id].width;
-    if(content != undefined) {
-        geo.width += (content.width * 4);
-        geo.height += (content.height * 16);
+    if (cell.children !== null && cell.children !== undefined) {
+        this.fixSizes(cell.children[2], width, height);
+        this.fixSizes(cell.children[1], width, 0);
     }
-
+    var geo = this.mod.getGeometry(cell).clone();
+    geo.width += width * 4;
+    geo.height += height * 16;
     this.mod.setGeometry(cell, geo);
 }
 
@@ -164,7 +202,7 @@ debuggerBP.prototype.convertPayloadToString = function(payload) {
     var width = 0;
     if(payload.constructor === Array) {
         payload.forEach(cur => {
-            var curRes = "Payloads[" + i + "]: " + JSON.stringify(cur) + "\n";
+            var curRes = "Payloads[" + i++ + "]: " + JSON.stringify(cur) + "\n";
             width = Math.max(width, curRes.length);
             res += curRes;
         })
@@ -179,35 +217,46 @@ debuggerBP.prototype.convertPayloadToString = function(payload) {
 }
 
 debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
-
-    // var content;
-    // var val = cell.clone().getValue();
-    // var style = cell.getStyle();
-    // val.setAttribute('label', "");
-    // style = style.replace('fillColor=#ffff99', 'fillColor=#ffffff');
-    // if (payload !== undefined) {
-    //     style = style.replace('fillColor=#ffffff', 'fillColor=#ffff99');
-    //     if (getshape(cell.getStyle()) !== "startnode") {
-    //         content = this.convertPayloadToString(payload);
-    //         val.setAttribute('label', content.text);
-    //     }
-    // }
-    // this.mod.setStyle(cell, style);
-    // this.mod.setValue(cell, val);
-    // this.fixSizes(cell, content);
-    // var ret = content !== undefined ? content.text : "";
-    // return ret;
+    var cellToUpdate = cell;
+    var val;
+    var color = "none";
+    var width = 0;
+    var height = 0;
     if (payload !== undefined) {
-        if (getshape(cell.getStyle()) !== "startnode") {
+        color = "#99ff99";
+        if (cell.bp_type !== "startnode") {
+            if (cell.children !== null && cell.children !== undefined) {
+                cellToUpdate = cell.children[2];
+            }
             var content = this.convertPayloadToString(payload);
-            cell.children[2].setVisible(true);
-            this.mod.setValue(cell.children[2], content.text);
+            val = content.text;
+            width = content.width;
+            height = content.height;
         }
     }
+    this.fixSizes(cell, width, height);
+    mxUtils.setCellStyles(this.mod, [cellToUpdate], 'fillColor', color);
+    if(val !== undefined)
+        this.mod.setValue(cellToUpdate, val);
+}
+
+debuggerBP.prototype.setToOriginal = function (cell) {
+    var geo = this.mod.getGeometry(cell).clone();
+    geo.width = this.lastCellsSizes[cell.id].width;
+    geo.height = this.lastCellsSizes[cell.id].height;
+    if (cell.children !== null && cell.children !== undefined){
+        this.setToOriginal(cell.children[1]);
+        this.setToOriginal(cell.children[2]);
+
+        mxUtils.setCellStyles(this.mod, [cell.children[2]], 'fillColor', 'none');
+        this.mod.setValue(cell.children[2], '');
+    }
+    this.mod.setGeometry(cell, geo);
+    this.mod.setValue(cell, this.lastCellValues[cell.id]);
 }
 
 debuggerBP.prototype.updateVertexCells = function(record) {
-    let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex() && getshape(cell.getStyle()) !== undefined);
+    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
 
     for (let i = 0; i < record.length; i++) {
         this.mod.beginUpdate();
@@ -215,7 +264,8 @@ debuggerBP.prototype.updateVertexCells = function(record) {
         let curStage = record[i].stages;
 
         cells.forEach(cell => {
-            this.graph.fixValue(cell);
+            this.setToOriginal(cell);
+            //this.graph.fixValue(cell);
             this.updateCell(cell, curStage[cell.id])
         });
 

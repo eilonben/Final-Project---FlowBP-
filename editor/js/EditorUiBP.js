@@ -84,7 +84,7 @@ EditorUiBP.prototype.disableActionsForDebugging = function () {
         actions[i].setEnabled(false);
     }
 
-    actions = ['debug_stop', 'debug_next'];
+    actions = ['debug_stop', 'debug_next', 'showConsole'];
     for (var i = 0; i < actions.length; i++) {
         this.actions.get(actions[i]).setEnabled(true);
     }
@@ -148,10 +148,10 @@ EditorUiBP.prototype.saveFile = function(forceDialog)
 };
 
 EditorUiBP.prototype.fixView = function() {
-    var cells = Object.values(this.editor.graph.model.cells).filter(cell =>
-        cell.bp_type == "BSync" || cell.bp_type == "BSync")
-    this.editor.graph.setSelectionCells(cells);
-    new mxHierarchicalLayout(this.editor.graph, mxConstants.DIRECTION_WEST).execute(this.editor.graph.getDefaultParent(), null);
-    fixConnectionRelatedBugs(this.editor.graph);
-    this.editor.graph.clearSelection();
+    var graph = this.editor.graph;
+    var cells = Object.values(graph.model.cells).filter(cell => cell.bp_cell || graph.model.isEdge(cell))
+    graph.setSelectionCells(cells);
+    new mxHierarchicalLayout(graph, mxConstants.DIRECTION_WEST).execute(graph.getDefaultParent(), graph.getSelectionCells());
+    fixConnectionRelatedBugs(graph);
+    graph.clearSelection();
 }
