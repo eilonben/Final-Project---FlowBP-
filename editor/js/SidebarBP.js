@@ -240,27 +240,31 @@ SidebarBP.prototype.createBPShape = function(name, shape)
 {
 
     //initial cells
-    var data = new mxCell('', new mxGeometry(0, 25, 160, 26), 'text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[];');
+    var data = new mxCell('empty', new mxGeometry(0, 25, 100, 26), 'text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[];');
     data.vertex = true;
     data.lock = true;
     data.selectable = false;
     data.bp_type = 'data';
     data.bp_cell = false;
+    // data.connectable = false;
 
     // divider line
-    var divider = new mxCell('', new mxGeometry(0, 50, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];resizeParent=1;');
+    var divider = new mxCell('', new mxGeometry(0, 50, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;rotatable=0;points=[];');
     divider.vertex = true;
     divider.lock = true;
     divider.selectable = false;
     divider.bp_type = 'divider';
     divider.visible = false;
     divider.bp_cell = false;
+    // divider.connectable = false;
 
     var payload = this.cloneCell(data, '');
     payload.geometry.y = 55;
     payload.bp_type = 'payloads';
     payload.visible = false;
     payload.bp_cell = false;
+    // payload.connectable = false;
+
 
     var cellStyle = 'shape=' + shape + ';swimlane;fontStyle=1;align=center;verticalAlign=top;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rotatable=0;';
 
