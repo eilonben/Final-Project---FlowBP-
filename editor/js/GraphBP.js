@@ -216,12 +216,8 @@ GraphBP.prototype.shapeContains = function(state, x, y) {
             var constaintImg = this.connectionHandler.constraintHandler.getImageForConstraint(state, constraint, constraintPoint);
             var constraintWidth = constaintImg.width  * size;
             var constraintHeight = constaintImg.height  * size;
-            contains = constraintPointX - constraintWidth <= x && constraintPointX + constraintWidth >= x &&
+            contains = constraintPointX - constraintWidth <= x && constraintPointX + constraintWidth*1.5 >= x &&
                 constraintPointY - constraintHeight <= y && constraintPointY + constraintHeight >= y;
-            var t =constraintPointX - constraintWidth;
-            var u = constraintPointX + constraintWidth;
-            var look =  constraintPointX - constraintWidth <= x && constraintPointX + constraintWidth >= x;
-            // console.log(""+ t +" <=" +  x + "<=" + u +look );
             if(contains)
                 return true;
 

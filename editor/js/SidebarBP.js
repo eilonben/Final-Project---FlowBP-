@@ -239,18 +239,16 @@ SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
 SidebarBP.prototype.createBPShape = function(name, shape)
 {
     //initial cells
-    var data = new mxCell('empty', new mxGeometry(0, 25, 100, 26), 'text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[];');
+    var data = new mxCell('empty', new mxGeometry(0, 25, 100, 26), 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;connectable=0;');
     data.vertex = true;
-    data.lock = true;
     data.selectable = false;
     data.bp_type = 'data';
     data.bp_cell = false;
     // data.connectable = false;
 
     // divider line
-    var divider = new mxCell('', new mxGeometry(0, 50, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;rotatable=0;points=[];');
+    var divider = new mxCell('', new mxGeometry(0, 50, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;rotatable=0;points=[];part=1;connectable=0;');
     divider.vertex = true;
-    divider.lock = true;
     divider.selectable = false;
     divider.bp_type = 'divider';
     divider.visible = false;

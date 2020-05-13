@@ -73,10 +73,10 @@ function updateConnectionPointsLabels(graph, cell, labels){
             else {
                 var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
                 var cp = cell.new_constraints[i].point;
-                var prefix = 'shape=flow.label;';
+                var prefix = 'shape=label;';
                 var x = cp.x * cell.getGeometry().width;
                 var y = cp.y * cell.getGeometry().height - constraint_img_height;
-                var labelVertex = graph.insertVertex(cell, null, label, x, y, 0, 0, prefix + 'labelPosition=right;align=left;childLayout=stackLayout;');
+                var labelVertex = graph.insertVertex(cell, null, label, x, y, 0, 0, prefix + 'labelPosition=right;align=left;childLayout=stackLayout;points=[]');
                 labelVertex.selectable = false;
                 labelVertex.lock = true;
                 labelVertex.label_index = i;

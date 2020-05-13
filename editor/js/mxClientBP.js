@@ -94,7 +94,6 @@ mxConnectionHandlerBP.prototype.insertEdge = function(parent, id, value, source,
     }
     else
     {
-
         var edge = this.createEdge(value, source, target, style);
         edge = this.graph.addEdge(edge, parent, source, target);
 
@@ -684,7 +683,7 @@ mxConstraintHandlerBP.prototype.update = function(me, source, existingEdge, poin
         var grid = new mxRectangle(x - tol, y - tol, 2 * tol, 2 * tol);
         var mouse = new mxRectangle(me.getGraphX() - tol, me.getGraphY() - tol, 2 * tol, 2 * tol);
         /*this.graph.getCellAt(x,y) - the change*/
-        var state = this.graph.view.getState(this.graph.getCellAt(x,y));
+        var state = this.graph.view.getState(this.graph.getCellAt(x, y));
 
         // Keeps focus icons visible while over vertex bounds and no other cell under mouse or shift is pressed
         if (!this.isKeepFocusEvent(me) && (this.currentFocusArea == null || this.currentFocus == null ||
@@ -805,9 +804,9 @@ mxConstraintHandlerBP.prototype.redraw = function()
         this.currentFocus = state;
         this.currentFocusArea = new mxRectangle(state.x, state.y, state.width, state.height);
 
-        var allIcons = state == null || this.focusIcons[state.cell.id] == null ? Object.values(this.focusIcons).flat() : this.focusIcons[state.cell.id] ;
+        var allIcons = (state == null || this.focusIcons[state.cell.id] == null) ? Object.values(this.focusIcons).flat() : this.focusIcons[state.cell.id] ;
 
-        for (var i = 0; i < allIcons.length; i++)
+        for (var i = 0; i < allIcons.length && i < this.constraints.length; i++)
         {
             var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
@@ -850,7 +849,7 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
     if (this.constraints != null)
     {
         this.currentFocus = state;
-        this.currentFocusArea = new mxRectangle(state.x, state.y, state.width, state.height);
+        this.currentFocusArea = new mxRectangle(state.x, state.y, state.width + 10, state.height);
 
         if (this.focusIcons[state.cell.id] != null)
         {
@@ -871,6 +870,9 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
             // when hover a shape hide input icon (if shape is the source).
             if(this.constraints[i].name == "I" && source)
                 continue;
+            var t = 0;
+            if(!source)
+                t=1;
             var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
 
@@ -1012,23 +1014,11 @@ mxGraphHandler.prototype.isRemoveCellsFromParent = function(value)
 mxGraphHandlerBP.prototype = Object.create(mxGraphHandler.prototype);
 
 
-mxGraphHandlerBP.prototype.getMovableCells= function(cells){
-    //cells without lock or
-    var unlockedCells = cells.filter(cell => !(cell.lock != null && cell.lock));
-    var lockedCells = cells.filter(cell => cell.lock != null && cell.lock);
-    //the locked cells that their parents also include
-    var validCells = lockedCells.filter(cell => cell.parent != null && cells.includes(cell.parent))
-    var tmp =  unlockedCells.concat(validCells);
-    return tmp;
-}
-
 // This is for preventing moving only an edge without its source and target
 // and preventing move locked cells
 mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, evt) {
 
-    cells = this.getMovableCells(cells);
-    if (cells.length == 0)
-        return ;
+
     // //this is new
     const edges = cells.filter(cell => cell.getStyle().includes("edgeStyle"));
     const shapes = cells.filter(cell => cell.getStyle().includes('shape'));
@@ -1474,7 +1464,6 @@ mxGraphViewBP.prototype.validate = function(cell)
     mxLog.leave('mxGraphView.validate', t0);
 
 
-    console.log('validate');
     // the only change
     this.graph.connectionHandler.constraintHandler.showConstraint();
 
@@ -1684,7 +1673,7 @@ Objectives
  */
 mxGraph.prototype.isOutEdge = function(source,edge){
     return edge.source.getId()==source.getId();
-};
+
 
 mxGraph.prototype.getNumOfOutEdges = function(source){
     var result = 0 ;
@@ -1901,7 +1890,7 @@ mxGraph.prototype.intersects = function(state, x, y)
     return false;
 };
 
-//
+
 mxGraph.prototype.hitsSwimlaneContent = function(swimlane, x, y)
 {
     return false;
@@ -1922,16 +1911,16 @@ mxGraph.prototype.isCellSelectable = function(cell)
     return this.isCellsSelectable();
 };
 
-mxGraph.prototype.isCellEditable = function(cell)
-{
-    if(cell != null && cell.lock != null && cell.lock)
-        return false;
-
-    var state = this.view.getState(cell);
-    var style = (state != null) ? state.style : this.getCellStyle(cell);
-
-    return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
-};
+// mxGraph.prototype.isCellEditable = function(cell)
+// {
+//     if(cell != null && cell.lock != null && cell.lock)
+//         return false;
+//
+//     var state = this.view.getState(cell);
+//     var style = (state != null) ? state.style : this.getCellStyle(cell);
+//
+//     return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
+// };
 
 // set all cells in graph visitable
 mxGraph.prototype.setAllCellsVisible = function(){

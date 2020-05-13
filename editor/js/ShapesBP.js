@@ -64,22 +64,6 @@ mxUtils.extend(ConsoleShape, FlowShape);
 
 mxCellRenderer.registerShape('flow.console', ConsoleShape);
 
-
-//******************************************text***********************************************
-function TextFlow()
-{
-    mxTextBP.call(this);
-};
-
-
-
-mxUtils.extend(TextFlow, mxTextBP);
-
-TextFlow.prototype.constraints = [];
-
-mxCellRenderer.registerShape('flow.text', TextFlow);
-
-
 //******************************************labele***********************************************
 function LabelFlow()
 {
