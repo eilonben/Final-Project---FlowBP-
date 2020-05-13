@@ -144,7 +144,8 @@ mxConnectionHandlerBP.prototype.init = function()
 };
 
 // after connecting edge into vertex redefine the target connection point to the left side
-mxConnectionHandlerBP.prototype.checkAndFixBorder = function(edge) {
+mxConnectionHandlerBP.prototype.checkAndFixBorder = function(edge)
+{
     var styles = edge.style.trim().split(";");
     styles=styles.map(x=>x.split("="));
     var stylesDic={};
@@ -164,7 +165,7 @@ mxConnectionHandlerBP.prototype.checkAndFixBorder = function(edge) {
     }
     edge.style=newStyle;
 
-}
+};
 
 // Not resolved yet - might help when you placing the mouse on the child to mark his parent
 mxConnectionHandler.prototype.mouseMove = function(sender, me)
@@ -436,7 +437,8 @@ mxConnectionHandlerBP.prototype.isInnerChild = function(cell){
 
 
 // when connecting into child of bp -> connect to his parent
-mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarget) {
+mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarget)
+{
 
     if (target != null || this.isCreateTarget(evt) || this.graph.allowDanglingEdges) {
         // Uses the common parent of source and target or
@@ -822,7 +824,8 @@ mxConstraintHandlerBP.prototype.redraw = function()
 };
 
 // define the connection points location on the cell by the type of connection
-mxConstraintHandlerBP.prototype.getConstraintLocation = function (state, constraints, size){
+mxConstraintHandlerBP.prototype.getConstraintLocation = function (state, constraints, size)
+{
     var cp = this.graph.getConnectionPoint(state, constraints);
     var img = this.getImageForConstraint(state, constraints, cp);
     var cell = state.cell;
@@ -839,7 +842,6 @@ mxConstraintHandlerBP.prototype.getConstraintLocation = function (state, constra
 // hide input connection points
 mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 {
-
     var size = this.graph.view.scale;
     this.constraints = (state != null && !this.isStateIgnored(state, source) &&
         this.graph.isCellConnectable(state.cell)) ? ((this.isEnabled()) ?
@@ -1016,8 +1018,8 @@ mxGraphHandlerBP.prototype = Object.create(mxGraphHandler.prototype);
 
 // This is for preventing moving only an edge without its source and target
 // and preventing move locked cells
-mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, evt) {
-
+mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, evt)
+{
 
     // //this is new
     const edges = cells.filter(cell => cell.getStyle().includes("edgeStyle"));
@@ -1671,8 +1673,9 @@ Objectives
 2. Block connection to start node
 3. after resizing cell fix his connection point label location
  */
-mxGraph.prototype.isOutEdge = function(source,edge){
-    return edge.source.getId()==source.getId();
+mxGraph.prototype.isOutEdge = function(source,edge) {
+    return edge.source.getId() == source.getId();
+};
 
 
 mxGraph.prototype.getNumOfOutEdges = function(source){
@@ -1930,7 +1933,7 @@ mxGraph.prototype.setAllCellsVisible = function(){
 
     cells.map(cell => (cell != null && cell.visible != null) ? cell.visible = true : null);
 
-}
+};
 
 // set the dividers and payloads cells invisible
 mxGraph.prototype.setCellsUnvisible = function(){
@@ -1944,7 +1947,7 @@ mxGraph.prototype.setCellsUnvisible = function(){
             cell.visible = false;
     }
 
-}
+};
 
 
 mxGraph.prototype.createGraphView = function()
