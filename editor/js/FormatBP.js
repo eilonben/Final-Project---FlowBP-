@@ -29,6 +29,29 @@ function fixConnectionPointsLabelLocation(graph, cell, x, y) {
 };
 
 
+function getMapStyle(style) {
+    var result = new Map();
+
+    if (style != null) {
+        var pairs = style.split(';');
+
+        for (var i = 0; i < pairs.length; i++) {
+            var pair = pairs[i].split('=');
+            if (pair.length == 2)
+                result.set(pair[0], pair[1])
+        }
+    }
+
+    return result;
+};
+
+function getValueByKey(style, key, defult) {
+    var map = getMapStyle(style);
+    return map.get(key) || defult;
+
+};
+
+
 FormatBP = function (editorUi, container) {
     Format.call(this, editorUi, container);
 };
@@ -76,7 +99,7 @@ FormatBP.prototype.adjustConnectionPoints = function (cell, connection_number, g
     this.validateNewConstraint(cell, graph);
     // input constraint always at the end of the list
     var cellHight = cell.geometry.height;
-    var cellTitle = 26;
+    var cellTitle = getValueByKey(cell.getStyle(),'startSize',26);
     // var cellTitel = mxUtils.getValue(,'startSize',90);
     var cellContent = cellHight -  cellTitle;
     var inputConstraint = cell.new_constraints.filter(x => x.name == "I");
