@@ -54,7 +54,7 @@ debuggerBP.prototype.makePayloadSectionsVisible = function (bool) {
     let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
     cells.forEach(cell => {
         if (cell.children !== null && cell.children !== undefined) {
-            cell.children.forEach(child => child.bp_type != null ? child.setVisible(bool) : null);
+            cell.children.forEach(child => child.setVisible(bool));
             cell.children[0].setVisible(true);
         }
     })
@@ -116,7 +116,6 @@ debuggerBP.prototype.endDebugging = function() {
     updateConsoleMessage("");
 
     this.setLabels();
-    this.fixAllLabels();
     this.makePayloadSectionsVisible(false);
 }
 
@@ -274,15 +273,6 @@ debuggerBP.prototype.setToOriginal = function (cell) {
     this.mod.setValue(cell, this.lastCellValues[cell.id]);
 }
 
-debuggerBP.prototype.fixAllLabels = function(){
-    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
-
-    cells.forEach(cell => {
-        this.editor.graph.fixConnectionPointsLabelLocation(cell,2);
-    });
-};
-
-
 debuggerBP.prototype.updateVertexCells = function(record) {
     let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
 
@@ -299,7 +289,9 @@ debuggerBP.prototype.updateVertexCells = function(record) {
 
         this.ui.fixView();
 
-        this.fixAllLabels();
+        cells.forEach(cell => {
+            fixConnectionPointsLabelLocation(this.editor.graph, cell)
+        });
 
         this.mod.endUpdate();
     }
@@ -354,7 +346,8 @@ debuggerBP.prototype.getProgramRecord = function() {
         var scens = Object.values(this.scenarios);
         curStage.stages = {};
         for (let j = 0; j < scens.length; j++) {
-            curStage.stages[scens[j][step][0]] = scens[j][step][1];
+            if(scens[j][step][0] != -1)
+                curStage.stages[scens[j][step][0]] = scens[j][step][1];
         }
         if(this.events[step] != -1)
             curStage.eventSelected = this.events[step];
