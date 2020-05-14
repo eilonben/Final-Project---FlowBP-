@@ -50,20 +50,17 @@ debuggerBP.prototype.setConsoleSteps = function (rec) {
     });
 }
 
-debuggerBP.prototype.VisibilityIsChangeable = function(name){
-    return name != null && (name != 'data' || name != 'divider' || name != 'label');
+debuggerBP.prototype.VisibilityIsChangeable = function(type){
+    return type != null && type != 'data' && type != 'divider' && type != 'label';
 
 }
 debuggerBP.prototype.makePayloadSectionsVisible = function (bool) {
-    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
+    let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
     cells.forEach(cell => {
-        if (cell.children !== null && cell.children !== undefined) {
             cell.children.forEach(child => {
                 if(this.VisibilityIsChangeable(child.bp_type))
                     child.setVisible(bool)
             });
-
-        }
     })
 }
 
@@ -108,7 +105,8 @@ debuggerBP.prototype.startDebugging = function(){
 
     if (numOfUndos == 0)
         this.ui.enableDebugNext(false);
-}
+
+};
 
 debuggerBP.prototype.endDebugging = function() {
 
@@ -288,7 +286,7 @@ debuggerBP.prototype.setToOriginal = function (cell) {
 
 
 debuggerBP.prototype.fixAllOutputsLabels = function() {
-    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
+    let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
     cells.forEach(cell => {
         this.editor.graph.fixConnectionPointsLabelLocation(cell);
     })
@@ -296,7 +294,7 @@ debuggerBP.prototype.fixAllOutputsLabels = function() {
 
 
 debuggerBP.prototype.fixDataCells = function() {
-    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
+    let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
     cells.forEach(cell => {
         var data = this.graph.getChildByType(cell, 'data');
         data.geometry.height = 0;

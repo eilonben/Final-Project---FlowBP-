@@ -1721,20 +1721,27 @@ mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell, x, y) {
 
 mxGraph.prototype.getChildByType = function(cell, type)
 {
-    var filterd = cell.children.filter(x => x.bp_type != null && x.bp_type == type);
-    return filterd.length == 0 ? null : filterd[0];
+    var child = null;
+    if(cell.children != null) {
+        var filterd = cell.children.filter(x => x.bp_type != null && x.bp_type == type);
+        child = filterd.length == 0 ? null : filterd[0];
+    }
+    return child;
 };
 
 // relocate diviser to be at the defult size
 mxGraph.prototype.fixBPChildren = function(cell){
-    //
+
     var divider = this.getChildByType(cell, 'divider');
-    divider.geometry.y = mxGraph.headLineSize * 0.7;
+    if(divider != null)
+        divider.geometry.y = mxGraph.headLineSize * 0.7;
     //
     var cellHeight = cell.geometry.height;
     var data = this.getChildByType(cell, 'data');
-    data.geometry.height = cellHeight - mxGraph.headLineSize;
-    data.geometry.y = mxGraph.headLineSize ;
+    if(data != null) {
+        data.geometry.height = cellHeight - mxGraph.headLineSize;
+        data.geometry.y = mxGraph.headLineSize;
+    }
 
 };
 
@@ -2053,3 +2060,5 @@ mxGraphSelectionModel.prototype.setCells = function(cells)
         this.changeSelection(tmp, this.cells);
     }
 };
+
+mxCell.prototype.isBPCell = function() {return this.bp_cell != null && this.bp_cell && this.bp_type != 'startnode'; }
