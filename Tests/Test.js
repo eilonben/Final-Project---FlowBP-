@@ -208,6 +208,20 @@ var testLegalGraph = function () {
     }
     return resulte.length == 0 ;
 }
+
+var testExceptionHandle =function () {
+    var expected = ["Before error"];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/ExceptionHandle.xml");
+    try {
+        parse_graph(xml);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
 function initConsole() {
     var textarea = document.createElement('textarea');
     textarea.setAttribute("id", "ConsoleText1");
@@ -230,8 +244,10 @@ var runTests = function() {
     run("payloadChange", testPayloadChange);    /*check that the payloads that apply in the start node can by change their value.
                                                     passes the payloads with the news changes between nodes and check the current new value of them*/
     run("PayloadsIfElse", testPayloadsIfElse);    //check that general node send other payloads to other outputs, according to the user-defined in the "if-else" condition.
-    run("Illegal Graph", testIllegalGraph);
+    run("Illegal Graph", testIllegalGraph);         //check if the graph has a lonely start node or edge without target or source.
     run("LegalGraph", testLegalGraph);
+    run("ExceptionHandle", testExceptionHandle);    //check that when occur error while executing the JS code on node the execution is terminated.
+
 }
 
 runTests();
