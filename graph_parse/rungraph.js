@@ -112,6 +112,9 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
             }
         }
     }
+    else{
+        window.bpEngine.deb.endScen(scen);
+    }
 }
 
 
@@ -132,7 +135,7 @@ function runInNewBT(c, payloads, bpEngine, model, curTime) {
             // cloned["selected"] = window.eventSelected;
         }
 
-        yield* goToFollowers(c, cloned, bpEngine,model,outputs, c.id);
+        yield* goToFollowers(c, cloned, bpEngine,model,outputs, c.scenarioID);
     }());
 
 };
@@ -180,12 +183,15 @@ function handleNodeAttributes(c, outputs, cloned, payloads) {
 function* runInSameBT(c, payloads, bpEngine, model, scen) {
     let outputs = {};
     let cloned = JSON.parse(JSON.stringify(payloads));
+
+    window.bpEngine.deb.updateScen(scen, c, cloned);
+
+    cloned = JSON.parse(JSON.stringify(payloads));
+
     outputs = handleNodeAttributes(c, outputs, cloned, payloads);
     if(outputs === -1){
         return;
     }
-
-    window.bpEngine.deb.updateScen(scen, c, cloned);
 
     if (c.getAttribute("sync") !== undefined) {
         let stmt = JSON.parse(c.getAttribute("sync"));
