@@ -264,7 +264,7 @@ SidebarBP.prototype.createBPShape = function(name, shape)
     // payload.connectable = false;
 
 
-    var cellStyle = 'shape=' + shape + ';swimlane;fontStyle=1;align=center;verticalAlign=top;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rotatable=0;overflow=auto';
+    var cellStyle = 'shape=' + shape + ';fontStyle=1;align=center;verticalAlign=top;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rotatable=0;overflow=auto';
 
     // shape
     var cell = new mxCell(name, new mxGeometry(0, 0, 160, 90), cellStyle);
