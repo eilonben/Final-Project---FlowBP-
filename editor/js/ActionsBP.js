@@ -111,7 +111,9 @@ ActionsBP.prototype.init = function (actions) {
             mxUtils.alert("Graph is Invalid! disconnected start node or edge");
             return;
         }
-
+        if(window.executeError) {
+            return;
+        }
         // Moves the UI into debugging mode
         ui.startDebugging();
 
