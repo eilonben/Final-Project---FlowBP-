@@ -15,6 +15,7 @@ debuggerBP.prototype.lastCellsSizes = {};
 debuggerBP.prototype.lastCellValues = {};
 debuggerBP.prototype.isFixed = 0;
 debuggerBP.prototype.isLocked = 0;
+debuggerBP.prototype.scenCounter = 0
 debuggerBP.prototype.scenarios = {};
 debuggerBP.prototype.consoleSteps = [""];
 debuggerBP.prototype.events = [];
@@ -366,20 +367,26 @@ debuggerBP.prototype.initDebug = function() {
     this.consoleSteps = [""];
     this.scenarios = {}
     this.events = [];
+    this.scenCounter = 0;
     updateConsoleMessage("");
 }
 
 debuggerBP.prototype.newScen = function(c, curTime, cloned) {
-    c.setAttribute("scenarioID", c.id);
-    this.scenarios[c.id] = [];
+    let scen = this.scenCounter++;
+    c.scenarioID = scen;
+    this.scenarios[scen] = [];
     for (let i = 0; i < curTime; i++)
-        this.scenarios[c.id].push([-1, null]);
-    this.scenarios[c.id].push([c.id, cloned]);
+        this.scenarios[scen].push([-1, null]);
+    this.scenarios[scen].push([c.id, cloned]);
 }
 
 debuggerBP.prototype.updateScen = function(scen, c, cloned) {
-    c.setAttribute("scenarioID", scen);
+    //c.setAttribute("scenarioID", scen);
     this.scenarios[scen].push([c.id, cloned]);
+}
+
+debuggerBP.prototype.endScen = function(scen) {
+    this.scenarios[scen].push([-1, null]);
 }
 
 debuggerBP.prototype.getScenarioTime = function(scen) {
