@@ -172,6 +172,42 @@ var testPayloadsIfElse =function () {
     return expected.toString() === resulte.toString();
 }
 
+var testIllegalGraph = function () {
+    var xml = loadXMl("XML_for_tests/UnlegalGraph.xml");
+    var resulte=[];
+    try {
+        let doc = mxUtils.parseXml(xml);
+        let codec = new mxCodec(doc);
+        let model = new mxGraphModel();
+        codec.decode(doc.documentElement, model);
+
+        resulte = findInvalidCells(model);
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    if( resulte.length == 2 && ((resulte[0].isVertex() && resulte[1].isEdge()) || (resulte[1].isVertex() && resulte[0].isEdge())) )
+        return true;
+    else
+        return false;
+}
+
+var testLegalGraph = function () {
+    var xml = loadXMl("XML_for_tests/HotCold.xml");
+    var resulte=[];
+    try {
+        let doc = mxUtils.parseXml(xml);
+        let codec = new mxCodec(doc);
+        let model = new mxGraphModel();
+        codec.decode(doc.documentElement, model);
+
+        resulte = findInvalidCells(model);
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return resulte.length == 0 ;
+}
 function initConsole() {
     var textarea = document.createElement('textarea');
     textarea.setAttribute("id", "ConsoleText1");
@@ -194,6 +230,8 @@ var runTests = function() {
     run("payloadChange", testPayloadChange);    /*check that the payloads that apply in the start node can by change their value.
                                                     passes the payloads with the news changes between nodes and check the current new value of them*/
     run("PayloadsIfElse", testPayloadsIfElse);    //check that general node send other payloads to other outputs, according to the user-defined in the "if-else" condition.
+    run("Illegal Graph", testIllegalGraph);
+    run("LegalGraph", testLegalGraph);
 }
 
 runTests();
