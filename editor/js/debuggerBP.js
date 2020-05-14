@@ -54,6 +54,7 @@ debuggerBP.prototype.makePayloadSectionsVisible = function (bool) {
     cells.forEach(cell => {
         if (cell.children !== null && cell.children !== undefined) {
             cell.children.forEach(child => child.setVisible(bool));
+            cell.children[0].setVisible(true);
         }
     })
 }
@@ -184,16 +185,37 @@ debuggerBP.prototype.getCellsSizes = function() {
     return res;
 }
 
-debuggerBP.prototype.fixSizes = function(cell, width, height) {
-
-    if (cell.children !== null && cell.children !== undefined) {
-        this.fixSizes(cell.children[2], width, height);
-        this.fixSizes(cell.children[1], width, 0);
+debuggerBP.prototype.fixSizes = function(cell, toDef) {
+    if(toDef){
+        var geo = this.mod.getGeometry(cell).clone();
+        geo.width = this.lastCellsSizes[cell.id].width;
+        geo.height = this.lastCellsSizes[cell.id].height;
+        this.mod.setGeometry(cell, geo);
     }
-    var geo = this.mod.getGeometry(cell).clone();
-    geo.width += width * 4;
-    geo.height += height * 16;
-    this.mod.setGeometry(cell, geo);
+    else {
+        var dWidth = 0;
+        var pWidth = 0;
+        var dHeight = 0;
+        var pHeight = 0;
+        var geo = this.mod.getGeometry(cell).clone();
+        if (cell.children !== null && cell.children !== undefined) {
+            this.graph.cellSizeUpdated(cell.children[0], true);
+            //this.graph.updateCellSize(cell.children[0], true);
+            dWidth = this.mod.getGeometry(cell.children[0]).width;
+            dHeight = this.mod.getGeometry(cell.children[0]).height;
+            this.graph.cellSizeUpdated(cell.children[2], true);
+            //this.graph.updateCellSize(cell.children[2], true);
+            pWidth = this.mod.getGeometry(cell.children[2]).width;
+            pHeight = this.mod.getGeometry(cell.children[2]).height;
+            //this.fixSizes(cell.children[2], width, height);
+        }
+        geo.width = Math.max(dWidth, pWidth, this.lastCellsSizes[cell.id].width);
+        geo.height = dHeight + pHeight + this.lastCellsSizes[cell.children[1].id].height + 32;
+        this.mod.setGeometry(cell, geo);
+        var tmpGeo = this.mod.getGeometry(cell.children[0]).clone();
+        tmpGeo.width = Math.max(geo.width, dWidth, pWidth);
+        this.mod.setGeometry(cell.children[0], tmpGeo);
+    }
 }
 
 debuggerBP.prototype.convertPayloadToString = function(payload) {
@@ -206,38 +228,33 @@ debuggerBP.prototype.convertPayloadToString = function(payload) {
             width = Math.max(width, curRes.length);
             res += curRes;
         })
-
     }
     else{
         var curRes = "Payload: " + JSON.stringify(payload) + "\n";
         width = Math.max(width, curRes.length);
         res += curRes;
     }
-    return {text: res, width: width, height: i};
+    return res + "\n";
 }
 
 debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
     var cellToUpdate = cell;
     var val;
     var color = "none";
-    var width = 0;
-    var height = 0;
     if (payload !== undefined) {
         color = "#99ff99";
         if (cell.bp_type !== "startnode") {
             if (cell.children !== null && cell.children !== undefined) {
                 cellToUpdate = cell.children[2];
             }
-            var content = this.convertPayloadToString(payload);
-            val = content.text;
-            width = content.width;
-            height = content.height;
+            val = this.convertPayloadToString(payload);
         }
     }
-    this.fixSizes(cell, width, height);
     mxUtils.setCellStyles(this.mod, [cellToUpdate], 'fillColor', color);
     if(val !== undefined)
         this.mod.setValue(cellToUpdate, val);
+    if (cell.bp_type !== "startnode")
+        this.fixSizes(cell, payload === undefined);
 }
 
 debuggerBP.prototype.setToOriginal = function (cell) {
@@ -270,6 +287,10 @@ debuggerBP.prototype.updateVertexCells = function(record) {
         });
 
         this.ui.fixView();
+
+        cells.forEach(cell => {
+            fixConnectionPointsLabelLocation(this.editor.graph, cell)
+        });
 
         this.mod.endUpdate();
     }

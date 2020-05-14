@@ -149,9 +149,8 @@ EditorUiBP.prototype.saveFile = function(forceDialog)
 
 EditorUiBP.prototype.fixView = function() {
     var graph = this.editor.graph;
-    var cells = Object.values(graph.model.cells).filter(cell => cell.bp_cell || graph.model.isEdge(cell))
+    var cells = Object.values(graph.model.cells);
     graph.setSelectionCells(cells);
     new mxHierarchicalLayout(graph, mxConstants.DIRECTION_WEST).execute(graph.getDefaultParent(), graph.getSelectionCells());
-    fixConnectionRelatedBugs(graph);
     graph.clearSelection();
 }
