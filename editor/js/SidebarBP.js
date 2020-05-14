@@ -240,7 +240,7 @@ SidebarBP.prototype.createBPShape = function(name, shape)
 {
 
     //initial cells
-    var data = new mxCell('', new mxGeometry(0, 25, 100, 26), 'text;fillColor=none;align=left;verticalAlign=top;overflow=auto;rotatable=0;points=[];part=1;connectable=0;');
+    var data = new mxCell('empty', new mxGeometry(0, 25, 160, 90), 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;connectable=0;');
     data.vertex = true;
     data.selectable = false;
     data.bp_type = 'data';

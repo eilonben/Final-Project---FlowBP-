@@ -612,7 +612,7 @@ mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBase
 
 mxConstraintHandlerBP.prototype.highlightColor = '#808080';
 
-// get diffrent images per diffrent types of constraints
+// get different images per different types of constraints
 mxConstraintHandlerBP.prototype.getImageForConstraint = function(state, constraint, point)
 {
     if(constraint != null && constraint.name == "I")
@@ -1687,6 +1687,10 @@ mxGraph.prototype.getNumOfOutEdges = function(source){
     return result;
 };
 
+// mxGraph.prototype.isValidDropTarget = function(cell, cells, evt)
+// {
+//     false;
+// };
 
 mxGraph.prototype.findCurrLabel = function(source, state) {
     //there is only one constraint point
