@@ -200,4 +200,81 @@ GraphBP.prototype.fixValue = function(cell) {
     cell.setValue(value);
 }
 
+GraphBP.prototype.shapeContains = function(state, x, y) {
+    var size = this.view.scale;
+    var contains = state.x <= x && state.x + state.width >= x &&
+        state.y <= y && state.y + state.height >= y;
+    if (!contains) {
+        var constraints = this.getAllConnectionConstraints(state, true) || [];
+        for (var i = 0; i < constraints.length && !contains; i++) {
+            var constraint = constraints[i];
+            if (constraint.name == "I")
+                continue;
+            var constraintPoint = constraint.point;
+            var constraintPointX = state.x + constraintPoint.x * state.width;
+            var constraintPointY = state.y + constraintPoint.y * state.height;
+            var constaintImg = this.connectionHandler.constraintHandler.getImageForConstraint(state, constraint, constraintPoint);
+            var constraintWidth = constaintImg.width  * size;
+            var constraintHeight = constaintImg.height  * size;
+            contains = constraintPointX - constraintWidth <= x && constraintPointX + constraintWidth*1.5 >= x &&
+                constraintPointY - constraintHeight <= y && constraintPointY + constraintHeight >= y;
+            if(contains)
+                return true;
+
+        }
+    }
+    return contains;
+};
+
+Graph.prototype.selectAllForDebugging = function() {
+    mxGraph.prototype.selectAll.apply(this, arguments);
+};
+
+// get the bp cell in (x,y) cordinate
+Graph.prototype.getScaledCellAt = function(x, y, parent, vertices, edges, ignoreFn)
+{
+    vertices = (vertices != null) ? vertices : true;
+    edges = (edges != null) ? edges : true;
+
+    if (parent == null)
+    {
+        parent = this.getCurrentRoot();
+
+        if (parent == null)
+        {
+            parent = this.getModel().getRoot();
+        }
+    }
+
+    if (parent != null)
+    {
+        var childCount = this.model.getChildCount(parent);
+
+        for (var i = childCount - 1; i >= 0; i--)
+        {
+            var cell = this.model.getChildAt(parent, i);
+            var result = this.getScaledCellAt(x, y, cell, vertices, edges, ignoreFn);
+
+            if (result != null)
+            {
+                return result;
+            }
+            else if (this.isCellVisible(cell) && (edges && this.model.isEdge(cell) ||
+                vertices && this.model.isVertex(cell)))
+            {
+                var state = this.view.getState(cell);
+
+                if (state != null && (ignoreFn == null || !ignoreFn(state, x, y)) &&
+                    this.intersects(state, x, y))
+                {
+                    if(cell.bp_cell == null || (cell.bp_cell != null && cell.bp_cell))
+                        return cell;
+                }
+            }
+        }
+    }
+
+    return null;
+};
+
 // GraphBP.prototype = Object.create(Graph.prototype);
