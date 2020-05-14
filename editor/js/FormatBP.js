@@ -176,7 +176,7 @@ FormatBP.prototype.adjustConnectionPointsLabels = function (graph, cell, newOutp
             }
         }
         //fix labels locations
-        fixConnectionPointsLabelLocation(graph, cell);
+        graph.fixConnectionPointsLabelLocation(cell);
     }
     finally {
         graph.getModel().endUpdate();

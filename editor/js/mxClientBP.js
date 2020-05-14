@@ -1792,7 +1792,8 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
 mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
 {
     var output =  this.resizeCells([cell], [bounds], recurse)[0];
-    fixConnectionPointsLabelLocation(this, cell, 0, 0);
+    graph.fixConnectionPointsLabelLocation(cell);
+    this.fixBPChildren(cell);
     return output;
 };
 
