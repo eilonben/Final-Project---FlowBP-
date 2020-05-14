@@ -1845,12 +1845,12 @@ mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell, mul) {
     for (var i = 0; i < labels.length; i++) {
         var ConnectionPointLabelCell = labels[i];
 
-        var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
+        var constraint_img_height = this.connectionHandler.constraintHandler.getImageForConstraint().height;
         var cp = cell.new_constraints[i].point;
 
-        var newY = y + cp.y * cell.getGeometry().height - constraint_img_height *mul;
+        var newY = cp.y * cell.getGeometry().height - constraint_img_height *mul;
         ConnectionPointLabelCell.geometry.y = newY;
-        var newX = x + cp.x * cell.getGeometry().width;
+        var newX = cp.x * cell.getGeometry().width;
         ConnectionPointLabelCell.geometry.x = newX;
     }
 
