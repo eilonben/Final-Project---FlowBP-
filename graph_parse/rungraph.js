@@ -1,8 +1,3 @@
-window.debug = {
-    scenarios: {},
-    blockedBlocks: [],
-    events: []
-};
 
 function writeToConsole(message) {
     let myConsole = document.getElementById("ConsoleText1");
@@ -11,15 +6,8 @@ function writeToConsole(message) {
     }
 }
 
-function getBlockedEvents() {
-    var res = []
-    window.bpEngine.BThreads.forEach(bt => {
-        bt.stmt.block.forEach(e => res.push(e));
-    });
-    return res;
-}
-
 window.bpEngine = {
+    deb : null,
     BThreads: [],
 
     sync: function* (stmt) {
@@ -34,22 +22,11 @@ window.bpEngine = {
 
     run: function* () {
         while (true) {
-            ///////
-            //let blockedEvents = getBlockedEvents();
-            //let curBlocked = []
-            //blockedEvents.forEach(e => {
-                //window.bpEngine.BThreads.forEach(bt => {
-                    //if(isReqWait(bt, e))
-                        //curBlocked.push(bt.stmt.cellID);
-                //});
-            //});
-            //window.debug.blockedBlocks.push(curBlocked);
-            ////////
-            fixStages();
+            window.bpEngine.deb.fixStages();
             let e = getEvent();
             if (e === null)
                 yield 'waiting for an event';
-            addEvent(e);
+            window.bpEngine.deb.addEvent(e);
             console.log(e + "\n");
             writeToConsole("event selected: " + e);
             window.bpEngine.BThreads.forEach(bt => {
@@ -112,7 +89,7 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
                 if (edgeLabel !== undefined && outputs !== undefined) {
                     if (outputs[edgeLabel] !== undefined) {
                         let nextPayloads = outputs[edgeLabel];
-                        runInNewBT(target, nextPayloads, bpEngine, model, window.debug.scenarios[scen].length);
+                        runInNewBT(target, nextPayloads, bpEngine, model, window.bpEngine.deb.getScenarioTime(scen));
                     }
                 }
             }
@@ -146,15 +123,11 @@ function runInNewBT(c, payloads, bpEngine, model, curTime) {
         if(outputs === -1){
             return;
         }
-        c.setAttribute("scenarioID", c.id);
-        window.debug.scenarios[c.id] = [];
-        for(let i = 0; i < curTime; i++)
-            window.debug.scenarios[c.id].push([-1, null]);
-        window.debug.scenarios[c.id].push([c.id, cloned]);
+
+        window.bpEngine.deb.newScen(c, curTime, cloned);
 
         if (c.getAttribute("sync") !== undefined) {
             var stmt = JSON.parse(c.getAttribute("sync"));
-            stmt["cellID"] = c.id;
             yield stmt;
             // cloned["selected"] = window.eventSelected;
         }
@@ -173,7 +146,7 @@ function getshape(str) {
 }
 
 function handleNodeAttributes(c, outputs, cloned, payloads) {
-    if(getshape(c.getStyle()) === "console"){
+    if(getshape(c.getStyle()) === "console") {
         writeToConsole(JSON.stringify(payloads));
     }
     if (c.getAttribute("code") !== undefined) {
@@ -211,12 +184,11 @@ function* runInSameBT(c, payloads, bpEngine, model, scen) {
     if(outputs === -1){
         return;
     }
-    c.setAttribute("scenarioID", scen);
-    window.debug.scenarios[scen].push([c.id, cloned]);
+
+    window.bpEngine.deb.updateScen(scen, c, cloned);
 
     if (c.getAttribute("sync") !== undefined) {
         let stmt = JSON.parse(c.getAttribute("sync"));
-        stmt["cellID"] = c.id;
         yield stmt;
         // cloned["selected"] = window.eventSelected;
     }
@@ -226,9 +198,12 @@ function* runInSameBT(c, payloads, bpEngine, model, scen) {
 
 
 
-function startRunning(model) {
-// Start the context nodes
-    initDebug();
+function startRunning(model, debug) {
+    // Start the context nodes
+    if(debug != null) {
+        window.bpEngine.deb = debug;
+        window.bpEngine.deb.initDebug();
+    }
 
     var cells = model.cells;
     var arr = Object.keys(cells).map(function (key) {
@@ -248,66 +223,7 @@ function startRunning(model) {
     window.bpEngine.BThreads = [];
 }
 
-function getNumOfSteps(){
-    let scen = Object.values(window.debug.scenarios);
-    if(scen.length > 0)
-        return scen[0].length;
-    return 0;
-}
 
-function getProgramRecord() {
-    var res = []
-
-    for(let step = 0; step < getNumOfSteps(); step++){
-        var curStage = {stages: [], eventSelected: null}
-        var scens = Object.values(window.debug.scenarios);
-        curStage.stages = {};
-        for (let j = 0; j < scens.length; j++) {
-            curStage.stages[scens[j][step][0]] = scens[j][step][1];
-        }
-        if(window.debug.events[step] != -1)
-            curStage.eventSelected = window.debug.events[step];
-        //if(Object.keys(curStage.stages).length > 0)
-        res.push(curStage)
-    }
-
-    return res;
-}
-
-function initDebug() {
-    window.debug.scenarios = {}
-    window.debug.events = [];
-}
-
-function fixStages() {
-    let scens = Object.values(window.debug.scenarios)
-    const lengths = scens.map(x => x.length);
-    let curTime = Math.max(...lengths)
-    for(let i = 0; i < scens.length; i++)
-    {
-        let curScen = scens[i];
-        let numOfFixes = curTime - curScen.length;
-        for (let j = 0; j < numOfFixes; j++)
-            curScen.push(curScen[curScen.length - 1]);
-    }
-}
-
-function addEvent(e) {
-    let scens = Object.values(window.debug.scenarios)
-    const lengths = scens.map(x => x.length);
-    let curTime = Math.max(...lengths)
-    for(let i = 0; i < scens.length; i++)
-    {
-        let curScen = scens[i];
-        let numOfFixes = curTime - curScen.length;
-        for (let j = 0; j < numOfFixes + 1; j++)
-            curScen.push(curScen[curScen.length - 1]);
-    }
-    let numOfFixes = curTime - window.debug.events.length;
-    for (let j = 0; j < numOfFixes; j++)
-        window.debug.events.push(-1);
-    window.debug.events.push(e);
-}
 
 
 

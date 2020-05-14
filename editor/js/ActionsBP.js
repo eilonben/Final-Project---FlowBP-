@@ -18,6 +18,15 @@ ActionsBP.prototype.init = function (actions) {
         }
     }
 
+    function hideConsole() {
+        if (this.consoleWindow === null || this.consoleWindow === undefined) {
+            this.consoleWindow = new myConsoleWindow(ui, document.body.offsetWidth - 480, 120, 420, 285);
+        }
+        else {
+            this.consoleWindow.window.setVisible(false);
+        }
+    }
+
     actions.addAction('showConsole', function () {
         showConsole.call(this);
     });
@@ -46,7 +55,7 @@ ActionsBP.prototype.init = function (actions) {
         else
         {
             showConsole.call(this);
-                parse_graph(code);
+            parse_graph(code, null);
             mxUtils.alert("Code deployed");
         }
 
@@ -79,6 +88,8 @@ ActionsBP.prototype.init = function (actions) {
 
         deb.endDebugging();
 
+        hideConsole.call(this);
+
         ui.endDebugging();
 
     }, false, null);
@@ -89,7 +100,7 @@ ActionsBP.prototype.init = function (actions) {
 
         try{
             var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
-            parse_graph(code, graph);
+            parse_graph(code, deb);
         }
         catch{
             return;
@@ -104,7 +115,9 @@ ActionsBP.prototype.init = function (actions) {
         // Moves the UI into debugging mode
         ui.startDebugging();
 
-        deb.startDebugging(getProgramRecord());
+        showConsole.call(this);
+
+        deb.startDebugging();
 
     }, null, null);
 

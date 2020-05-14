@@ -235,22 +235,88 @@ SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
     }
 };
 
+// create bp shape
+SidebarBP.prototype.createBPShape = function(name, shape)
+{
+
+    //initial cells
+    var data = new mxCell('empty', new mxGeometry(0, 25, 160, 90), 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;connectable=0;');
+    data.vertex = true;
+    data.selectable = false;
+    data.bp_type = 'data';
+    data.bp_cell = false;
+    // data.connectable = false;
+
+    // divider line
+    var divider = new mxCell('', new mxGeometry(0, 50, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=top;rotatable=0;points=[];part=1;connectable=0;overflow=auto');
+    divider.vertex = true;
+    divider.selectable = false;
+    divider.bp_type = 'divider';
+    divider.visible = false;
+    divider.bp_cell = false;
+    // divider.connectable = false;
+
+    var payload = this.cloneCell(data, '');
+    payload.geometry.y = 55;
+    payload.bp_type = 'payloads';
+    payload.visible = false;
+    payload.bp_cell = false;
+    // payload.connectable = false;
+
+
+    var cellStyle = 'shape=' + shape + ';swimlane;fontStyle=1;align=center;verticalAlign=top;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rotatable=0;overflow=auto';
+
+    // shape
+    var cell = new mxCell(name, new mxGeometry(0, 0, 160, 90), cellStyle);
+    cell.vertex = true;
+    cell.bp_cell = true;
+    cell.bp_type = name;
+
+    cell.insert(data);
+    cell.insert(divider);
+    cell.insert(payload);
+
+    return cell;
+
+};
+
 /**
  * Adds the general palette to the sidebar.
  */
 SidebarBP.prototype.addFlowBPPalette = function()
 {
-
-    var prefix = mxClient.imageBasePath;
-    var item = '/console_2.png';
+    var sb = this;
 
     var fns = [
-        this.createVertexTemplateEntry('shape=flow.startnode;whiteSpace=wrap;html=1;', 60, 60, null, 'Start Node', null, null, 'start'),
-        this.createVertexTemplateEntry('shape=flow.bsync;whiteSpace=wrap;html=1;', 120, 80, 'Bsync', 'Bsync', null, null, 'bsync'),
-        this.createVertexTemplateEntry('shape=flow.general;whiteSpace=wrap;html=1;', 120, 80, 'General', 'General', null, null, 'general'),
-        this.createVertexTemplateEntry('shape=flow.console;html=1;labelBackgroundColor=#ffffff;image=' + prefix + item +';', 120, 80, null, 'Console', null, null, 'console')
+
+        this.addEntry('start', function()
+        {
+            var cell = new mxCell(name, new mxGeometry(0, 0, 60, 60), 'shape=flow.startnode;whiteSpace=wrap;html=1;');
+            cell.vertex = true;
+            cell.bp_type = 'startnode';
+            cell.bp_cell = true;
+            return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Start Node');
+        }),
+
+               this.addEntry('bsync', function()
+        {
+            var cell = sb.createBPShape('BSync', 'flow.bsync');
+            return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'BSync');
+        }),
+
+        this.addEntry('general', function()
+        {
+            var cell = sb.createBPShape('General', 'flow.general');
+            return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'General');
+        }),
+
+        this.addEntry('console', function()
+        {
+            var cell = sb.createBPShape('Console', 'flow.console');
+            return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Console');
+        }),
+
     ];
 
     this.addPaletteFunctions('Flow', 'Flow',  false, fns);
 };
-
