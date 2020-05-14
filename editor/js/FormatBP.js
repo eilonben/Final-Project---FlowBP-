@@ -6,6 +6,27 @@ function getLabelsFromChildren(cell){
     return labels;
 }
 
+// relocate connection points labels according to connection points labels
+function fixConnectionPointsLabelLocation(graph, cell, x, y) {
+    if (cell == null || cell.children == null)
+        return;
+    var labels = getLabelsFromChildren(cell);
+    x = x || 0;
+    y = y || 0;
+
+    for (var i = 0; i < labels.length; i++) {
+        var ConnectionPointLabelCell = labels[i];
+
+        var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
+        var cp = cell.new_constraints[i].point;
+
+        var newY = y + cp.y * cell.getGeometry().height - constraint_img_height;
+        ConnectionPointLabelCell.geometry.y = newY;
+        var newX = x + cp.x * cell.getGeometry().width;
+        ConnectionPointLabelCell.geometry.x = newX;
+    }
+
+};
 
 
 function getMapStyle(style) {
@@ -131,7 +152,7 @@ FormatBP.prototype.updateConnectionPointsLabels = function (graph, cell, labels)
             }
         }
         //fix labels locations
-        graph.fixConnectionPointsLabelLocation(cell);
+        fixConnectionPointsLabelLocation(graph, cell);
     }
     finally {
         graph.getModel().endUpdate();
@@ -155,7 +176,7 @@ FormatBP.prototype.adjustConnectionPointsLabels = function (graph, cell, newOutp
             }
         }
         //fix labels locations
-        this.fixConnectionPointsLabelLocation(cell);
+        fixConnectionPointsLabelLocation(graph, cell);
     }
     finally {
         graph.getModel().endUpdate();
@@ -631,3 +652,36 @@ FormatBP.prototype.refresh = function () {
     }
 
 };
+
+//
+// FormatBP.prototype.roundableShapes = ['label', 'rectangle', 'internalStorage', 'corner',
+//     'parallelogram', 'swimlane', 'triangle', 'trapezoid',
+//     'ext', 'step', 'tee', 'process', 'link',
+//     'rhombus', 'offPageConnector', 'loopLimit', 'hexagon',
+//     'manualInput', 'curlyBracket', 'singleArrow', 'callout',
+//     'doubleArrow', 'flexArrow', 'card', 'umlLifeline','flow.hadas'];
+//
+// /**
+//  * Returns information about the current selection.
+//  */
+// FormatBP.prototype.isComicState = function(state)
+// {
+//     var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
+//
+//     return mxUtils.indexOf(['label', 'rectangle', 'internalStorage', 'corner', 'parallelogram', 'note', 'collate',
+//         'swimlane', 'triangle', 'trapezoid', 'ext', 'step', 'tee', 'process', 'link', 'rhombus',
+//         'offPageConnector', 'loopLimit', 'hexagon', 'manualInput', 'singleArrow', 'doubleArrow',
+//         'flexArrow', 'filledEdge', 'card', 'umlLifeline', 'connector', 'folder', 'component', 'sortShape',
+//         'cross', 'umlFrame', 'cube', 'isoCube', 'isoRectangle', 'partialRectangle', 'flow.hadas'], shape) >= 0;
+// };
+//
+// Format.prototype.isGlassState = function(state)
+// {
+//     var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
+//
+//     return (shape == 'label' || shape == 'rectangle' || shape == 'internalStorage' ||
+//         shape == 'ext' || shape == 'umlLifeline' || shape == 'swimlane' ||
+//         shape == 'process' || shape == 'flow.hadas');
+// };
+
+// FormatBP.prototype.constructor = Format;
