@@ -49,7 +49,7 @@ function GeneralShape()
 mxUtils.extend(GeneralShape, FlowShape);
 
 //filed only in general constraints
-BsyncShape.prototype.constraints[0].index = 0;
+GeneralShape.prototype.constraints[0].index = 0;
 
 mxCellRenderer.registerShape('flow.general', GeneralShape);
 
@@ -63,32 +63,6 @@ function ConsoleShape()
 mxUtils.extend(ConsoleShape, FlowShape);
 
 mxCellRenderer.registerShape('flow.console', ConsoleShape);
-
-//******************************************labele***********************************************
-function LabelFlow()
-{
-    mxLabel.call(this);
-};
-
-mxUtils.extend(LabelFlow, mxLabel);
-
-LabelFlow.prototype.constraints = [];
-
-mxCellRenderer.registerShape('flow.label', LabelFlow);
-
-//******************************************line***********************************************
-function LineFlow()
-{
-    mxLine.call(this);
-};
-
-
-
-mxUtils.extend(LineFlow, mxLine);
-
-LineFlow.prototype.constraints = [];
-
-mxCellRenderer.registerShape('flow.line', LineFlow);
 
 
 mxSwimlane.prototype.constraints = FlowShape.prototype.constraints;

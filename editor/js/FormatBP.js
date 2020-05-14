@@ -94,20 +94,26 @@ FormatBP.prototype.validateNewConstraint = function (cell, graph){
 //     }
 // };
 
+// compute constraint new position
+FormatBP.prototype.computeNewPosition = function(cell, numOfOutputs, index){
+    var cellHeight = cell.geometry.height;
+    var cellTitle = getValueByKey(cell.getStyle(),'startSize',26);
+    var cellContent = cellHeight -  cellTitle;
+    var interval = (cellContent / cellHeight ) / (numOfOutputs + 1);
+    return new mxPoint(mxConnectionHandlerBP.defultOutputX,(cellTitle/cellHeight) + interval * index);
+}
+
+
 // update connection point number
-FormatBP.prototype.adjustConnectionPoints = function (cell, connection_number, graph) {
+FormatBP.prototype.adjustConnectionPoints = function (cell, numOfOutputs, graph) {
     this.validateNewConstraint(cell, graph);
     // input constraint always at the end of the list
-    var cellHight = cell.geometry.height;
-    var cellTitle = getValueByKey(cell.getStyle(),'startSize',26);
-    // var cellTitel = mxUtils.getValue(,'startSize',90);
-    var cellContent = cellHight -  cellTitle;
+
     var inputConstraint = cell.new_constraints.filter(x => x.name == "I");
     cell.new_constraints = [];
-    var interval = (cellContent / cellHight ) / (connection_number + 1);
-    for (var i = 1; i <= connection_number; i++) {
-        var point = new mxPoint(mxConnectionHandlerBP.defultOutputX,(cellTitle/cellHight) + interval * i);
-        cell.new_constraints.push(new mxConnectionConstraint(point, true, "O", 1, interval * i));
+    for (var i = 1; i <= numOfOutputs; i++) {
+        var newLocationPoint = this.computeNewPosition(cell, numOfOutputs, i);
+        cell.new_constraints.push(new mxConnectionConstraint(newLocationPoint, true, "O", newLocationPoint.x, newLocationPoint.y));
     }
     // input constraint Should be at the end of the list
     cell.new_constraints = cell.new_constraints.concat(inputConstraint);
@@ -196,8 +202,8 @@ FormatBP.prototype.adjustEdges = function (cell, numOfOutputs, graph) {
                 graphModel.remove(outEdges[i], true);
             else {
                 //    relocate edge exit location of edge
-                var newY = constraintNumber * (1 / (numOfOutputs + 1));
-                var new_style = mxUtils.setStyle(outEdges[i].style, 'exitY', newY);
+                var newLocationPoint = this.computeNewPosition(cell, numOfOutputs, constraintNumber);
+                var new_style = mxUtils.setStyle(outEdges[i].style, 'exitY', newLocationPoint.y);
                 graphModel.setStyle(outEdges[i], new_style);
             }
         }
