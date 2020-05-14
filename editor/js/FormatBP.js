@@ -132,7 +132,7 @@ FormatBP.prototype.updateConnectionPointsLabels = function (graph, cell, labels)
             }
         }
         //fix labels locations
-        fixConnectionPointsLabelLocation(graph, cell);
+        graph.fixConnectionPointsLabelLocation(cell);
     }
     finally {
         graph.getModel().endUpdate();
@@ -212,7 +212,7 @@ FormatBP.prototype.updateEdgesLabels = function (cell, graph, cellValue ) {
 FormatBP.prototype.refresh = function () {
 
     var format = this;
-    // Performance tweak: No refresh needed if not visible
+    // Performance tweak: No refresh needed if not visiblevisible
     if (this.container.style.width == '0px') {
         return;
     }

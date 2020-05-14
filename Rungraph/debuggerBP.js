@@ -50,12 +50,19 @@ debuggerBP.prototype.setConsoleSteps = function (rec) {
     });
 }
 
+debuggerBP.prototype.VisibilityIsChangeable = function(name){
+    return name != null && (name != 'data' || name != 'divider' || name != 'label');
+
+}
 debuggerBP.prototype.makePayloadSectionsVisible = function (bool) {
     let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
     cells.forEach(cell => {
         if (cell.children !== null && cell.children !== undefined) {
-            cell.children.forEach(child => (child.bp_type!= null && child.bp_type!= 'label') ? child.setVisible(bool) : null);
-            cell.children[0].setVisible(true);
+            cell.children.forEach(child => {
+                if(this.VisibilityIsChangeable(child.bp_type))
+                    child.setVisible(bool)
+            });
+
         }
     })
 }
@@ -116,6 +123,8 @@ debuggerBP.prototype.endDebugging = function() {
     updateConsoleMessage("");
 
     this.setLabels();
+    this.fixAllOutputsLabels();
+    this.fixDataCells();
     this.makePayloadSectionsVisible(false);
 }
 
@@ -199,23 +208,25 @@ debuggerBP.prototype.fixSizes = function(cell, toDef) {
         var dHeight = 0;
         var pHeight = 0;
         var geo = this.mod.getGeometry(cell).clone();
+        var payloads = this.graph.getChildByType(cell, 'payloads');
+        var data = this.graph.getChildByType(cell, 'data');
         if (cell.children !== null && cell.children !== undefined) {
-            this.graph.cellSizeUpdated(cell.children[0], true);
+            this.graph.cellSizeUpdated(data, true);
             //this.graph.updateCellSize(cell.children[0], true);
-            dWidth = this.mod.getGeometry(cell.children[0]).width;
-            dHeight = this.mod.getGeometry(cell.children[0]).height;
-            this.graph.cellSizeUpdated(cell.children[2], true);
+            dWidth = this.mod.getGeometry(data).width;
+            dHeight = this.mod.getGeometry(data).height;
+            this.graph.cellSizeUpdated(payloads, true);
             //this.graph.updateCellSize(cell.children[2], true);
-            pWidth = this.mod.getGeometry(cell.children[2]).width;
-            pHeight = this.mod.getGeometry(cell.children[2]).height;
+            pWidth = this.mod.getGeometry(payloads).width;
+            pHeight = this.mod.getGeometry(payloads).height;
             //this.fixSizes(cell.children[2], width, height);
         }
         geo.width = Math.max(dWidth, pWidth, this.lastCellsSizes[cell.id].width);
-        geo.height = dHeight + pHeight + this.lastCellsSizes[cell.children[1].id].height + 32;
+        // geo.height = dHeight + pHeight + this.lastCellsSizes[cell.children[1].id].height + 32;
         this.mod.setGeometry(cell, geo);
-        var tmpGeo = this.mod.getGeometry(cell.children[0]).clone();
+        var tmpGeo = this.mod.getGeometry(data).clone();
         tmpGeo.width = Math.max(geo.width, dWidth, pWidth);
-        this.mod.setGeometry(cell.children[0], tmpGeo);
+        this.mod.setGeometry(data, tmpGeo);
     }
 }
 
@@ -246,7 +257,7 @@ debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
         color = "#99ff99";
         if (cell.bp_type !== "startnode") {
             if (cell.children !== null && cell.children !== undefined) {
-                cellToUpdate = cell.children[2];
+                cellToUpdate = this.graph.getChildByType(cell, 'payloads');
             }
             val = this.convertPayloadToString(payload);
         }
@@ -263,15 +274,35 @@ debuggerBP.prototype.setToOriginal = function (cell) {
     geo.width = this.lastCellsSizes[cell.id].width;
     geo.height = this.lastCellsSizes[cell.id].height;
     if (cell.children !== null && cell.children !== undefined){
-        this.setToOriginal(cell.children[1]);
-        this.setToOriginal(cell.children[2]);
+        var payloads = this.graph.getChildByType(cell, 'payloads');
+        // this.setToOriginal(cell.children[1]);
+        this.setToOriginal(payloads);
 
-        mxUtils.setCellStyles(this.mod, [cell.children[2]], 'fillColor', 'none');
-        this.mod.setValue(cell.children[2], '');
+        mxUtils.setCellStyles(this.mod, payloads, 'fillColor', 'none');
+        this.mod.setValue(payloads, '');
     }
     this.mod.setGeometry(cell, geo);
     this.mod.setValue(cell, this.lastCellValues[cell.id]);
 }
+
+
+
+debuggerBP.prototype.fixAllOutputsLabels = function() {
+    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
+    cells.forEach(cell => {
+        this.editor.graph.fixConnectionPointsLabelLocation(cell);
+    })
+};
+
+
+debuggerBP.prototype.fixDataCells = function() {
+    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
+    cells.forEach(cell => {
+        var data = this.graph.getChildByType(cell, 'data');
+        data.geometry.height = 0;
+        data.geometry.width = 0;
+    })
+};
 
 debuggerBP.prototype.updateVertexCells = function(record) {
     let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
@@ -289,9 +320,7 @@ debuggerBP.prototype.updateVertexCells = function(record) {
 
         this.ui.fixView();
 
-        cells.forEach(cell => {
-            fixConnectionPointsLabelLocation(this.editor.graph, cell)
-        });
+        this.fixAllOutputsLabels();
 
         this.mod.endUpdate();
     }

@@ -15,7 +15,7 @@ var BSyncForm = function (editorUi, cell) {
     w = 800;
     h = 350;
     noHide = true;
-    var row, td
+    var row, td;
 
     var table = document.createElement('table');
     var tbody = document.createElement('tbody');
@@ -78,7 +78,8 @@ var BSyncForm = function (editorUi, cell) {
         var cellData = cell.children != null ?  cell.children.filter(x => x.bp_type != null && x.bp_type == 'data')[0] : null;
         if(cellData != null) {
             cellData.value = "Request: " + linkInput["Request"].value + "\nWait: " + linkInput["Wait"].value + "\nBlock: " + linkInput["Block"].value;
-            graph.updateCellSize(cellData, true);
+            // graph.updateCellSize(cellData, true);
+
         }
         // value.setAttribute("label","Request: "+linkInput["Request"].value+"\nWait: "+linkInput["Wait"].value+"\nBlock: "+linkInput["Block"].value);
         graph.getModel().setValue(cell, value);
