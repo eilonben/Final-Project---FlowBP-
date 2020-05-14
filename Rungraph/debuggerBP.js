@@ -346,7 +346,8 @@ debuggerBP.prototype.getProgramRecord = function() {
         var scens = Object.values(this.scenarios);
         curStage.stages = {};
         for (let j = 0; j < scens.length; j++) {
-            curStage.stages[scens[j][step][0]] = scens[j][step][1];
+            if(scens[j][step][0] != -1)
+                curStage.stages[scens[j][step][0]] = scens[j][step][1];
         }
         if(this.events[step] != -1)
             curStage.eventSelected = this.events[step];

@@ -229,6 +229,109 @@ function initConsole() {
     document.getElementById("001").appendChild(textarea);
 }
 
+var testHelloWorld = function () {
+    var expected = ["Hello","World"];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/Hello_World.xml");
+    try {
+        parse_graph(xml);
+        resulte = consoleToArray();
+        //console.log(window.eventsSelected);
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
+var testHotCold = function () {
+    var expected = ["Hot","Cold","Hot","Cold","Hot","Cold"];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/HotCold.xml");
+    try {
+        parse_graph(xml);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
+var testRandomOrder = function () {
+    var expected = [["1","2","3","4"],["3","4","1","2"],["1","3","2","4"],["1","3","4","2"],["3","1","2","4"],["3","1","4","2"]];
+    var statistic=[0,0,0,0,0,0];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/RandomOrder.xml");
+    for (var j = 0 ; j<100 ; j++) {
+        try {
+            document.getElementById("ConsoleText1").value="";
+            parse_graph(xml);
+            resulte = consoleToArray();
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+        for (let i = 0; i < expected.length; i++) {
+            if (expected[i].toString() === resulte.toString()) {
+                statistic[i]+=1;
+            }
+        }
+    }
+    var sum = statistic.reduce(function(a, b){
+        return a + b;
+    }, 0);
+    if(sum!=100)
+        return false;
+    for (var i =0 ; i<statistic.length ; i++)
+        if(statistic[i]>=45){
+            return false;
+        }
+    return true;
+}
+
+var testPayload =function () {
+    var expected = ["[{\"x\":3},{\"y\":4}]"];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/Payloads.xml");
+    try {
+        parse_graph(xml);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
+var testPayloadChange =function () {
+    var expected = ["[{\"x\":5},{\"y\":6}]"];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/PayloadsChange.xml");
+    try {
+        parse_graph(xml);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
+var testPayloadsIfElse =function () {
+    var expected = ["{\"x\":3}"];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/PayloadsIfElse.xml");
+    try {
+        parse_graph(xml);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
 var runTests = function() {
     function run(name,func) {
         initConsole();
@@ -250,4 +353,232 @@ var runTests = function() {
 
 }
 
+var debug_testHelloWorld = function () {
+    var expected = [{"stages":{"24":[{}]},"eventSelected":null},
+        {"stages":{"26":[{}]},"eventSelected":null},
+        {"stages":{"26":[{}]},"eventSelected":"Hello"},
+        {"stages":{"27":[{}]},"eventSelected":null},
+        {"stages":{"27":[{}]},"eventSelected":"World"}];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/Hello_World.xml");
+    try {
+        parse_graph(xml);
+        resulte = getProgramRecord();
+        //console.log(window.eventsSelected);
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
+var debug_testRequestsList = function () {
+    var expected = [[{"stages":{"6":[{}]},"eventSelected":null},
+        {"stages":{"7":[{}]},"eventSelected":null},
+        {"stages":{"7":[{}]},"eventSelected":"Goodbye"}],
+        [{"stages":{"6":[{}]},"eventSelected":null},
+        {"stages":{"7":[{}]},"eventSelected":null},
+        {"stages":{"7":[{}]},"eventSelected":"Hi"}]];
+    var statistic=[0,0];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/HiOrGoodbye.xml");
+    for (var j = 0 ; j<100 ; j++) {
+        try {
+            document.getElementById("ConsoleText1").value="";
+            parse_graph(xml);
+            resulte = getProgramRecord();
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+        if (resulte.length != 1)
+            return false;
+        for (let i = 0; i < expected.length; i++) {
+            if (expected[i].toString() === resulte.toString()) {
+                statistic[i] += 1;
+            }
+        }
+    }
+    if(statistic[0]+statistic[1] != 100)
+        return false;
+    if(statistic[0]>80 || statistic[1]>80)
+        return false;
+    return true;
+}
+
+var debug_testHotCold = function () {
+    var expected = [{"stages":{"3":[{}],"12":[{}],"17":[{}]},"eventSelected":null},
+        {"stages":{"2":[{}],"10":[{}],"18":[{}]},"eventSelected":null},
+        {"stages":{"2":[{}],"10":[{}],"18":[{}]},"eventSelected":"Hot"},
+        {"stages":{"5":[{}],"10":[{}],"19":[{}]},"eventSelected":null},
+        {"stages":{"5":[{}],"10":[{}],"19":[{}]},"eventSelected":"Cold"},
+        {"stages":{"5":[{}],"14":[{}],"18":[{}]},"eventSelected":null},
+        {"stages":{"5":[{}],"14":[{}],"18":[{}]},"eventSelected":"Hot"},
+        {"stages":{"6":[{}],"14":[{}],"19":[{}]},"eventSelected":null},
+        {"stages":{"6":[{}],"14":[{}],"19":[{}]},"eventSelected":"Cold"},
+        {"stages":{"6":[{}],"15":[{}],"18":[{}]},"eventSelected":null},
+        {"stages":{"6":[{}],"15":[{}],"18":[{}]},"eventSelected":"Hot"},
+        {"stages":{"15":[{}],"19":[{}]},"eventSelected":null},
+        {"stages":{"15":[{}],"19":[{}]},"eventSelected":"Cold"},
+        {"stages":{"18":[{}]},"eventSelected":null}]
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/HotCold.xml");
+    try {
+        parse_graph(xml);
+        resulte = getProgramRecord();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
+var debug_testRandomOrder = function () {
+    var expected = [[{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
+        {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
+        {"stages":{"4":[{}],"5":[{}]},"eventSelected":"3"},
+        {"stages":{"4":[{}],"9":[{}]},"eventSelected":null},
+        {"stages":{"4":[{}],"9":[{}]},"eventSelected":"1"},
+        {"stages":{"8":[{}],"9":[{}]},"eventSelected":null},
+        {"stages":{"8":[{}],"9":[{}]},"eventSelected":"2"},
+        {"stages":{"9":[{}]},"eventSelected":null},
+        {"stages":{"9":[{}]},"eventSelected":"4"},
+        {"stages":{},"eventSelected":null}],
+
+        [{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"5":[{}]},"eventSelected":"1"},
+            {"stages":{"5":[{}],"8":[{}]},"eventSelected":null},
+            {"stages":{"5":[{}],"8":[{}]},"eventSelected":"2"},
+            {"stages":{"5":[{}]},"eventSelected":null},
+            {"stages":{"5":[{}]},"eventSelected":"3"},
+            {"stages":{"9":[{}]},"eventSelected":null},
+            {"stages":{"9":[{}]},"eventSelected":"4"},
+            {"stages":{},"eventSelected":null}],
+
+        [{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"5":[{}]},"eventSelected":"1"},
+            {"stages":{"5":[{}],"8":[{}]},"eventSelected":null},
+            {"stages":{"5":[{}],"8":[{}]},"eventSelected":"3"},
+            {"stages":{"8":[{}],"9":[{}]},"eventSelected":null},
+            {"stages":{"8":[{}],"9":[{}]},"eventSelected":"4"},
+            {"stages":{"8":[{}]},"eventSelected":null},
+            {"stages":{"8":[{}]},"eventSelected":"2"},
+            {"stages":{},"eventSelected":null}],
+
+        [{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"5":[{}]},"eventSelected":"3"},
+            {"stages":{"4":[{}],"9":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"9":[{}]},"eventSelected":"4"},
+            {"stages":{"4":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}]},"eventSelected":"1"},
+            {"stages":{"8":[{}]},"eventSelected":null},
+            {"stages":{"8":[{}]},"eventSelected":"2"},
+            {"stages":{},"eventSelected":null}],
+
+        [{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"5":[{}]},"eventSelected":"1"},
+            {"stages":{"5":[{}],"8":[{}]},"eventSelected":null},
+            {"stages":{"5":[{}],"8":[{}]},"eventSelected":"3"},
+            {"stages":{"8":[{}],"9":[{}]},"eventSelected":null},
+            {"stages":{"8":[{}],"9":[{}]},"eventSelected":"2"},
+            {"stages":{"9":[{}]},"eventSelected":null},
+            {"stages":{"9":[{}]},"eventSelected":"4"},
+            {"stages":{},"eventSelected":null}],
+
+        [{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"5":[{}]},"eventSelected":"3"},
+            {"stages":{"4":[{}],"9":[{}]},"eventSelected":null},
+            {"stages":{"4":[{}],"9":[{}]},"eventSelected":"1"},
+            {"stages":{"8":[{}],"9":[{}]},"eventSelected":null},
+            {"stages":{"8":[{}],"9":[{}]},"eventSelected":"4"},
+            {"stages":{"8":[{}]},"eventSelected":null},
+            {"stages":{"8":[{}]},"eventSelected":"2"},
+            {"stages":{},"eventSelected":null}]];
+
+    var statistic=[0,0,0,0,0,0];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/RandomOrder.xml");
+    for (var j = 0 ; j<100 ; j++) {
+        try {
+            document.getElementById("ConsoleText1").value="";
+            parse_graph(xml);
+            resulte = getProgramRecord();
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+        for (let i = 0; i < expected.length; i++) {
+            if (expected[i].toString() === resulte.toString()) {
+                statistic[i]+=1;
+            }
+        }
+    }
+    var sum = statistic.reduce(function(a, b){
+        return a + b;
+    }, 0);
+    if(sum!=100)
+        return false;
+    for (var i =0 ; i<statistic.length ; i++)
+        if(statistic[i]>=45){
+            return false;
+        }
+    return true;
+}
+
+var debug_testPayload =function () {
+    var expected = [{"stages":{"12":[{"x":3},{"y":4}]}},
+        {"stages":{"14":[{"x":3},{"y":4}]}},
+        {"stages":{}}];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/Payloads.xml");
+    try {
+        parse_graph(xml);
+        resulte = getProgramRecord();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
+var debug_testPayloadChange =function () {
+    var expected = [{"stages":{"21":[{"x":3},{"y":2}]}},
+        {"stages":{"33":[{"x":3},{"y":2}]}},
+        {"stages":{"24":[{"x":5},{"y":6}]}},
+        {"stages":{}}];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/PayloadsChange.xml");
+    try {
+        parse_graph(xml);
+        resulte = getProgramRecord();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
+var debug_testPayloadsIfElse =function () {
+    var expected = [{"stages":{"3":[{"x":5},{"x":3},{}]}},
+        {"stages":{"6":[{"x":5},{"x":3},{}]}},
+        {"stages":{"10":{"x":3}}},
+        {"stages":{}}];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/PayloadsIfElse.xml");
+    try {
+        parse_graph(xml);
+        resulte = getProgramRecord();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
+
 runTests();
+
