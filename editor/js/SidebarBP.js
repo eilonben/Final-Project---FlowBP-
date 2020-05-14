@@ -28,7 +28,7 @@ SidebarBP.prototype.thumbWidth = 92;
 /**
  * Specifies the height of the thumbnails.
  */
-SidebarBP.prototype.thumbHeight = 92;
+SidebarBP.prototype.thumbHeight = 82;
 
 /**
  * Specifies the width of the thumbnails.
