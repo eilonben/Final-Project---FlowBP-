@@ -1788,6 +1788,29 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
     return edge;
 };
 
+
+// relocate connection points labels according to connection points labels
+mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell, mul) {
+    if (cell == null || cell.children == null)
+        return;
+    var labels = getLabelsFromChildren(cell);
+    mul = mul || 1
+    for (var i = 0; i < labels.length; i++) {
+        var ConnectionPointLabelCell = labels[i];
+
+        var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
+        var cp = cell.new_constraints[i].point;
+
+        var newY = y + cp.y * cell.getGeometry().height - constraint_img_height *mul;
+        ConnectionPointLabelCell.geometry.y = newY;
+        var newX = x + cp.x * cell.getGeometry().width;
+        ConnectionPointLabelCell.geometry.x = newX;
+    }
+
+};
+
+
+
 // after resizing cell fix his connection point label location
 mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
 {
