@@ -28,7 +28,7 @@ SidebarBP.prototype.thumbWidth = 92;
 /**
  * Specifies the height of the thumbnails.
  */
-SidebarBP.prototype.thumbHeight = 92;
+SidebarBP.prototype.thumbHeight = 80;
 
 /**
  * Specifies the width of the thumbnails.
@@ -238,6 +238,7 @@ SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
 // create bp shape
 SidebarBP.prototype.createBPShape = function(name, shape)
 {
+
     //initial cells
     var data = new mxCell('', new mxGeometry(0, mxGraph.headLineSize+4, 0, 0), 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;');
     data.vertex = true;

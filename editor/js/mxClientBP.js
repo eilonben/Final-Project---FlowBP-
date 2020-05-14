@@ -1703,22 +1703,20 @@ mxGraph.prototype.getNumOfOutEdges = function(source){
 };
 
 // relocate connection points labels according to connection points labels
-mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell, x, y) {
+mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell, mul) {
     if (cell == null || cell.children == null)
         return;
     var labels = getLabelsFromChildren(cell);
-    x = x || 0;
-    y = y || 0;
-
+    mul = mul || 1;
     for (var i = 0; i < labels.length; i++) {
         var ConnectionPointLabelCell = labels[i];
 
         var constraint_img_height = this.connectionHandler.constraintHandler.getImageForConstraint().height;
         var cp = cell.new_constraints[i].point;
 
-        var newY = y + cp.y * cell.getGeometry().height - constraint_img_height;
+        var newY = cp.y * cell.getGeometry().height - constraint_img_height * mul;
         ConnectionPointLabelCell.geometry.y = newY;
-        var newX = x + cp.x * cell.getGeometry().width;
+        var newX = cp.x * cell.getGeometry().width;
         ConnectionPointLabelCell.geometry.x = newX;
     }
 };

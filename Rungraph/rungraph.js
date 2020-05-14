@@ -6,76 +6,76 @@ function writeToConsole(message) {
     }
 }
 
-window.bpEngine = {
-    deb : null,
-    BThreads: [],
-
-    sync: function* (stmt) {
-        yield stmt;
-    },
-
-    registerBThread: (bt) => {
-        let x = bt.next().value;
-        let b = {iterator: bt, stmt: fixStmt(x)};
-        window.bpEngine.BThreads.push(b);
-    },
-
-    run: function* () {
-        while (true) {
-            window.bpEngine.deb.fixStages();
-            let e = getEvent();
-            if (e === null)
-                yield 'waiting for an event';
-            window.bpEngine.deb.addEvent(e);
-            console.log(e + "\n");
-            writeToConsole("event selected: " + e);
-            window.bpEngine.BThreads.forEach(bt => {
-                if (isReqWait(bt, e)) {
-                    bt.stmt = fixStmt(bt.iterator.next().value)
-                }
-            })
-        }
-    }
-};
-
-// // to be implemented
-// function waitForEvent() {
+// window.bpEngine = {
+//     deb : null,
+//     BThreads: [],
+//
+//     sync: function* (stmt) {
+//         yield stmt;
+//     },
+//
+//     registerBThread: (bt) => {
+//         let x = bt.next().value;
+//         let b = {iterator: bt, stmt: fixStmt(x)};
+//         window.bpEngine.BThreads.push(b);
+//     },
+//
+//     run: function* () {
+//         while (true) {
+//             window.bpEngine.deb.fixStages();
+//             let e = getEvent();
+//             if (e === null)
+//                 yield 'waiting for an event';
+//             window.bpEngine.deb.addEvent(e);
+//             console.log(e + "\n");
+//             writeToConsole("event selected: " + e);
+//             window.bpEngine.BThreads.forEach(bt => {
+//                 if (isReqWait(bt, e)) {
+//                     bt.stmt = fixStmt(bt.iterator.next().value)
+//                 }
+//             })
+//         }
+//     }
+// };
+//
+// // // to be implemented
+// // function waitForEvent() {
+// // }
+//
+// function fixStmt(stmt) {
+//     if (stmt === undefined)
+//         return {request: [], block: [], wait: []};
+//     if (stmt.request === undefined)
+//         stmt.request = [];
+//     if (stmt.block === undefined)
+//         stmt.block = [];
+//     if (stmt.wait === undefined)
+//         stmt.wait = [];
+//     return stmt
 // }
-
-function fixStmt(stmt) {
-    if (stmt === undefined)
-        return {request: [], block: [], wait: []};
-    if (stmt.request === undefined)
-        stmt.request = [];
-    if (stmt.block === undefined)
-        stmt.block = [];
-    if (stmt.wait === undefined)
-        stmt.wait = [];
-    return stmt
-}
-
-function isReqWait(bt, e) {
-    return bt.stmt.request.includes(e) || bt.stmt.wait.includes(e)
-}
-
-function getEvent() {
-    let requests = new Set();
-    let blocks = new Set();
-    window.bpEngine.BThreads.forEach(bt => {
-        bt.stmt.request.forEach(requests.add, requests);
-        bt.stmt.block.forEach(blocks.add, blocks);
-    });
-    let diff = [...requests].filter(x => ![...blocks].includes(x));
-    return getRandomItem(diff);
-}
-
-// get random item from a Set
-function getRandomItem(set) {
-    let items = Array.from(set);
-    if (items.length === 0)
-        return null;
-    return items[Math.floor(Math.random() * items.length)];
-}
+//
+// function isReqWait(bt, e) {
+//     return bt.stmt.request.includes(e) || bt.stmt.wait.includes(e)
+// }
+//
+// function getEvent() {
+//     let requests = new Set();
+//     let blocks = new Set();
+//     window.bpEngine.BThreads.forEach(bt => {
+//         bt.stmt.request.forEach(requests.add, requests);
+//         bt.stmt.block.forEach(blocks.add, blocks);
+//     });
+//     let diff = [...requests].filter(x => ![...blocks].includes(x));
+//     return getRandomItem(diff);
+// }
+//
+// // get random item from a Set
+// function getRandomItem(set) {
+//     let items = Array.from(set);
+//     if (items.length === 0)
+//         return null;
+//     return items[Math.floor(Math.random() * items.length)];
+// }
 
 function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
     let edg = model.getEdges(c, false, true, true);
@@ -89,7 +89,12 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
                 if (edgeLabel !== undefined && outputs !== undefined) {
                     if (outputs[edgeLabel] !== undefined) {
                         let nextPayloads = outputs[edgeLabel];
-                        runInNewBT(target, nextPayloads, bpEngine, model, window.bpEngine.deb.getScenarioTime(scen));
+                        if(bpEngine.deb !== null) {
+                            runInNewBT(target, nextPayloads, bpEngine, model, bpEngine.deb.getScenarioTime(scen));
+                        }
+                        else{
+                            runInNewBT(target, nextPayloads, bpEngine, model, null);
+                        }
                     }
                 }
             }
@@ -112,19 +117,33 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
             }
         }
     }
+    else{
+        if(bpEngine.deb !== null) {
+            bpEngine.deb.endScen(scen);
+        }
+    }
 }
 
-
+/*
+A function which is called in 2 cases:
+1. When the interpreter encounters a start node
+2. When the interpreter encounters a split from a general node into 2 different nodes
+c describes the current cell the interpreter is parsing
+ */
 function runInNewBT(c, payloads, bpEngine, model, curTime) {
-    window.bpEngine.registerBThread(function* () {
+    bpEngine.registerBThread(function* () {
         let outputs = {};
+        //cloning the payloads object array
         let cloned = JSON.parse(JSON.stringify(payloads));
         outputs = handleNodeAttributes(c,outputs,cloned,payloads);
         if(outputs === -1){
+            window.executeError = true;
             return;
         }
-
-        window.bpEngine.deb.newScen(c, curTime, cloned);
+        //checking if we are in debug mode
+        if(bpEngine.deb!=null) {
+            bpEngine.deb.newScen(c, curTime, cloned);
+        }
 
         if (c.getAttribute("sync") !== undefined) {
             var stmt = JSON.parse(c.getAttribute("sync"));
@@ -132,7 +151,7 @@ function runInNewBT(c, payloads, bpEngine, model, curTime) {
             // cloned["selected"] = window.eventSelected;
         }
 
-        yield* goToFollowers(c, cloned, bpEngine,model,outputs, c.id);
+        yield* goToFollowers(c, cloned, bpEngine,model,outputs, c.scenarioID);
     }());
 
 };
@@ -144,7 +163,12 @@ function getshape(str) {
     arr = arr[0].split("=")[1] != null ? arr[0].split("=")[1].split(".")[1] : "";
     return arr;
 }
-
+/*
+A function that handles all the fields inside a node relevant for executing BP flow programs
+"code" for the code editor in general blocks
+"sync" for the sync section in bsync nodes
+"log" for the code section in console nodes
+ */
 function handleNodeAttributes(c, outputs, cloned, payloads) {
     if(getshape(c.getStyle()) === "console") {
         writeToConsole(JSON.stringify(payloads));
@@ -180,12 +204,18 @@ function handleNodeAttributes(c, outputs, cloned, payloads) {
 function* runInSameBT(c, payloads, bpEngine, model, scen) {
     let outputs = {};
     let cloned = JSON.parse(JSON.stringify(payloads));
-    outputs = handleNodeAttributes(c, outputs, cloned, payloads);
-    if(outputs === -1){
-        return;
+    //checking if we are in debug mode
+    if (bpEngine.deb != null) {
+        bpEngine.deb.updateScen(scen, c, cloned);
     }
 
-    window.bpEngine.deb.updateScen(scen, c, cloned);
+    cloned = JSON.parse(JSON.stringify(payloads));
+
+    outputs = handleNodeAttributes(c, outputs, cloned, payloads);
+    if(outputs === -1){
+        window.executeError = true;
+        return;
+    }
 
     if (c.getAttribute("sync") !== undefined) {
         let stmt = JSON.parse(c.getAttribute("sync"));
@@ -200,9 +230,11 @@ function* runInSameBT(c, payloads, bpEngine, model, scen) {
 
 function startRunning(model, debug) {
     // Start the context nodes
+    window.executeError= false;
+    let bpEngine = new BPEngine();
     if(debug != null) {
-        window.bpEngine.deb = debug;
-        window.bpEngine.deb.initDebug();
+        bpEngine.deb = debug;
+        bpEngine.deb.initDebug();
     }
 
     var cells = model.cells;
@@ -219,8 +251,8 @@ function startRunning(model, debug) {
             payloads = (JSON.parse(startNds[i].getAttribute("Payloads")));
         runInNewBT(startNds[i], payloads, bpEngine, model, 0);
     }
-    window.bpEngine.run().next();
-    window.bpEngine.BThreads = [];
+    bpEngine.run().next();
+    bpEngine.BThreads = [];
 }
 
 

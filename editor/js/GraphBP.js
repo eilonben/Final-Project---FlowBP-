@@ -223,6 +223,10 @@ GraphBP.prototype.shapeContains = function(state, x, y) {
     return contains;
 };
 
+Graph.prototype.selectAllForDebugging = function() {
+    mxGraph.prototype.selectAll.apply(this, arguments);
+};
+
 // get the bp cell in (x,y) cordinate
 GraphBP.prototype.getScaledCellAt = function(x, y, parent, vertices, edges, ignoreFn)
 {
