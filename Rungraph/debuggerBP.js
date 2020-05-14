@@ -54,7 +54,7 @@ debuggerBP.prototype.makePayloadSectionsVisible = function (bool) {
     let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
     cells.forEach(cell => {
         if (cell.children !== null && cell.children !== undefined) {
-            cell.children.forEach(child => child.setVisible(bool));
+            cell.children.forEach(child => (child.bp_type!= null && child.bp_type!= 'label') ? child.setVisible(bool) : null);
             cell.children[0].setVisible(true);
         }
     })
