@@ -218,16 +218,13 @@ GraphBP.prototype.shapeContains = function(state, x, y) {
             var constraintHeight = constaintImg.height  * size;
             contains = constraintPointX - constraintWidth <= x && constraintPointX + constraintWidth*1.5 >= x &&
                 constraintPointY - constraintHeight <= y && constraintPointY + constraintHeight >= y;
-            if(contains)
-                return true;
-
-        }
+                    }
     }
     return contains;
 };
 
 // get the bp cell in (x,y) cordinate
-Graph.prototype.getScaledCellAt = function(x, y, parent, vertices, edges, ignoreFn)
+GraphBP.prototype.getScaledCellAt = function(x, y, parent, vertices, edges, ignoreFn)
 {
     vertices = (vertices != null) ? vertices : true;
     edges = (edges != null) ? edges : true;
@@ -242,32 +239,33 @@ Graph.prototype.getScaledCellAt = function(x, y, parent, vertices, edges, ignore
         }
     }
 
-    if (parent != null)
-    {
+    if (parent != null) {
         var childCount = this.model.getChildCount(parent);
 
-        for (var i = childCount - 1; i >= 0; i--)
-        {
+        for (var i = childCount - 1; i >= 0; i--) {
             var cell = this.model.getChildAt(parent, i);
             var result = this.getScaledCellAt(x, y, cell, vertices, edges, ignoreFn);
 
-            if (result != null)
-            {
+            //delete
+            if(result != null && result.bp_type == 'Console')
+                var t = 10;
+
+            if (result != null) {
                 return result;
             }
+
             else if (this.isCellVisible(cell) && (edges && this.model.isEdge(cell) ||
-                vertices && this.model.isVertex(cell)))
-            {
+                vertices && this.model.isVertex(cell))) {
                 var state = this.view.getState(cell);
 
                 if (state != null && (ignoreFn == null || !ignoreFn(state, x, y)) &&
-                    this.intersects(state, x, y))
-                {
-                    if(cell.bp_cell == null || (cell.bp_cell != null && cell.bp_cell))
+                    this.intersects(state, x, y)) {
+                    if (cell.bp_cell == null || (cell.bp_cell != null && cell.bp_cell))
                         return cell;
                 }
             }
         }
+
     }
 
     return null;

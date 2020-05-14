@@ -239,31 +239,37 @@ SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
 SidebarBP.prototype.createBPShape = function(name, shape)
 {
     //initial cells
-    var data = new mxCell('empty', new mxGeometry(0, 25, 160, 90), 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;connectable=0;');
+    var data = new mxCell('', new mxGeometry(0, mxGraph.headLineSize+4, 0, 0), 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;');
     data.vertex = true;
     data.selectable = false;
     data.bp_type = 'data';
-    data.bp_cell = false;
+    // data.bp_cell = false;
     // data.connectable = false;
 
     // divider line
-    var divider = new mxCell('', new mxGeometry(0, 50, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;rotatable=0;points=[];part=1;connectable=0;');
+    var divider = new mxCell('', new mxGeometry(0, mxGraph.headLineSize * 0.7, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;');
     divider.vertex = true;
     divider.selectable = false;
     divider.bp_type = 'divider';
-    divider.visible = false;
+    // divider.visible = false;
     divider.bp_cell = false;
-    // divider.connectable = false;
 
     var payload = this.cloneCell(data, 'payloads');
-    payload.geometry.y = 55;
+    payload.geometry.y = mxGraph.headLineSize * 2;
     payload.bp_type = 'payloads';
     payload.visible = false;
     payload.bp_cell = false;
-    // payload.connectable = false;
 
+    // divider line 2
+    var divider2 = new mxCell('', new mxGeometry(0, mxGraph.headLineSize * 2, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;');
+    divider2.vertex = true;
+    divider2.geometry.y = 55;
+    divider2.selectable = false;
+    divider2.bp_type = 'divider2';
+    divider2.visible = false;
+    divider2.bp_cell = false;
 
-    var cellStyle = 'shape=' + shape + ';swimlane;fontStyle=1;align=center;verticalAlign=top;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rotatable=0;';
+    var cellStyle = 'shape=' + shape + ';fontStyle=1;align=center;verticalAlign=top;horizontal=1;startSize=26;resizeParent=1;resizeLast=0;collapsible=1;rotatable=0;';
 
     // shape
     var cell = new mxCell(name, new mxGeometry(0, 0, 160, 90), cellStyle);
@@ -273,7 +279,12 @@ SidebarBP.prototype.createBPShape = function(name, shape)
 
     cell.insert(data);
     cell.insert(divider);
+
+    cell.insert(divider2);
     cell.insert(payload);
+
+    // cell.insert(payload);
+
 
     return cell;
 

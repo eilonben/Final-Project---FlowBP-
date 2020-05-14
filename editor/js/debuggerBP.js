@@ -213,8 +213,8 @@ debuggerBP.prototype.updateVertexCells = function(record) {
         });
 
         this.ui.fixView();
-
         this.mod.endUpdate();
+        Object.values(graph.getModel().cells).map(cell => graph.fixConnectionPointsLabelLocation(cell));
     }
 }
 
