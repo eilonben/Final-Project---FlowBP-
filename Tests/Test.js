@@ -1,4 +1,5 @@
 var xml_for_test="";
+var debug = new debuggerBP(uiBP);
 function readTextFile(file)
 {
     var rawFile = new XMLHttpRequest();
@@ -56,7 +57,7 @@ var testRequestsList = function () {
     for (var j = 0 ; j<100 ; j++) {
         try {
             document.getElementById("ConsoleText1").value="";
-            parse_graph(xml);
+            parse_graph(xml,debug);
             resulte = consoleToArray();
         } catch (e) {
             console.log(e);
@@ -82,7 +83,7 @@ var testHelloWorld = function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/Hello_World.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = consoleToArray();
         //console.log(window.eventsSelected);
     }catch (e) {
@@ -97,7 +98,7 @@ var testHotCold = function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HotCold.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = consoleToArray();
     }catch (e) {
         console.log(e);
@@ -114,7 +115,7 @@ var testRandomOrder = function () {
     for (var j = 0 ; j<100 ; j++) {
         try {
             document.getElementById("ConsoleText1").value="";
-            parse_graph(xml);
+            parse_graph(xml,debug);
             resulte = consoleToArray();
         } catch (e) {
             console.log(e);
@@ -143,7 +144,7 @@ var testPayload =function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/Payloads.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = consoleToArray();
     }catch (e) {
         console.log(e);
@@ -157,7 +158,7 @@ var testPayloadChange =function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/PayloadsChange.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = consoleToArray();
     }catch (e) {
         console.log(e);
@@ -171,7 +172,7 @@ var testPayloadsIfElse =function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/PayloadsIfElse.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = consoleToArray();
     }catch (e) {
         console.log(e);
@@ -222,7 +223,7 @@ var testExceptionHandle =function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/ExceptionHandle.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = consoleToArray();
     }catch (e) {
         console.log(e);
@@ -232,11 +233,11 @@ var testExceptionHandle =function () {
 }
 
 var testExceptionHandle2 =function () {
-    var expected = ["Before error","1","2","3","4","5","6"];
+    var expected = ["before error","1","2","3","4","5","6"];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/ExceptionHandle2.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = consoleToArray();
     }catch (e) {
         console.log(e);
@@ -256,7 +257,7 @@ var runTests = function() {
         initConsole();
         printToIndex(name,func());
     }
-
+    document.getElementById("001").innerText="";
     run("RequestsList", testRequestsList);  //Checks that only one of the requests events has occurred
     run("HelloWorld", testHelloWorld);     //Checks the order of requests that occur
     run("RandomOrder", testRandomOrder);   //Checks that randomization of requests events occurrence from two scenarios that starting from two different start-nodes is legal.

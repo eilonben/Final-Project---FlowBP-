@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" type="text/css" href="../resources/mxgraph/javascript/examples/grapheditor/www/styles/grapheditor.css">
     <link rel="stylesheet" href="../editor/codemirror/lib/codemirror.css">
-    <script src="codemirror/lib/codemirror.js"></script>
+    <script src="../editor/codemirror/lib/codemirror.js"></script>
     <script src="https://unpkg.com/esprima@~4.0/dist/esprima.js"></script>
     <script src="../editor/codemirror/mode/javascript/javascript.js"></script>
     <script type="text/javascript">
@@ -69,12 +69,16 @@
     <script type="text/javascript" src="../editor/js/ActionsBP.js"></script>
     <script type="text/javascript" src="../editor/js/DialogsBP.js"></script>
     <script type="text/javascript" src="../editor/js/mxClientBP.js"></script>
+    <script type="text/javascript" src="../Rungraph/debuggerBP.js"></script>
+    <script type="text/javascript" src="../Rungraph/BPEngine.js"></script>
+    <script type="text/javascript" src="../editor/js/ShapesBP.js"></script>
+
 </head>
 <body class="geEditor" id="001">
-<script type="text/javascript" src="Test.js"></script>
 <script type="text/javascript">
-
-
+    var uiBP =new EditorUiBP(null,null,null);
 </script>
+<script type="text/javascript" src="Test.js"></script>
+
 </body>
 </html>
