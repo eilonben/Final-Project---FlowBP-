@@ -222,6 +222,26 @@ var testExceptionHandle =function () {
     }
     return expected.toString() === resulte.toString();
 }
+var testExceptionHandle2 =function () {
+    var expected = ["Before error","1","2","3","4","5","6"];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/ExceptionHandle2.xml");
+    try {
+        parse_graph(xml);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    if(resulte.length==7) {
+        for (var i = 0; i < resulte.length; i++)
+            if (!expected.includes(resulte[i]))
+                return false;
+        return true;
+    }
+    return false;
+}
+
 function initConsole() {
     var textarea = document.createElement('textarea');
     textarea.setAttribute("id", "ConsoleText1");
@@ -350,6 +370,7 @@ var runTests = function() {
     run("Illegal Graph", testIllegalGraph);         //check if the graph has a lonely start node or edge without target or source.
     run("LegalGraph", testLegalGraph);
     run("ExceptionHandle", testExceptionHandle);    //check that when occur error while executing the JS code on node the execution is terminated.
+    run("ExceptionHandle2", testExceptionHandle2);    //check that when occur error while executing the JS code on node the execution is terminated.
 
 }
 
