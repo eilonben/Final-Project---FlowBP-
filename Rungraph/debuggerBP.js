@@ -52,8 +52,9 @@ debuggerBP.prototype.setConsoleSteps = function (rec) {
 
 debuggerBP.prototype.VisibilityIsChangeable = function(type){
     return type != null && type != 'data' && type != 'divider' && type != 'label';
+};
 
-}
+// changes special debug objects visibility
 debuggerBP.prototype.makePayloadSectionsVisible = function (bool) {
     let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
     cells.forEach(cell => {
@@ -81,6 +82,11 @@ debuggerBP.prototype.startDebugging = function(){
     let isLocked = this.editor.undoManager.indexOfNextAdd;
     this.graph.lockLayers(true);
     this.isLocked = this.editor.undoManager.indexOfNextAdd - isLocked;
+
+    this.mod.beginUpdate();
+    let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
+    cells.forEach(cell => this.fixSizes(cell, false));
+    this.mod.endUpdate();
 
     let isFixed = this.editor.undoManager.indexOfNextAdd;
     this.fixCellsChildrenSizes();
@@ -208,6 +214,7 @@ debuggerBP.prototype.fixSizes = function(cell, toDef) {
         var geo = this.mod.getGeometry(cell).clone();
         var payloads = this.graph.getChildByType(cell, 'payloads');
         var data = this.graph.getChildByType(cell, 'data');
+        var divider = this.graph.getChildByType(cell, 'divider2');
         if (cell.children !== null && cell.children !== undefined) {
             this.graph.cellSizeUpdated(data, true);
             //this.graph.updateCellSize(cell.children[0], true);
@@ -220,11 +227,17 @@ debuggerBP.prototype.fixSizes = function(cell, toDef) {
             //this.fixSizes(cell.children[2], width, height);
         }
         geo.width = Math.max(dWidth, pWidth, this.lastCellsSizes[cell.id].width);
-        // geo.height = dHeight + pHeight + this.lastCellsSizes[cell.children[1].id].height + 32;
+        geo.height = dHeight + pHeight + this.lastCellsSizes[divider.id].height + 32;
         this.mod.setGeometry(cell, geo);
         var tmpGeo = this.mod.getGeometry(data).clone();
         tmpGeo.width = Math.max(geo.width, dWidth, pWidth);
         this.mod.setGeometry(data, tmpGeo);
+
+        var dividerGeo = this.mod.getGeometry(divider).clone();
+        dividerGeo.y = this.mod.getGeometry(payloads).y;
+        this.mod.setGeometry(divider, dividerGeo);
+        this.graph.cellSizeUpdated(cell, true);
+        this.editor.graph.fixConnectionPointsLabelLocation(cell);
     }
 }
 

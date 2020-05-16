@@ -1864,7 +1864,6 @@ mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell, mul) {
 };
 
 
-
 // after resizing cell fix his connection point label location
 mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
 {
@@ -1976,11 +1975,6 @@ mxGraph.prototype.intersects = function(state, x, y)
 };
 
 
-mxGraph.prototype.hitsSwimlaneContent = function(swimlane, x, y)
-{
-    return false;
-};
-
 // unsed -> may use to prevent connect start node as target
 mxGraph.prototype.isValidConnection = function(source, target)
 {
@@ -2006,30 +2000,6 @@ mxGraph.prototype.isCellSelectable = function(cell)
 //
 //     return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
 // };
-
-// set all cells in graph visitable
-mxGraph.prototype.setAllCellsVisible = function(){
-    var cells = [];
-    if(this.getModel() != null && this.getModel().cells != null)
-        cells = Object.values(this.getModel().cells);
-
-    cells.map(cell => (cell != null && cell.visible != null) ? cell.visible = true : null);
-
-};
-
-// set the dividers and payloads cells invisible
-mxGraph.prototype.setCellsUnvisible = function(){
-    var cells = [];
-    if(this.getModel() != null && this.getModel().cells != null)
-        cells = Object.values(this.getModel().cells);
-
-    for(var i=0; i <= cells.length ; i++){
-        var cell = cells[i];
-        if(cell.bp_type != null && (cell.bp_type == 'divider' || cell.bp_type == 'payloads'))
-            cell.visible = false;
-    }
-
-};
 
 
 mxGraph.prototype.createGraphView = function()
