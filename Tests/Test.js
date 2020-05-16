@@ -252,25 +252,13 @@ var testExceptionHandle2 =function () {
     return false;
 }
 
-var runTests = function() {
-    document.getElementById("001").innerText="";
-    function run(name,func) {
-        initConsole();
-        printToIndex(name,func());
+
+var  debug_compareResulte = function(resulte,expected){
+    for (let i = 0; i < resulte.length-1; i++) {
+        if (JSON.stringify( expected[i].stages) != JSON.stringify(resulte[i].stages) || resulte[i].eventSelected!=expected[i].eventSelected)
+            return false;
     }
-    run("RequestsList", testRequestsList);  //Checks that only one of the requests events has occurred
-    run("HelloWorld", testHelloWorld);     //Checks the order of requests that occur
-    run("RandomOrder", testRandomOrder);   //Checks that randomization of requests events occurrence from two scenarios that starting from two different start-nodes is legal.
-    run("HotCold", testHotCold);           /* Checking the program hot cold:
-                                               Checks the order of requests that occur in conjunction with block and wait events*/
-    run("payload", testPayload);           //Check that the payloads that apply in the start node pass between nodes and check the current value of them
-    run("payloadChange", testPayloadChange);    /*check that the payloads that apply in the start node can by change their value.
-                                                    passes the payloads with the news changes between nodes and check the current new value of them*/
-    run("PayloadsIfElse", testPayloadsIfElse);    //check that general node send other payloads to other outputs, according to the user-defined in the "if-else" condition.
-    run("Illegal Graph", testIllegalGraph);         //check if the graph has a lonely start node or edge without target or source.
-    run("LegalGraph", testLegalGraph);
-    run("ExceptionHandle", testExceptionHandle);    //check that when occur error while executing the JS code on node the execution is terminated.
-    run("ExceptionHandle2", testExceptionHandle2);   
+    return true;
 
 }
 
@@ -284,13 +272,13 @@ var debug_testHelloWorld = function () {
     var xml = loadXMl("XML_for_tests/Hello_World.xml");
     try {
         parse_graph(xml,debug);
-        resulte = getProgramRecord();
+        resulte = debug.getProgramRecord();
         //console.log(window.eventsSelected);
     }catch (e) {
         console.log(e);
         return false;
     }
-    return expected.toString() === resulte.toString();
+    return debug_compareResulte(resulte,expected);
 }
 
 var debug_testRequestsList = function () {
@@ -307,15 +295,14 @@ var debug_testRequestsList = function () {
         try {
             document.getElementById("ConsoleText1").value="";
             parse_graph(xml,debug);
-            resulte = getProgramRecord();
+            resulte = debug.getProgramRecord();
         } catch (e) {
             console.log(e);
             return false;
         }
-        if (resulte.length != 1)
-            return false;
+
         for (let i = 0; i < expected.length; i++) {
-            if (expected[i].toString() === resulte.toString()) {
+            if (debug_compareResulte(resulte,expected[i])) {
                 statistic[i] += 1;
             }
         }
@@ -346,12 +333,12 @@ var debug_testHotCold = function () {
     var xml = loadXMl("XML_for_tests/HotCold.xml");
     try {
         parse_graph(xml,debug);
-        resulte = getProgramRecord();
+        resulte = debug.getProgramRecord();
     }catch (e) {
         console.log(e);
         return false;
     }
-    return expected.toString() === resulte.toString();
+    return debug_compareResulte(resulte,expected);;
 }
 
 var debug_testRandomOrder = function () {
@@ -428,13 +415,13 @@ var debug_testRandomOrder = function () {
         try {
             document.getElementById("ConsoleText1").value="";
             parse_graph(xml,debug);
-            resulte = getProgramRecord();
+            resulte = debug.getProgramRecord();
         } catch (e) {
             console.log(e);
             return false;
         }
         for (let i = 0; i < expected.length; i++) {
-            if (expected[i].toString() === resulte.toString()) {
+            if (debug_compareResulte(resulte,expected[i])) {
                 statistic[i]+=1;
             }
         }
@@ -459,12 +446,12 @@ var debug_testPayload =function () {
     var xml = loadXMl("XML_for_tests/Payloads.xml");
     try {
         parse_graph(xml,debug);
-        resulte = getProgramRecord();
+        resulte = debug.getProgramRecord();
     }catch (e) {
         console.log(e);
         return false;
     }
-    return expected.toString() === resulte.toString();
+    return debug_compareResulte(resulte,expected);
 }
 
 var debug_testPayloadChange =function () {
@@ -476,12 +463,12 @@ var debug_testPayloadChange =function () {
     var xml = loadXMl("XML_for_tests/PayloadsChange.xml");
     try {
         parse_graph(xml,debug);
-        resulte = getProgramRecord();
+        resulte = debug.getProgramRecord();
     }catch (e) {
         console.log(e);
         return false;
     }
-    return expected.toString() === resulte.toString();
+    return debug_compareResulte(resulte,expected);
 }
 
 var debug_testPayloadsIfElse =function () {
@@ -493,12 +480,41 @@ var debug_testPayloadsIfElse =function () {
     var xml = loadXMl("XML_for_tests/PayloadsIfElse.xml");
     try {
         parse_graph(xml,debug);
-        resulte = getProgramRecord();
+        resulte = debug.getProgramRecord();
     }catch (e) {
         console.log(e);
         return false;
     }
-    return expected.toString() === resulte.toString();
+    return debug_compareResulte(resulte,expected);
+}
+
+var runTests = function() {
+    document.getElementById("001").innerText="";
+    function run(name,func) {
+        initConsole();
+        printToIndex(name,func());
+    }
+    run("RequestsList", testRequestsList);  //Checks that only one of the requests events has occurred
+    run("HelloWorld", testHelloWorld);     //Checks the order of requests that occur
+    run("RandomOrder", testRandomOrder);   //Checks that randomization of requests events occurrence from two scenarios that starting from two different start-nodes is legal.
+    run("HotCold", testHotCold);           /* Checking the program hot cold:
+                                               Checks the order of requests that occur in conjunction with block and wait events*/
+    run("payload", testPayload);           //Check that the payloads that apply in the start node pass between nodes and check the current value of them
+    run("payloadChange", testPayloadChange);    /*check that the payloads that apply in the start node can by change their value.
+                                                    passes the payloads with the news changes between nodes and check the current new value of them*/
+    run("PayloadsIfElse", testPayloadsIfElse);    //check that general node send other payloads to other outputs, according to the user-defined in the "if-else" condition.
+    run("Illegal Graph", testIllegalGraph);         //check if the graph has a lonely start node or edge without target or source.
+    run("LegalGraph", testLegalGraph);
+    run("ExceptionHandle", testExceptionHandle);    //check that when occur error while executing the JS code on node the execution is terminated.
+    run("ExceptionHandle2", testExceptionHandle2);
+
+    run("debug_HelloWorld", debug_testHelloWorld);
+    run("debug_RequestsList", debug_testRequestsList);
+    run("debug_HotCold", debug_testHotCold);
+    run("debug_RandomOrder", debug_testRandomOrder);
+    run("debug_testPayload", debug_testPayload);
+    run("debug_testPayloadChange", debug_testPayloadChange);
+    run("debug_testPayloadsIfElse", debug_testPayloadsIfElse);
 }
 
 runTests();
