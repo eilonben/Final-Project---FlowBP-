@@ -72,6 +72,11 @@ debuggerBP.prototype.startDebugging = function(){
     this.savePreDebuggingInfo();
     this.makePayloadSectionsVisible(true);
 
+    //lock the option to create news edges
+    for (let i = 0; i < Object.keys(this.graph.getModel().cells).length ; i++) {
+        if(this.graph.getModel().cells[i].isVertex())
+        this.graph.getModel().cells[i].connectable=false;
+    }
 
     // Locks all layers
     let isLocked = this.editor.undoManager.indexOfNextAdd;
@@ -104,6 +109,12 @@ debuggerBP.prototype.startDebugging = function(){
 }
 
 debuggerBP.prototype.endDebugging = function() {
+
+    //unlock the option to create news edges
+    for (let i = 0; i < Object.keys(this.graph.getModel().cells).length ; i++) {
+        if(this.graph.getModel().cells[i].isVertex())
+            this.graph.getModel().cells[i].connectable=true;
+    }
 
     this.editor.undoManager.indexOfNextAdd = this.editor.undoManager.history.length;
     var numOfNewUndos = this.editor.undoManager.history.length - this.lastUndo;
@@ -290,7 +301,7 @@ debuggerBP.prototype.updateVertexCells = function(record) {
         this.ui.fixView();
 
         cells.forEach(cell => {
-            fixConnectionPointsLabelLocation(this.editor.graph, cell)
+            this.graph.fixConnectionPointsLabelLocation(this.editor.graph, cell)
         });
 
         this.mod.endUpdate();
