@@ -253,11 +253,11 @@ var testExceptionHandle2 =function () {
 }
 
 var runTests = function() {
+    document.getElementById("001").innerText="";
     function run(name,func) {
         initConsole();
         printToIndex(name,func());
     }
-    document.getElementById("001").innerText="";
     run("RequestsList", testRequestsList);  //Checks that only one of the requests events has occurred
     run("HelloWorld", testHelloWorld);     //Checks the order of requests that occur
     run("RandomOrder", testRandomOrder);   //Checks that randomization of requests events occurrence from two scenarios that starting from two different start-nodes is legal.
@@ -270,7 +270,7 @@ var runTests = function() {
     run("Illegal Graph", testIllegalGraph);         //check if the graph has a lonely start node or edge without target or source.
     run("LegalGraph", testLegalGraph);
     run("ExceptionHandle", testExceptionHandle);    //check that when occur error while executing the JS code on node the execution is terminated.
-    run("ExceptionHandle2", testExceptionHandle2);    //check that when occur error while executing the JS code on node the execution is terminated.
+    run("ExceptionHandle2", testExceptionHandle2);   
 
 }
 
@@ -283,7 +283,7 @@ var debug_testHelloWorld = function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/Hello_World.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = getProgramRecord();
         //console.log(window.eventsSelected);
     }catch (e) {
@@ -306,7 +306,7 @@ var debug_testRequestsList = function () {
     for (var j = 0 ; j<100 ; j++) {
         try {
             document.getElementById("ConsoleText1").value="";
-            parse_graph(xml);
+            parse_graph(xml,debug);
             resulte = getProgramRecord();
         } catch (e) {
             console.log(e);
@@ -345,7 +345,7 @@ var debug_testHotCold = function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HotCold.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = getProgramRecord();
     }catch (e) {
         console.log(e);
@@ -427,7 +427,7 @@ var debug_testRandomOrder = function () {
     for (var j = 0 ; j<100 ; j++) {
         try {
             document.getElementById("ConsoleText1").value="";
-            parse_graph(xml);
+            parse_graph(xml,debug);
             resulte = getProgramRecord();
         } catch (e) {
             console.log(e);
@@ -458,7 +458,7 @@ var debug_testPayload =function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/Payloads.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = getProgramRecord();
     }catch (e) {
         console.log(e);
@@ -475,7 +475,7 @@ var debug_testPayloadChange =function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/PayloadsChange.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = getProgramRecord();
     }catch (e) {
         console.log(e);
@@ -492,7 +492,7 @@ var debug_testPayloadsIfElse =function () {
     var resulte = [];
     var xml = loadXMl("XML_for_tests/PayloadsIfElse.xml");
     try {
-        parse_graph(xml);
+        parse_graph(xml,debug);
         resulte = getProgramRecord();
     }catch (e) {
         console.log(e);
