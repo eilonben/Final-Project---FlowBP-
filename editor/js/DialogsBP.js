@@ -15,7 +15,7 @@ var BSyncForm = function (editorUi, cell) {
     w = 800;
     h = 350;
     noHide = true;
-    var row, td
+    var row, td;
 
     var table = document.createElement('table');
     var tbody = document.createElement('tbody');
@@ -82,9 +82,8 @@ var BSyncForm = function (editorUi, cell) {
         }
         // value.setAttribute("label","Request: "+linkInput["Request"].value+"\nWait: "+linkInput["Wait"].value+"\nBlock: "+linkInput["Block"].value);
         graph.getModel().setValue(cell, value);
-        // graph.updateCellSize(cell, true);
 
-
+        //graph.updateCellSize(cell, true);
 
         editorUi.hideDialog();
     });

@@ -1698,43 +1698,29 @@ mxGraph.prototype.getNumOfOutEdges = function(source){
     return result;
 };
 
-// relocate connection points labels according to connection points labels
-mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell, x, y) {
-    if (cell == null || cell.children == null)
-        return;
-    var labels = getLabelsFromChildren(cell);
-    x = x || 0;
-    y = y || 0;
-
-    for (var i = 0; i < labels.length; i++) {
-        var ConnectionPointLabelCell = labels[i];
-
-        var constraint_img_height = this.connectionHandler.constraintHandler.getImageForConstraint().height;
-        var cp = cell.new_constraints[i].point;
-
-        var newY = y + cp.y * cell.getGeometry().height - constraint_img_height;
-        ConnectionPointLabelCell.geometry.y = newY;
-        var newX = x + cp.x * cell.getGeometry().width;
-        ConnectionPointLabelCell.geometry.x = newX;
-    }
-};
-
 mxGraph.prototype.getChildByType = function(cell, type)
 {
-    var filterd = cell.children.filter(x => x.bp_type != null && x.bp_type == type);
-    return filterd.length == 0 ? null : filterd[0];
+    var child = null;
+    if(cell.children != null) {
+        var filterd = cell.children.filter(x => x.bp_type != null && x.bp_type == type);
+        child = filterd.length == 0 ? null : filterd[0];
+    }
+    return child;
 };
 
 // relocate diviser to be at the defult size
 mxGraph.prototype.fixBPChildren = function(cell){
-    //
+
     var divider = this.getChildByType(cell, 'divider');
-    divider.geometry.y = mxGraph.headLineSize * 0.7;
+    if(divider != null)
+        divider.geometry.y = mxGraph.headLineSize * 0.7;
     //
     var cellHeight = cell.geometry.height;
     var data = this.getChildByType(cell, 'data');
-    data.geometry.height = cellHeight - mxGraph.headLineSize;
-    data.geometry.y = mxGraph.headLineSize ;
+    if(data != null) {
+        data.geometry.height = cellHeight - mxGraph.headLineSize;
+        data.geometry.y = mxGraph.headLineSize;
+    }
 
 };
 
@@ -1836,33 +1822,11 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
 };
 
 
-// relocate connection points labels according to connection points labels
-mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell, mul) {
-    if (cell == null || cell.children == null)
-        return;
-    var labels = getLabelsFromChildren(cell);
-    mul = mul || 1
-    for (var i = 0; i < labels.length; i++) {
-        var ConnectionPointLabelCell = labels[i];
-
-        var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
-        var cp = cell.new_constraints[i].point;
-
-        var newY = y + cp.y * cell.getGeometry().height - constraint_img_height *mul;
-        ConnectionPointLabelCell.geometry.y = newY;
-        var newX = x + cp.x * cell.getGeometry().width;
-        ConnectionPointLabelCell.geometry.x = newX;
-    }
-
-};
-
-
-
 // after resizing cell fix his connection point label location
 mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
 {
     var output =  this.resizeCells([cell], [bounds], recurse)[0];
-    graph.fixConnectionPointsLabelLocation(cell);
+    this.fixConnectionPointsLabelLocation(cell);
     this.fixBPChildren(cell);
     return output;
 };
@@ -1969,11 +1933,6 @@ mxGraph.prototype.intersects = function(state, x, y)
 };
 
 
-mxGraph.prototype.hitsSwimlaneContent = function(swimlane, x, y)
-{
-    return false;
-};
-
 // unsed -> may use to prevent connect start node as target
 mxGraph.prototype.isValidConnection = function(source, target)
 {
@@ -1999,30 +1958,6 @@ mxGraph.prototype.isCellSelectable = function(cell)
 //
 //     return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
 // };
-
-// set all cells in graph visitable
-mxGraph.prototype.setAllCellsVisible = function(){
-    var cells = [];
-    if(this.getModel() != null && this.getModel().cells != null)
-        cells = Object.values(this.getModel().cells);
-
-    cells.map(cell => (cell != null && cell.visible != null) ? cell.visible = true : null);
-
-};
-
-// set the dividers and payloads cells invisible
-mxGraph.prototype.setCellsUnvisible = function(){
-    var cells = [];
-    if(this.getModel() != null && this.getModel().cells != null)
-        cells = Object.values(this.getModel().cells);
-
-    for(var i=0; i <= cells.length ; i++){
-        var cell = cells[i];
-        if(cell.bp_type != null && (cell.bp_type == 'divider' || cell.bp_type == 'payloads'))
-            cell.visible = false;
-    }
-
-};
 
 
 mxGraph.prototype.createGraphView = function()
@@ -2052,4 +1987,29 @@ mxGraphSelectionModel.prototype.setCells = function(cells)
 
         this.changeSelection(tmp, this.cells);
     }
+};
+
+mxCell.prototype.isBPCell = function() {return this.bp_cell != null && this.bp_cell && this.bp_type != 'startnode'; }
+
+// relocate connection points labels according to connection points labels
+mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell) {
+    if (cell == null || cell.children == null)
+        return;
+
+    var labels = getLabelsFromChildren(cell);
+
+    for (var i = 0; i < labels.length; i++) {
+        var ConnectionPointLabelCell = labels[i];
+
+        var constraint_img_height = this.connectionHandler.constraintHandler.getImageForConstraint().height;
+        var cp = cell.new_constraints[i].point;
+
+        var newY = cp.y * cell.getGeometry().height - constraint_img_height;
+        var geo = ConnectionPointLabelCell.getGeometry().clone();
+        geo.y = newY;
+        var newX = cp.x * cell.getGeometry().width;
+        geo.x = newX;
+        this.getModel().setGeometry(ConnectionPointLabelCell, geo);
+    }
+
 };

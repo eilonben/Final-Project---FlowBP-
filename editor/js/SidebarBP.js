@@ -235,60 +235,47 @@ SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
     }
 };
 
+SidebarBP.prototype.setCellAttributs = function(value, geometry, style, type, bpCell, visible){
+    let cell = new mxCell(value, geometry, style);
+    cell.vertex = true;
+    cell.bp_type = type;
+    cell.bp_cell = bpCell;
+    cell.visible = visible ;
+    return cell;
+};
+
 // create bp shape
 SidebarBP.prototype.createBPShape = function(name, shape)
 {
-
-    //initial cells
-    var data = new mxCell('', new mxGeometry(0, mxGraph.headLineSize+4, 0, 0), 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;');
-    data.vertex = true;
-    data.selectable = false;
-    data.bp_type = 'data';
-    // data.bp_cell = false;
-    // data.connectable = false;
+    // data
+    let textGeometry = new mxGeometry(0, mxGraph.headLineSize, 0, 0);
+    let textStyle = 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;selectable=0;';
+    let data = this.setCellAttributs('', textGeometry,textStyle,'data',false, true);
 
     // divider line
-    var divider = new mxCell('', new mxGeometry(0, mxGraph.headLineSize * 0.7, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;');
-    divider.vertex = true;
-    divider.selectable = false;
-    divider.bp_type = 'divider';
-    // divider.visible = false;
-    divider.bp_cell = false;
+    let dividerGeometry = new mxGeometry(0, mxGraph.headLineSize * 0.7, 160, 8);
+    let lineStyle = 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;';
+    let divider = this.setCellAttributs('', dividerGeometry,lineStyle,'divider',false, true);
 
-    var payload = this.cloneCell(data, 'payloads');
-    payload.geometry.y = mxGraph.headLineSize * 2;
-    payload.bp_type = 'payloads';
-    payload.visible = false;
-    payload.bp_cell = false;
+    // payload
+    let payloadGeometry = new mxGeometry(0, mxGraph.headLineSize * 2, 160, 8);
+    let payload = this.setCellAttributs('', payloadGeometry, textStyle,'payloads', false, false);
 
     // divider line 2
-    var divider2 = new mxCell('', new mxGeometry(0, mxGraph.headLineSize * 2, 160, 8), 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;');
-    divider2.vertex = true;
-    divider2.geometry.y = 55;
-    divider2.selectable = false;
-    divider2.bp_type = 'divider2';
-    divider2.visible = false;
-    divider2.bp_cell = false;
-
-    var cellStyle = 'shape=' + shape + ';fontStyle=1;align=center;verticalAlign=top;horizontal=1;startSize=26;resizeParent=1;resizeLast=0;collapsible=1;rotatable=0;';
+    let divider2Geometry = new mxGeometry(0, mxGraph.headLineSize * 2, 160, 8);
+    let divider2 = this.setCellAttributs('', divider2Geometry, lineStyle, 'divider2', false, false);
 
     // shape
-    var cell = new mxCell(name, new mxGeometry(0, 0, 160, 90), cellStyle);
-    cell.vertex = true;
-    cell.bp_cell = true;
-    cell.bp_type = name;
+    let cellStyle = 'shape=' + shape + ';fontStyle=1;align=center;verticalAlign=top;horizontal=1;startSize=26;resizeParent=1;resizeLast=0;collapsible=1;rotatable=0;';
+    let cellGeometry = new mxGeometry(0, 0, 160, 90);
+    let cell = this.setCellAttributs(name, cellGeometry,cellStyle,name,true, true);
 
-    cell.insert(data);
     cell.insert(divider);
-
-    cell.insert(divider2);
+    cell.insert(data);
     cell.insert(payload);
-
-    // cell.insert(payload);
-
+    cell.insert(divider2);
 
     return cell;
-
 };
 
 /**
