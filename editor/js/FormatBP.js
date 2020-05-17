@@ -4,29 +4,8 @@ function getLabelsFromChildren(cell){
     var labels = children.filter(x => x.label_index != null);
     labels = labels.sort(function(a, b) {return a.label_index - b.label_index});
     return labels;
-}
-
-// relocate connection points labels according to connection points labels
-function fixConnectionPointsLabelLocation(graph, cell, x, y) {
-    if (cell == null || cell.children == null)
-        return;
-    var labels = getLabelsFromChildren(cell);
-    x = x || 0;
-    y = y || 0;
-
-    for (var i = 0; i < labels.length; i++) {
-        var ConnectionPointLabelCell = labels[i];
-
-        var constraint_img_height = graph.connectionHandler.constraintHandler.getImageForConstraint().height;
-        var cp = cell.new_constraints[i].point;
-
-        var newY = y + cp.y * cell.getGeometry().height - constraint_img_height;
-        ConnectionPointLabelCell.geometry.y = newY;
-        var newX = x + cp.x * cell.getGeometry().width;
-        ConnectionPointLabelCell.geometry.x = newX;
-    }
-
 };
+
 
 
 function getMapStyle(style) {
@@ -148,6 +127,7 @@ FormatBP.prototype.updateConnectionPointsLabels = function (graph, cell, labels)
                 labelVertex.selectable = false;
                 labelVertex.lock = true;
                 labelVertex.label_index = i;
+                labelVertex.bp_type = 'label';
                 // delete connection constraint for the label
             }
         }
@@ -176,7 +156,7 @@ FormatBP.prototype.adjustConnectionPointsLabels = function (graph, cell, newOutp
             }
         }
         //fix labels locations
-        fixConnectionPointsLabelLocation(graph, cell);
+        graph.fixConnectionPointsLabelLocation(cell);
     }
     finally {
         graph.getModel().endUpdate();
@@ -228,7 +208,7 @@ FormatBP.prototype.updateEdgesLabels = function (cell, graph, cellValue ) {
 };
 
 
-
+// origin format.js function, that update the right toolbar for the selected shapes
 FormatBP.prototype.refresh = function () {
 
     var format = this;
