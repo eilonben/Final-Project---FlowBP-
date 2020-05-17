@@ -24,7 +24,7 @@ debuggerBP.prototype.events = [];
 // Saves pre-debugging info such as stencils sizes, last undo index in undo manager and cell labels
 debuggerBP.prototype.savePreDebuggingInfo = function () {
     this.lastUndo = this.editor.undoManager.indexOfNextAdd;
-    this.lastLabels = this.getLabels();
+    //this.lastLabels = this.getLabels();
     this.lastCellsSizes = this.getCellsSizes();
     this.lastCellValues = this.getValues();
 }
@@ -34,9 +34,9 @@ debuggerBP.prototype.getValues = function(){
 
     let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
     cells.forEach(cell => {
-        if (cell.children !== null && cell.children !== undefined)
-            cell.children.forEach(child => res[child.id] = child.getValue())
-        res[cell.id] = cell.getValue();
+        if (cell.bp_type !== "startnode")
+            cell.children.forEach(child => res[child.id] = child.getValue() !== undefined ? child.getValue() : "")
+        res[cell.id] = cell.getValue() !== undefined ? cell.getValue() : "";
     });
 
     return res;
@@ -50,13 +50,18 @@ debuggerBP.prototype.setConsoleSteps = function (rec) {
     });
 }
 
+debuggerBP.prototype.VisibilityIsChangeable = function(type){
+    return type != null && type != 'data' && type != 'divider' && type != 'label';
+};
+
+// changes special debug objects visibility
 debuggerBP.prototype.makePayloadSectionsVisible = function (bool) {
-    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
+    let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
     cells.forEach(cell => {
-        if (cell.children !== null && cell.children !== undefined) {
-            cell.children.forEach(child => (child.bp_type!= null && child.bp_type!= 'label') ? child.setVisible(bool) : null);
-            cell.children[0].setVisible(true);
-        }
+        cell.children.forEach(child => {
+            if (this.VisibilityIsChangeable(child.bp_type))
+                child.setVisible(bool)
+        });
     })
 }
 
@@ -69,23 +74,25 @@ debuggerBP.prototype.fixCellsChildrenSizes = function(){
 
 debuggerBP.prototype.startDebugging = function(){
 
-    this.savePreDebuggingInfo();
     this.makePayloadSectionsVisible(true);
+    this.savePreDebuggingInfo();
 
     //lock the option to create news edges
-    for (let i = 0; i < Object.keys(this.graph.getModel().cells).length ; i++) {
-        if(this.graph.getModel().cells[i].isVertex())
-        this.graph.getModel().cells[i].connectable=false;
-    }
+    let tmpCells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
+    tmpCells.forEach(cell => cell.connectable=false);
+
 
     // Locks all layers
     let isLocked = this.editor.undoManager.indexOfNextAdd;
     this.graph.lockLayers(true);
     this.isLocked = this.editor.undoManager.indexOfNextAdd - isLocked;
 
+
     let isFixed = this.editor.undoManager.indexOfNextAdd;
-    this.fixCellsChildrenSizes();
-    this.ui.fixView();
+    let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
+    cells.forEach(cell => this.fixSizes(cell, false));
+    this.fixAllOutputsLabels();
+    //this.ui.fixView();
     this.isFixed = this.editor.undoManager.indexOfNextAdd - isFixed;
 
     var rec = this.getProgramRecord()
@@ -106,15 +113,14 @@ debuggerBP.prototype.startDebugging = function(){
 
     if (numOfUndos == 0)
         this.ui.enableDebugNext(false);
-}
+
+};
 
 debuggerBP.prototype.endDebugging = function() {
 
     //unlock the option to create news edges
-    for (let i = 0; i < Object.keys(this.graph.getModel().cells).length ; i++) {
-        if(this.graph.getModel().cells[i].isVertex())
-            this.graph.getModel().cells[i].connectable=true;
-    }
+    let tmpCells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
+    tmpCells.forEach(cell => cell.connectable=true);
 
     this.editor.undoManager.indexOfNextAdd = this.editor.undoManager.history.length;
     var numOfNewUndos = this.editor.undoManager.history.length - this.lastUndo;
@@ -126,7 +132,9 @@ debuggerBP.prototype.endDebugging = function() {
     this.graph.clearSelection();
     updateConsoleMessage("");
 
-    this.setLabels();
+    //this.setLabels();
+    this.fixAllOutputsLabels();
+    this.fixDataCells();
     this.makePayloadSectionsVisible(false);
 }
 
@@ -172,10 +180,15 @@ debuggerBP.prototype.next = function () {
 debuggerBP.prototype.getLabels = function() {
     var res = {};
 
-    let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
+    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_type);
     cells.forEach(cell => {
         let label = cell.getAttribute('label');
-        res[cell.id] = label != undefined ? label : ""
+        res[cell.id] = label != undefined ? label : "";
+        if(cell.bp_type !== "startnode")
+            cell.children.forEach(child => {
+                let clabel = child.getAttribute('label');
+                res[child.id] = clabel != undefined ? clabel : "";
+            })
     });
 
     return res;
@@ -205,28 +218,38 @@ debuggerBP.prototype.fixSizes = function(cell, toDef) {
         this.mod.setGeometry(cell, geo);
     }
     else {
-        var dWidth = 0;
-        var pWidth = 0;
-        var dHeight = 0;
-        var pHeight = 0;
-        var geo = this.mod.getGeometry(cell).clone();
-        if (cell.children !== null && cell.children !== undefined) {
-            this.graph.cellSizeUpdated(cell.children[0], true);
-            //this.graph.updateCellSize(cell.children[0], true);
-            dWidth = this.mod.getGeometry(cell.children[0]).width;
-            dHeight = this.mod.getGeometry(cell.children[0]).height;
-            this.graph.cellSizeUpdated(cell.children[2], true);
-            //this.graph.updateCellSize(cell.children[2], true);
-            pWidth = this.mod.getGeometry(cell.children[2]).width;
-            pHeight = this.mod.getGeometry(cell.children[2]).height;
-            //this.fixSizes(cell.children[2], width, height);
-        }
-        geo.width = Math.max(dWidth, pWidth, this.lastCellsSizes[cell.id].width);
-        geo.height = dHeight + pHeight + this.lastCellsSizes[cell.children[1].id].height + 32;
-        this.mod.setGeometry(cell, geo);
-        var tmpGeo = this.mod.getGeometry(cell.children[0]).clone();
-        tmpGeo.width = Math.max(geo.width, dWidth, pWidth);
-        this.mod.setGeometry(cell.children[0], tmpGeo);
+        this.graph.fixSizes(cell);
+        // var dWidth = 0;
+        // var pWidth = 0;
+        // var dHeight = 0;
+        // var pHeight = 0;
+        // var geo = this.mod.getGeometry(cell).clone();
+        // var payloads = this.graph.getChildByType(cell, 'payloads');
+        // var data = this.graph.getChildByType(cell, 'data');
+        // var divider = this.graph.getChildByType(cell, 'divider2');
+        // if (cell.children !== null && cell.children !== undefined) {
+        //     this.graph.cellSizeUpdated(data, true);
+        //     //this.graph.updateCellSize(cell.children[0], true);
+        //     dWidth = this.mod.getGeometry(data).width;
+        //     dHeight = this.mod.getGeometry(data).height;
+        //     this.graph.cellSizeUpdated(payloads, true);
+        //     //this.graph.updateCellSize(cell.children[2], true);
+        //     pWidth = this.mod.getGeometry(payloads).width;
+        //     pHeight = this.mod.getGeometry(payloads).height;
+        //     //this.fixSizes(cell.children[2], width, height);
+        // }
+        // geo.width = Math.max(dWidth, pWidth, geo.width);
+        // geo.height = dHeight + pHeight + divider.getGeometry().height + 32;
+        // this.mod.setGeometry(cell, geo);
+        // var tmpGeo = this.mod.getGeometry(data).clone();
+        // tmpGeo.width = Math.max(geo.width, dWidth, pWidth);
+        // this.mod.setGeometry(data, tmpGeo);
+        //
+        // var dividerGeo = this.mod.getGeometry(divider).clone();
+        // dividerGeo.y = this.mod.getGeometry(payloads).y;
+        // this.mod.setGeometry(divider, dividerGeo);
+        // //this.graph.cellSizeUpdated(cell, true);
+        // this.editor.graph.fixConnectionPointsLabelLocation(cell);
     }
 }
 
@@ -249,40 +272,60 @@ debuggerBP.prototype.convertPayloadToString = function(payload) {
     return res + "\n";
 }
 
+
+debuggerBP.prototype.colorCell = function(cell, color) {
+    mxUtils.setCellStyles(this.mod, [ cell], 'fillColor', color);
+}
 debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
-    var cellToUpdate = cell;
-    var val;
-    var color = "none";
-    if (payload !== undefined) {
-        color = "#99ff99";
-        if (cell.bp_type !== "startnode") {
-            if (cell.children !== null && cell.children !== undefined) {
-                cellToUpdate = cell.children[2];
-            }
-            val = this.convertPayloadToString(payload);
-        }
-    }
-    mxUtils.setCellStyles(this.mod, [cellToUpdate], 'fillColor', color);
-    if(val !== undefined)
-        this.mod.setValue(cellToUpdate, val);
-    if (cell.bp_type !== "startnode")
+    this.colorCell(cell, "none");
+    if(cell.isBPCell()) {
+        cell.children.forEach(child => {
+            if (payload !== undefined && child.bp_type == "payloads") {
+                this.colorCell(child, "#99ff99");
+                this.mod.setValue(child, this.convertPayloadToString(payload));
+            } else
+                this.colorCell(child, "none");
+        });
         this.fixSizes(cell, payload === undefined);
+    }
+    else if(payload !== undefined)
+        this.colorCell(cell, "#99ff99");
+
 }
 
 debuggerBP.prototype.setToOriginal = function (cell) {
     var geo = this.mod.getGeometry(cell).clone();
     geo.width = this.lastCellsSizes[cell.id].width;
     geo.height = this.lastCellsSizes[cell.id].height;
-    if (cell.children !== null && cell.children !== undefined){
-        this.setToOriginal(cell.children[1]);
-        this.setToOriginal(cell.children[2]);
-
-        mxUtils.setCellStyles(this.mod, [cell.children[2]], 'fillColor', 'none');
-        this.mod.setValue(cell.children[2], '');
+    var val = this.lastCellValues[cell.id];
+    if (cell.bp_cell && cell.bp_type !== "startnode"){
+        cell.children.forEach(child =>{
+            if(child.bp_type !== 'label') this.setToOriginal(child)
+        });
     }
+    mxUtils.setCellStyles(this.mod, cell, 'fillColor', 'none');
     this.mod.setGeometry(cell, geo);
-    this.mod.setValue(cell, this.lastCellValues[cell.id]);
+    this.mod.setValue(cell, val);
 }
+
+
+
+debuggerBP.prototype.fixAllOutputsLabels = function() {
+    let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
+    cells.forEach(cell => {
+        this.editor.graph.fixConnectionPointsLabelLocation(cell);
+    })
+};
+
+
+debuggerBP.prototype.fixDataCells = function() {
+    let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
+    cells.forEach(cell => {
+        var data = this.graph.getChildByType(cell, 'data');
+        data.geometry.height = 0;
+        data.geometry.width = 0;
+    })
+};
 
 debuggerBP.prototype.updateVertexCells = function(record) {
     let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
@@ -298,11 +341,9 @@ debuggerBP.prototype.updateVertexCells = function(record) {
             this.updateCell(cell, curStage[cell.id])
         });
 
-        this.ui.fixView();
+        //this.ui.fixView();
 
-        cells.forEach(cell => {
-            this.graph.fixConnectionPointsLabelLocation(this.editor.graph, cell)
-        });
+        this.fixAllOutputsLabels();
 
         this.mod.endUpdate();
     }
@@ -353,7 +394,7 @@ debuggerBP.prototype.getProgramRecord = function() {
     var res = []
 
     for(let step = 0; step < this.getNumOfSteps(); step++){
-        var curStage = {stages: [], eventSelected: null}
+        var curStage = {stages: {}, eventSelected: null}
         var scens = Object.values(this.scenarios);
         curStage.stages = {};
         for (let j = 0; j < scens.length; j++) {
@@ -362,7 +403,8 @@ debuggerBP.prototype.getProgramRecord = function() {
         }
         if(this.events[step] != -1)
             curStage.eventSelected = this.events[step];
-        res.push(curStage)
+        if(Object.values(curStage.stages).length > 0 || curStage.eventSelected !== undefined)
+            res.push(curStage)
     }
 
     return res;
