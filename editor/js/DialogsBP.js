@@ -78,14 +78,12 @@ var BSyncForm = function (editorUi, cell) {
         var cellData = cell.children != null ?  cell.children.filter(x => x.bp_type != null && x.bp_type == 'data')[0] : null;
         if(cellData != null) {
             cellData.value = "Request: " + linkInput["Request"].value + "\nWait: " + linkInput["Wait"].value + "\nBlock: " + linkInput["Block"].value;
-            // graph.updateCellSize(cellData, true);
-
+            graph.updateCellSize(cellData, true);
         }
         // value.setAttribute("label","Request: "+linkInput["Request"].value+"\nWait: "+linkInput["Wait"].value+"\nBlock: "+linkInput["Block"].value);
         graph.getModel().setValue(cell, value);
-        // graph.updateCellSize(cell, true);
 
-
+        //graph.updateCellSize(cell, true);
 
         editorUi.hideDialog();
     });

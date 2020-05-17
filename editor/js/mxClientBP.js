@@ -1698,27 +1698,6 @@ mxGraph.prototype.getNumOfOutEdges = function(source){
     return result;
 };
 
-// relocate connection points labels according to connection points labels
-mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell, x, y) {
-    if (cell == null || cell.children == null)
-        return;
-    var labels = getLabelsFromChildren(cell);
-    x = x || 0;
-    y = y || 0;
-
-    for (var i = 0; i < labels.length; i++) {
-        var ConnectionPointLabelCell = labels[i];
-
-        var constraint_img_height = this.connectionHandler.constraintHandler.getImageForConstraint().height;
-        var cp = cell.new_constraints[i].point;
-
-        var newY = y + cp.y * cell.getGeometry().height - constraint_img_height;
-        ConnectionPointLabelCell.geometry.y = newY;
-        var newX = x + cp.x * cell.getGeometry().width;
-        ConnectionPointLabelCell.geometry.x = newX;
-    }
-};
-
 mxGraph.prototype.getChildByType = function(cell, type)
 {
     var child = null;
@@ -1843,32 +1822,11 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
 };
 
 
-// relocate connection points labels according to connection points labels
-mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell, mul) {
-    if (cell == null || cell.children == null)
-        return;
-    var labels = getLabelsFromChildren(cell);
-    mul = mul || 1
-    for (var i = 0; i < labels.length; i++) {
-        var ConnectionPointLabelCell = labels[i];
-
-        var constraint_img_height = this.connectionHandler.constraintHandler.getImageForConstraint().height;
-        var cp = cell.new_constraints[i].point;
-
-        var newY = cp.y * cell.getGeometry().height - constraint_img_height *mul;
-        ConnectionPointLabelCell.geometry.y = newY;
-        var newX = cp.x * cell.getGeometry().width;
-        ConnectionPointLabelCell.geometry.x = newX;
-    }
-
-};
-
-
 // after resizing cell fix his connection point label location
 mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
 {
     var output =  this.resizeCells([cell], [bounds], recurse)[0];
-    graph.fixConnectionPointsLabelLocation(cell);
+    this.fixConnectionPointsLabelLocation(cell);
     this.fixBPChildren(cell);
     return output;
 };
@@ -2032,3 +1990,26 @@ mxGraphSelectionModel.prototype.setCells = function(cells)
 };
 
 mxCell.prototype.isBPCell = function() {return this.bp_cell != null && this.bp_cell && this.bp_type != 'startnode'; }
+
+// relocate connection points labels according to connection points labels
+mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell) {
+    if (cell == null || cell.children == null)
+        return;
+
+    var labels = getLabelsFromChildren(cell);
+
+    for (var i = 0; i < labels.length; i++) {
+        var ConnectionPointLabelCell = labels[i];
+
+        var constraint_img_height = this.connectionHandler.constraintHandler.getImageForConstraint().height;
+        var cp = cell.new_constraints[i].point;
+
+        var newY = cp.y * cell.getGeometry().height - constraint_img_height;
+        var geo = ConnectionPointLabelCell.getGeometry().clone();
+        geo.y = newY;
+        var newX = cp.x * cell.getGeometry().width;
+        geo.x = newX;
+        this.getModel().setGeometry(ConnectionPointLabelCell, geo);
+    }
+
+};

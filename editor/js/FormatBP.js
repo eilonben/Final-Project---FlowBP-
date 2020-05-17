@@ -208,7 +208,7 @@ FormatBP.prototype.updateEdgesLabels = function (cell, graph, cellValue ) {
 };
 
 
-
+// origin format.js function, that update the right toolbar for the selected shapes
 FormatBP.prototype.refresh = function () {
 
     var format = this;
