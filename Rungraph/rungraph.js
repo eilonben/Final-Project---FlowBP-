@@ -77,7 +77,7 @@ function writeToConsole(message) {
 //     return items[Math.floor(Math.random() * items.length)];
 // }
 
-function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
+function* goToFollowers(c, payload, bpEngine, model, outputs, scen) {
     let edg = model.getEdges(c, false, true, true);
 
     if (edg.length > 0) {
@@ -88,12 +88,12 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
                 let edgeLabel = edg[i].getAttribute("label");
                 if (edgeLabel !== undefined && outputs !== undefined) {
                     if (outputs[edgeLabel] !== undefined) {
-                        let nextPayloads = outputs[edgeLabel];
+                        let nextpayload = outputs[edgeLabel];
                         if(bpEngine.deb !== null) {
-                            runInNewBT(target, nextPayloads, bpEngine, model, bpEngine.deb.getScenarioTime(scen));
+                            runInNewBT(target, nextpayload, bpEngine, model, bpEngine.deb.getScenarioTime(scen));
                         }
                         else{
-                            runInNewBT(target, nextPayloads, bpEngine, model, null);
+                            runInNewBT(target, nextpayload, bpEngine, model, null);
                         }
                     }
                 }
@@ -104,14 +104,14 @@ function* goToFollowers(c, payloads, bpEngine, model, outputs, scen) {
         if (target !== undefined) {
             let block = getshape(c.getStyle());
             if (block !== "general") {
-                yield* runInSameBT(edg[0].getTerminal(false), JSON.parse(JSON.stringify(payloads)), bpEngine, model, scen);
+                yield* runInSameBT(edg[0].getTerminal(false), JSON.parse(JSON.stringify(payload)), bpEngine, model, scen);
             }
             else {
                 let edgeLabel = edg[0].getAttribute("label");
                 if (edgeLabel !== undefined && outputs !== undefined) {
                     if (outputs[edgeLabel] !== undefined) {
-                        let nextPayloads = outputs[edgeLabel];
-                        yield* runInSameBT(edg[0].getTerminal(false), nextPayloads, bpEngine, model, scen);
+                        let nextpayload = outputs[edgeLabel];
+                        yield* runInSameBT(edg[0].getTerminal(false), nextpayload, bpEngine, model, scen);
                     }
                 }
             }
@@ -130,12 +130,12 @@ A function which is called in 2 cases:
 2. When the interpreter encounters a split from a general node into 2 different nodes
 c describes the current cell the interpreter is parsing
  */
-function runInNewBT(c, payloads, bpEngine, model, curTime) {
+function runInNewBT(c, payload, bpEngine, model, curTime) {
     bpEngine.registerBThread(function* () {
         let outputs = {};
-        //cloning the payloads object array
-        let cloned = JSON.parse(JSON.stringify(payloads));
-        outputs = handleNodeAttributes(c,outputs,cloned,payloads);
+        //cloning the payload object
+        let cloned = JSON.parse(JSON.stringify(payload));
+        outputs = handleNodeAttributes(c,outputs,cloned,payload);
         if(outputs === -1){
             window.executeError = true;
             return;
@@ -145,10 +145,25 @@ function runInNewBT(c, payloads, bpEngine, model, curTime) {
             bpEngine.deb.newScen(c, curTime, cloned);
         }
 
-        if (c.getAttribute("sync") !== undefined) {
-            var stmt = JSON.parse(c.getAttribute("sync"));
-            yield stmt;
+        if (c.getAttribute("Request") !== undefined || c.getAttribute("Wait") !==undefined || c.getAttribute("Block")!==undefined ) {
+            // let stmt = JSON.parse(c.getAttribute("sync"));
+            // yield stmt;
             // cloned["selected"] = window.eventSelected;
+            let requested = handleBsync("Request",c,cloned);
+            if(requested === -1) {
+                return;
+            }
+            let wait = handleBsync("Wait",c,cloned);
+            if(wait === -1) {
+                return;
+            }
+            let block = handleBsync("Block",c,cloned);
+            if(block === -1) {
+                return;
+            }else{
+                let stmt = JSON.parse("{\"request\":" + JSON.stringify(requested) + ", \"wait\":" + JSON.stringify(wait)+ ",\"block\":" + JSON.stringify(block) + "}");
+                yield stmt;
+            }
         }
 
         yield* goToFollowers(c, cloned, bpEngine,model,outputs, c.scenarioID);
@@ -169,13 +184,13 @@ A function that handles all the fields inside a node relevant for executing BP f
 "sync" for the sync section in bsync nodes
 "log" for the code section in console nodes
  */
-function handleNodeAttributes(c, outputs, cloned, payloads) {
+function handleNodeAttributes(c, outputs, cloned, payload) {
     if(getshape(c.getStyle()) === "console") {
-        writeToConsole(JSON.stringify(payloads));
+        writeToConsole(JSON.stringify(payload));
     }
     if (c.getAttribute("code") !== undefined) {
         try {
-            eval('var func = function(payloads){' + c.getAttribute("code") + '\n}');
+            eval('var func = function(payload){' + c.getAttribute("code") + '\n}');
             outputs = func(cloned)
         }
         catch (e) {
@@ -186,7 +201,7 @@ function handleNodeAttributes(c, outputs, cloned, payloads) {
     }
     if (c.getAttribute("log") !== undefined) {
         try {
-            eval('var func = function(payloads){' + c.getAttribute("log") + '\n}');
+            eval('var func = function(payload){' + c.getAttribute("log") + '\n}');
             let consoleString = func(cloned);
             if (consoleString !== undefined) {
                 writeToConsole(consoleString);
@@ -201,32 +216,76 @@ function handleNodeAttributes(c, outputs, cloned, payloads) {
     return outputs;
 }
 
-function* runInSameBT(c, payloads, bpEngine, model, scen) {
+function* runInSameBT(c, payload, bpEngine, model, scen) {
     let outputs = {};
-    let cloned = JSON.parse(JSON.stringify(payloads));
+    let cloned = JSON.parse(JSON.stringify(payload));
     //checking if we are in debug mode
     if (bpEngine.deb != null) {
         bpEngine.deb.updateScen(scen, c, cloned);
     }
 
-    cloned = JSON.parse(JSON.stringify(payloads));
+    cloned = JSON.parse(JSON.stringify(payload));
 
-    outputs = handleNodeAttributes(c, outputs, cloned, payloads);
+    outputs = handleNodeAttributes(c, outputs, cloned, payload);
     if(outputs === -1){
         window.executeError = true;
         return;
     }
 
-    if (c.getAttribute("sync") !== undefined) {
-        let stmt = JSON.parse(c.getAttribute("sync"));
-        yield stmt;
+    if (c.getAttribute("Request") !== undefined || c.getAttribute("Wait") !==undefined || c.getAttribute("Block")!==undefined ) {
+        // let stmt = JSON.parse(c.getAttribute("sync"));
+        // yield stmt;
         // cloned["selected"] = window.eventSelected;
+        let requested = handleBsync("Request",c,cloned);
+        if(requested === -1) {
+            return;
+        }
+        let wait = handleBsync("Wait",c,cloned);
+        if(wait === -1) {
+            return;
+        }
+        let block = handleBsync("Block",c,cloned);
+        if(block === -1) {
+            return;
+        }else{
+           let stmt = JSON.parse("{\"request\":" + JSON.stringify(requested) + ", \"wait\":" + JSON.stringify(wait)+ ",\"block\":" + JSON.stringify(block) + "}");
+           yield stmt;
+        }
     }
 
     yield* goToFollowers(c, cloned, bpEngine, model, outputs, scen);
 }
 
-
+const handleBsync = function(section,c,payload) {
+    try {
+        if (c.getAttribute(section) === undefined || c.getAttribute(section) === null || c.getAttribute(section) === "")
+            return [];
+        eval('var func = function(payload){' + c.getAttribute(section) + '\n}');
+        let arr = func(payload);
+        let isOk = true;
+        if (!Array.isArray(arr)) {
+            isOk = false;
+        }
+        else {
+            const reducer = function (currBool, curritem) {
+                return (currBool && (curritem && typeof curritem.valueOf() === 'string'))
+            };
+            arr.reduce(reducer, isOk);
+        }
+        if (!isOk) {
+            alert(section + ' section should return an array of strings');
+            return -1;
+        }
+        else {
+            return arr;
+        }
+    }
+    catch (e) {
+        alert('There has been an error while executing the JS code on the ' + section + ' section' +
+            ": \n" + e + ".\n please try again");
+        return -1;
+    }
+};
 
 function startRunning(model, debug) {
     // Start the context nodes
@@ -247,9 +306,12 @@ function startRunning(model, debug) {
         });
     for (let i = 0; i < startNds.length; i++) {
         let payloads = [{}];
-        if (startNds[i].getAttribute("Payloads") !== undefined)
+        if (startNds[i].getAttribute("Payloads") !== undefined) {
             payloads = (JSON.parse(startNds[i].getAttribute("Payloads")));
-        runInNewBT(startNds[i], payloads, bpEngine, model, 0);
+            for (let j=0; j<payloads.length; j++){
+                runInNewBT(startNds[i], payloads[j], bpEngine, model, 0);
+            }
+        }
     }
     bpEngine.run().next();
     bpEngine.BThreads = [];
