@@ -23,6 +23,7 @@ BPEngine.prototype.run = function*(){
         if(this.deb!=null) {
             this.deb.addEvent(e);
         }
+        window.eventSelected = e;
         console.log(e + "\n");
         writeToConsole("event selected: " + e);
         this.BThreads.forEach(bt => {
@@ -40,11 +41,11 @@ BPEngine.prototype.run = function*(){
 function fixStmt(stmt) {
     if (stmt === undefined)
         return {request: [], block: [], wait: []};
-    if (stmt.request === undefined)
+    if (stmt.request === undefined || stmt.request === null)
         stmt.request = [];
-    if (stmt.block === undefined)
+    if (stmt.block === undefined || stmt.block === null)
         stmt.block = [];
-    if (stmt.wait === undefined)
+    if (stmt.wait === undefined || stmt.wait === null)
         stmt.wait = [];
     return stmt
 }
