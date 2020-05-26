@@ -39,7 +39,7 @@ var BSyncForm = function (editorUi, cell) {
     var linkInput = {};
 
     addSec = function (lbl) {
-        mxUtils.write(td, lbl);
+        mxUtils.write(td, lbl+"function(payload)");
         linkInput[lbl] = document.createElement('input');
         linkInput[lbl].setAttribute('type', 'text');
         linkInput[lbl].style.marginTop = '6px';

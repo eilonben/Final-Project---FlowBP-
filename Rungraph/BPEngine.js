@@ -23,6 +23,7 @@ BPEngine.prototype.run = function*(){
         if(this.deb!=null) {
             this.deb.addEvent(e);
         }
+        window.eventSelected = e;
         console.log(e + "\n");
         writeToConsole("event selected: " + e);
         this.BThreads.forEach(bt => {
