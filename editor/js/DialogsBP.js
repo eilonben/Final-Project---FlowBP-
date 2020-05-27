@@ -39,7 +39,7 @@ var BSyncForm = function (editorUi, cell) {
     var linkInput = {};
 
     addSec = function (lbl) {
-        mxUtils.write(td, lbl+"function(payload)");
+        mxUtils.write(td, lbl+"Function(payload)");
         linkInput[lbl] = document.createElement('input');
         linkInput[lbl].setAttribute('type', 'text');
         linkInput[lbl].style.marginTop = '6px';
@@ -78,7 +78,7 @@ var BSyncForm = function (editorUi, cell) {
         var cellData = cell.children != null ?  cell.children.filter(x => x.bp_type != null && x.bp_type == 'data')[0] : null;
         if(cellData != null) {
             cellData.value = "Request: " + linkInput["Request"].value + "\nWait: " + linkInput["Wait"].value + "\nBlock: " + linkInput["Block"].value;
-            graph.updateCellSize(cellData, true);
+            graph.fixSizes(cell);
         }
         // value.setAttribute("label","Request: "+linkInput["Request"].value+"\nWait: "+linkInput["Wait"].value+"\nBlock: "+linkInput["Block"].value);
         graph.getModel().setValue(cell, value);
