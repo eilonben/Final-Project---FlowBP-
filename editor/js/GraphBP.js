@@ -269,6 +269,8 @@ Graph.prototype.getScaledCellAt = function(x, y, parent, vertices, edges, ignore
                 {
                     if(cell.bp_cell == null || (cell.bp_cell != null && cell.bp_cell))
                         return cell;
+                    else if(cell.bp_cell != null && !cell.bp_cell)
+                        return cell.parent;
                 }
             }
         }

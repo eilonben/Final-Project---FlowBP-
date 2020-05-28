@@ -239,6 +239,7 @@ SidebarBP.prototype.setCellAttributs = function(value, geometry, style, type, bp
     let cell = new mxCell(value, geometry, style);
     cell.vertex = true;
     cell.bp_type = type;
+    cell.selectable = bpCell;
     cell.bp_cell = bpCell;
     cell.visible = visible ;
     return cell;
@@ -249,7 +250,7 @@ SidebarBP.prototype.createBPShape = function(name, shape)
 {
     // data
     let textGeometry = new mxGeometry(0, mxGraph.headLineSize, 0, 0);
-    let textStyle = 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;selectable=0;';
+    let textStyle = 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;';
     let data = this.setCellAttributs('', textGeometry,textStyle,'data',false, true);
 
     // divider line
