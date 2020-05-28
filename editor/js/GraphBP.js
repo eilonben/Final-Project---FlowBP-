@@ -267,8 +267,10 @@ Graph.prototype.getScaledCellAt = function(x, y, parent, vertices, edges, ignore
                 if (state != null && (ignoreFn == null || !ignoreFn(state, x, y)) &&
                     this.intersects(state, x, y))
                 {
-                    if(cell.bp_cell == null || (cell.bp_cell != null && cell.bp_cell))
+                    // if(cell.bp_cell == null || (cell.bp_cell != null && cell.bp_cell))
                         return cell;
+                    // else if(cell.bp_cell != null && !cell.bp_cell)
+                    //     return cell.parent;
                 }
             }
         }
