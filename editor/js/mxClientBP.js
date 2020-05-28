@@ -432,7 +432,7 @@ mxConnectionHandler.prototype.mouseMove = function(sender, me)
 
 //
 mxConnectionHandlerBP.prototype.isInnerChild = function(cell){
-    return (cell != null && cell.bp_type != null && cell.bp_type == 'data');
+    return (cell != null && cell.bp_type != null && (cell.bp_type == 'data' || cell.bp_type== 'divider'));
 };
 
 
@@ -1023,9 +1023,10 @@ mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, ev
 
     // //this is new
     const edges = cells.filter(cell => cell.getStyle().includes("edgeStyle"));
-    const shapes = cells.filter(cell => cell.getStyle().includes('shape'));
+    const shapes = cells.filter(cell => cell.bp_type != null);
+    const noneShapeOrEdge = cells.filter(cell => cell.bp_type == null);
     var validEdges = edges.filter(edge => (cells.includes(edge.target) && cells.includes(edge.source)));
-    cells = shapes.concat(validEdges);
+    cells = shapes.concat(validEdges).concat(noneShapeOrEdge);
 
 
     //this is old
@@ -1403,7 +1404,7 @@ mxGraphView.prototype.removeState = function(cell)
 
 mxGraphViewBP.prototype = Object.create(mxGraphView.prototype);
 
-// drow connection points of all bp shapes (call show constraint)
+// draw connection points of all bp shapes (call show constraint)
 mxGraphViewBP.prototype.validate = function(cell)
 {
     var t0 = mxLog.enter('mxGraphView.validate');
@@ -1675,7 +1676,7 @@ Objectives
  */
 mxGraph.headLineSize = 26;
 
-mxGraph.prototype.cellsEditable = false;
+mxGraph.prototype.cellsEditable = true;
 
 mxGraph.prototype.vertexLabelsMovable = false;
 
@@ -1708,12 +1709,13 @@ mxGraph.prototype.getChildByType = function(cell, type)
     return child;
 };
 
-// relocate diviser to be at the defult size
-mxGraph.prototype.fixBPChildren = function(cell){
-
+// relocate divider to be at the defult size
+mxGraph.prototype.fixBPChildren = function(cell, dividerGeomtry){
     var divider = this.getChildByType(cell, 'divider');
-    if(divider != null)
+    if(divider != null) {
         divider.geometry.y = mxGraph.headLineSize * 0.7;
+        divider.geometry.height =  dividerGeomtry != null ?dividerGeomtry.height : divider.geometry.height;
+    }
     //
     var cellHeight = cell.geometry.height;
     var data = this.getChildByType(cell, 'data');
@@ -1825,15 +1827,21 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
 // after resizing cell fix his connection point label location
 mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
 {
+    var dividerGeomtry;
+    if(cell != null && cell.isBPCell())
+        dividerGeomtry = this.getChildByType(cell, 'divider').geometry;
     var output =  this.resizeCells([cell], [bounds], recurse)[0];
     this.fixConnectionPointsLabelLocation(cell);
-    this.fixBPChildren(cell);
+    this.fixBPChildren(cell, dividerGeomtry);
     return output;
 };
 
 // use lock attribute
 mxGraph.prototype.isCellLocked = function(cell)
 {
+    if (cell.bp_cell != null && !cell.bp_cell)
+        return true;
+
     var geometry = this.model.getGeometry(cell);
 
     return this.isCellsLocked() || (geometry != null && this.model.isVertex(cell) && geometry.relative) ||
@@ -1948,16 +1956,16 @@ mxGraph.prototype.isCellSelectable = function(cell)
     return this.isCellsSelectable();
 };
 
-// mxGraph.prototype.isCellEditable = function(cell)
-// {
-//     if(cell != null && cell.lock != null && cell.lock)
-//         return false;
-//
-//     var state = this.view.getState(cell);
-//     var style = (state != null) ? state.style : this.getCellStyle(cell);
-//
-//     return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
-// };
+mxGraph.prototype.isCellEditable = function(cell)
+{
+    if(cell != null && cell.bp_type != null || cell.isEdge())
+        return false;
+
+    var state = this.view.getState(cell);
+    var style = (state != null) ? state.style : this.getCellStyle(cell);
+
+    return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
+};
 
 
 mxGraph.prototype.createGraphView = function()

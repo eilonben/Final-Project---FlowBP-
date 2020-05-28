@@ -75,10 +75,15 @@ var BSyncForm = function (editorUi, cell) {
         value.setAttribute("Request", linkInput["Request"].value);
         value.setAttribute("Wait", linkInput["Wait"].value);
         value.setAttribute("Block", linkInput["Block"].value);
-        var cellData = cell.children != null ?  cell.children.filter(x => x.bp_type != null && x.bp_type == 'data')[0] : null;
+        var cellData = graph.getChildByType(cell, 'data');
         if(cellData != null) {
+            var oldHeight = cell.geometry.height;
             cellData.value = "Request: " + linkInput["Request"].value + "\nWait: " + linkInput["Wait"].value + "\nBlock: " + linkInput["Block"].value;
             graph.fixSizes(cell);
+            // cellData.geometry.width = 0;
+            // cellData.geometry.height = 0;
+            cell.geometry.height = cellData.geometry.y + cellData.geometry.height;
+
         }
         // value.setAttribute("label","Request: "+linkInput["Request"].value+"\nWait: "+linkInput["Wait"].value+"\nBlock: "+linkInput["Block"].value);
         graph.getModel().setValue(cell, value);
