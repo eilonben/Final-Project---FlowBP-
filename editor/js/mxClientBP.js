@@ -1709,12 +1709,13 @@ mxGraph.prototype.getChildByType = function(cell, type)
     return child;
 };
 
-// relocate diviser to be at the defult size
-mxGraph.prototype.fixBPChildren = function(cell){
-
+// relocate divider to be at the defult size
+mxGraph.prototype.fixBPChildren = function(cell, dividerGeomtry){
     var divider = this.getChildByType(cell, 'divider');
-    if(divider != null)
+    if(divider != null) {
         divider.geometry.y = mxGraph.headLineSize * 0.7;
+        divider.geometry.height =  dividerGeomtry != null ?dividerGeomtry.height : divider.geometry.height;
+    }
     //
     var cellHeight = cell.geometry.height;
     var data = this.getChildByType(cell, 'data');
@@ -1826,9 +1827,12 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
 // after resizing cell fix his connection point label location
 mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
 {
+    var dividerGeomtry;
+    if(cell != null && cell.isBPCell())
+        dividerGeomtry = this.getChildByType(cell, 'divider').geometry;
     var output =  this.resizeCells([cell], [bounds], recurse)[0];
     this.fixConnectionPointsLabelLocation(cell);
-    this.fixBPChildren(cell);
+    this.fixBPChildren(cell, dividerGeomtry);
     return output;
 };
 

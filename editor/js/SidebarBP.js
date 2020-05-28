@@ -250,7 +250,7 @@ SidebarBP.prototype.createBPShape = function(name, shape)
 {
     // data
     let textGeometry = new mxGeometry(0, mxGraph.headLineSize, 0, 0);
-    let textStyle = 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;';
+    let textStyle = 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;resizeParent=1;';
     let data = this.setCellAttributs('', textGeometry,textStyle,'data',false, true);
 
     // divider line
