@@ -254,7 +254,7 @@ var testExceptionHandle2 =function () {
 
 
 var  debug_compareResulte = function(resulte,expected){
-    for (let i = 0; i < resulte.length-1; i++) {
+    for (let i = 0; i < resulte.length; i++) {
         if (JSON.stringify( expected[i].stages) != JSON.stringify(resulte[i].stages) || resulte[i].eventSelected!=expected[i].eventSelected)
             return false;
     }
@@ -263,11 +263,11 @@ var  debug_compareResulte = function(resulte,expected){
 }
 
 var debug_testHelloWorld = function () {
-    var expected = [{"stages":{"24":[{}]},"eventSelected":null},
-        {"stages":{"26":[{}]},"eventSelected":null},
-        {"stages":{"26":[{}]},"eventSelected":"Hello"},
-        {"stages":{"27":[{}]},"eventSelected":null},
-        {"stages":{"27":[{}]},"eventSelected":"World"}];
+    var expected = [{"stages":{"28":[{}]},"eventSelected":null},
+        {"stages":{"29":[{}]},"eventSelected":null},
+        {"stages":{"29":[{}]},"eventSelected":"Hello"},
+        {"stages":{"34":[{}]},"eventSelected":null},
+        {"stages":{"34":[{}]},"eventSelected":"World"}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/Hello_World.xml");
     try {
@@ -282,12 +282,12 @@ var debug_testHelloWorld = function () {
 }
 
 var debug_testRequestsList = function () {
-    var expected = [[{"stages":{"6":[{}]},"eventSelected":null},
-        {"stages":{"7":[{}]},"eventSelected":null},
-        {"stages":{"7":[{}]},"eventSelected":"Goodbye"}],
-        [{"stages":{"6":[{}]},"eventSelected":null},
-        {"stages":{"7":[{}]},"eventSelected":null},
-        {"stages":{"7":[{}]},"eventSelected":"Hi"}]];
+    var expected = [[{"stages":{"9":[{}]},"eventSelected":null},
+        {"stages":{"10":[{}]},"eventSelected":null},
+        {"stages":{"10":[{}]},"eventSelected":"Goodbye"}],
+        [{"stages":{"9":[{}]},"eventSelected":null},
+        {"stages":{"10":[{}]},"eventSelected":null},
+        {"stages":{"10":[{}]},"eventSelected":"Hi"}]];
     var statistic=[0,0];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HiOrGoodbye.xml");
@@ -315,20 +315,20 @@ var debug_testRequestsList = function () {
 }
 
 var debug_testHotCold = function () {
-    var expected = [{"stages":{"3":[{}],"12":[{}],"17":[{}]},"eventSelected":null},
-        {"stages":{"2":[{}],"10":[{}],"18":[{}]},"eventSelected":null},
-        {"stages":{"2":[{}],"10":[{}],"18":[{}]},"eventSelected":"Hot"},
-        {"stages":{"5":[{}],"10":[{}],"19":[{}]},"eventSelected":null},
-        {"stages":{"5":[{}],"10":[{}],"19":[{}]},"eventSelected":"Cold"},
-        {"stages":{"5":[{}],"14":[{}],"18":[{}]},"eventSelected":null},
-        {"stages":{"5":[{}],"14":[{}],"18":[{}]},"eventSelected":"Hot"},
-        {"stages":{"6":[{}],"14":[{}],"19":[{}]},"eventSelected":null},
-        {"stages":{"6":[{}],"14":[{}],"19":[{}]},"eventSelected":"Cold"},
-        {"stages":{"6":[{}],"15":[{}],"18":[{}]},"eventSelected":null},
-        {"stages":{"6":[{}],"15":[{}],"18":[{}]},"eventSelected":"Hot"},
-        {"stages":{"15":[{}],"19":[{}]},"eventSelected":null},
-        {"stages":{"15":[{}],"19":[{}]},"eventSelected":"Cold"},
-        {"stages":{"18":[{}]},"eventSelected":null}]
+    var expected = [{"stages":{"23":[{}],"24":[{}],"25":[{}]},"eventSelected":null},
+        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":null},
+        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":"Hot"},
+        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":null},
+        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":"Cold"},
+        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":null},
+        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":"Hot"},
+        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":null},
+        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":"Cold"},
+        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":null},
+        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":"Hot"},
+        {"stages":{"60":[{}],"67":[{}]},"eventSelected":null},
+        {"stages":{"60":[{}],"67":[{}]},"eventSelected":"Cold"},
+        {"stages":{"36":[{}]},"eventSelected":null}]
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HotCold.xml");
     try {
@@ -342,70 +342,65 @@ var debug_testHotCold = function () {
 }
 
 var debug_testRandomOrder = function () {
-    var expected = [[{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
-        {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
-        {"stages":{"4":[{}],"5":[{}]},"eventSelected":"3"},
-        {"stages":{"4":[{}],"9":[{}]},"eventSelected":null},
-        {"stages":{"4":[{}],"9":[{}]},"eventSelected":"1"},
-        {"stages":{"8":[{}],"9":[{}]},"eventSelected":null},
-        {"stages":{"8":[{}],"9":[{}]},"eventSelected":"2"},
-        {"stages":{"9":[{}]},"eventSelected":null},
-        {"stages":{"9":[{}]},"eventSelected":"4"},
-        {"stages":{},"eventSelected":null}],
+    var expected = [[{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
+        {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
+        {"stages":{"14":[{}],"19":[{}]},"eventSelected":"3"},
+        {"stages":{"14":[{}],"29":[{}]},"eventSelected":null},
+        {"stages":{"14":[{}],"29":[{}]},"eventSelected":"1"},
+        {"stages":{"24":[{}],"29":[{}]},"eventSelected":null},
+        {"stages":{"24":[{}],"29":[{}]},"eventSelected":"2"},
+        {"stages":{"29":[{}]},"eventSelected":null},
+        {"stages":{"29":[{}]},"eventSelected":"4"}],
 
-        [{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"5":[{}]},"eventSelected":"1"},
-            {"stages":{"5":[{}],"8":[{}]},"eventSelected":null},
-            {"stages":{"5":[{}],"8":[{}]},"eventSelected":"2"},
-            {"stages":{"5":[{}]},"eventSelected":null},
-            {"stages":{"5":[{}]},"eventSelected":"3"},
-            {"stages":{"9":[{}]},"eventSelected":null},
-            {"stages":{"9":[{}]},"eventSelected":"4"},
-            {"stages":{},"eventSelected":null}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":"1"},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":"2"},
+            {"stages":{"19":[{}]},"eventSelected":null},
+            {"stages":{"19":[{}]},"eventSelected":"3"},
+            {"stages":{"29":[{}]},"eventSelected":null},
+            {"stages":{"29":[{}]},"eventSelected":"4"}],
 
-        [{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"5":[{}]},"eventSelected":"1"},
-            {"stages":{"5":[{}],"8":[{}]},"eventSelected":null},
-            {"stages":{"5":[{}],"8":[{}]},"eventSelected":"3"},
-            {"stages":{"8":[{}],"9":[{}]},"eventSelected":null},
-            {"stages":{"8":[{}],"9":[{}]},"eventSelected":"4"},
-            {"stages":{"8":[{}]},"eventSelected":null},
-            {"stages":{"8":[{}]},"eventSelected":"2"},
-            {"stages":{},"eventSelected":null}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":"1"},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":"3"},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":"4"},
+            {"stages":{"24":[{}]},"eventSelected":null},
+            {"stages":{"24":[{}]},"eventSelected":"2"}],
 
-        [{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"5":[{}]},"eventSelected":"3"},
-            {"stages":{"4":[{}],"9":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"9":[{}]},"eventSelected":"4"},
-            {"stages":{"4":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}]},"eventSelected":"1"},
-            {"stages":{"8":[{}]},"eventSelected":null},
-            {"stages":{"8":[{}]},"eventSelected":"2"},
-            {"stages":{},"eventSelected":null}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":"3"},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":"4"},
+            {"stages":{"14":[{}]},"eventSelected":null},
+            {"stages":{"14":[{}]},"eventSelected":"1"},
+            {"stages":{"24":[{}]},"eventSelected":null},
+            {"stages":{"24":[{}]},"eventSelected":"2"}],
 
-        [{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"5":[{}]},"eventSelected":"1"},
-            {"stages":{"5":[{}],"8":[{}]},"eventSelected":null},
-            {"stages":{"5":[{}],"8":[{}]},"eventSelected":"3"},
-            {"stages":{"8":[{}],"9":[{}]},"eventSelected":null},
-            {"stages":{"8":[{}],"9":[{}]},"eventSelected":"2"},
-            {"stages":{"9":[{}]},"eventSelected":null},
-            {"stages":{"9":[{}]},"eventSelected":"4"},
-            {"stages":{},"eventSelected":null}],
+            [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
+                {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
+                {"stages":{"14":[{}],"19":[{}]},"eventSelected":"1"},
+                {"stages":{"19":[{}],"24":[{}]},"eventSelected":null},
+                {"stages":{"19":[{}],"24":[{}]},"eventSelected":"3"},
+                {"stages":{"24":[{}],"29":[{}]},"eventSelected":null},
+                {"stages":{"24":[{}],"29":[{}]},"eventSelected":"2"},
+                {"stages":{"29":[{}]},"eventSelected":null},
+                {"stages":{"29":[{}]},"eventSelected":"4"}],
 
-        [{"stages":{"2":[{}],"3":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"5":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"5":[{}]},"eventSelected":"3"},
-            {"stages":{"4":[{}],"9":[{}]},"eventSelected":null},
-            {"stages":{"4":[{}],"9":[{}]},"eventSelected":"1"},
-            {"stages":{"8":[{}],"9":[{}]},"eventSelected":null},
-            {"stages":{"8":[{}],"9":[{}]},"eventSelected":"4"},
-            {"stages":{"8":[{}]},"eventSelected":null},
-            {"stages":{"8":[{}]},"eventSelected":"2"},
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":"3"},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":"1"},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":"4"},
+            {"stages":{"24":[{}]},"eventSelected":null},
+            {"stages":{"24":[{}]},"eventSelected":"2"},
             {"stages":{},"eventSelected":null}]];
 
     var statistic=[0,0,0,0,0,0];
@@ -439,9 +434,8 @@ var debug_testRandomOrder = function () {
 }
 
 var debug_testPayload =function () {
-    var expected = [{"stages":{"12":[{"x":3},{"y":4}]}},
-        {"stages":{"14":[{"x":3},{"y":4}]}},
-        {"stages":{}}];
+    var expected = [{"stages":{"2":[{"x":3},{"y":4}]}},
+        {"stages":{"3":[{"x":3},{"y":4}]}}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/Payloads.xml");
     try {
@@ -455,10 +449,9 @@ var debug_testPayload =function () {
 }
 
 var debug_testPayloadChange =function () {
-    var expected = [{"stages":{"21":[{"x":3},{"y":2}]}},
-        {"stages":{"33":[{"x":3},{"y":2}]}},
-        {"stages":{"24":[{"x":5},{"y":6}]}},
-        {"stages":{}}];
+    var expected = [{"stages":{"2":[{"x":3},{"y":2}]}},
+        {"stages":{"9":[{"x":3},{"y":2}]}},
+        {"stages":{"14":[{"x":5},{"y":6}]}}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/PayloadsChange.xml");
     try {
@@ -509,7 +502,7 @@ var runTests = function() {
     run("ExceptionHandle2", testExceptionHandle2);
 
     run("debug_HelloWorld", debug_testHelloWorld);
-    run("debug_RequestsList", debug_testRequestsList);
+    run("debug_RandomOrder", debug_testRequestsList);
     run("debug_HotCold", debug_testHotCold);
     run("debug_RandomOrder", debug_testRandomOrder);
     run("debug_testPayload", debug_testPayload);
