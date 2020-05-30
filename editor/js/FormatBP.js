@@ -442,6 +442,10 @@ FormatBP.prototype.refresh = function () {
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
                 var outputNumber = parseInt(NumberOfOutPutBox.value);
+                if(!Number.isInteger(outputNumber)) {
+                    NumberOfOutPutBox.value = value.getAttribute("numberOfOutputs");
+                    return;
+                }
                 format.adjustConnectionPoints(cell, outputNumber, graph);
                 format.deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 format.adjustEdges(cell, outputNumber, graph);
