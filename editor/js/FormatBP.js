@@ -75,11 +75,13 @@ FormatBP.prototype.validateNewConstraint = function (cell, graph){
 
 // compute constraint new position
 FormatBP.prototype.computeNewPosition = function(cell, numOfOutputs, index){
-    var cellHeight = cell.geometry.height;
-    var cellTitle = getValueByKey(cell.getStyle(),'startSize',26);
-    var cellContent = cellHeight -  cellTitle;
-    var interval = (cellContent / cellHeight ) / (numOfOutputs + 1);
-    return new mxPoint(mxConnectionHandlerBP.defultOutputX,(cellTitle/cellHeight) + interval * index);
+    // var cellHeight = cell.geometry.height;
+    // var cellTitle = mxGraph.headLineSize *0.7;
+    // var cellContent = cellHeight -  cellTitle;
+    // var interval = (cellContent / cellHeight ) / (numOfOutputs + 1);
+    // return new mxPoint(mxConnectionHandlerBP.defultOutputX,(cellTitle/cellHeight) + interval * index);
+    var interval = 1 / (numOfOutputs + 1);
+    return new mxPoint(mxConnectionHandlerBP.defultOutputX, interval * index);
 }
 
 
@@ -442,6 +444,10 @@ FormatBP.prototype.refresh = function () {
             var NumberOfOutPutButton = createApplyButton();
             NumberOfOutPutButton.onclick = function () {
                 var outputNumber = parseInt(NumberOfOutPutBox.value);
+                if(!Number.isInteger(outputNumber)) {
+                    NumberOfOutPutBox.value = value.getAttribute("numberOfOutputs");
+                    return;
+                }
                 format.adjustConnectionPoints(cell, outputNumber, graph);
                 format.deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
                 format.adjustEdges(cell, outputNumber, graph);
