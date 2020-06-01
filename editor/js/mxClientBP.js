@@ -430,11 +430,6 @@ mxConnectionHandler.prototype.mouseMove = function(sender, me)
     }
 };
 
-//
-mxConnectionHandlerBP.prototype.isInnerChild = function(cell){
-    return (cell != null && cell.bp_type != null && (cell.bp_type == 'data' || cell.bp_type== 'divider'));
-};
-
 
 // when connecting into child of bp -> connect to his parent
 mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarget)
@@ -448,7 +443,7 @@ mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarg
         var edge = null;
 
         //If this is a bp child connect to his parent
-        if (this.isInnerChild(target))
+        if (target.isInnerChild())
             target = target.parent;
 
         model.beginUpdate();
@@ -1383,6 +1378,57 @@ function mxGraphViewBP(graph){
 
 };
 
+mxGraphViewBP.prototype = Object.create(mxGraphView.prototype);
+
+
+
+// reconnecting edge to bp node when connection to his children
+mxGraphView.prototype.updateEdgeState = function(state, geo)
+{
+    var source = state.getVisibleTerminalState(true);
+    var target = state.getVisibleTerminalState(false);
+
+    //If this is a bp child connect to his parent
+    if (target!= null && target.cell.isInnerChild()) {
+        var targetcell = target.cell.parent;
+        target = this.getState(targetcell)
+    }
+
+
+    // This will remove edges with no terminals and no terminal points
+    // as such edges are invalid and produce NPEs in the edge styles.
+    // Also removes connected edges that have no visible terminals.
+    if ((this.graph.model.getTerminal(state.cell, true) != null && source == null) ||
+        (source == null && geo.getTerminalPoint(true) == null) ||
+        (this.graph.model.getTerminal(state.cell, false) != null && target == null) ||
+        (target == null && geo.getTerminalPoint(false) == null))
+    {
+        this.clear(state.cell, true);
+    }
+    else
+    {
+        this.updateFixedTerminalPoints(state, source, target);
+        this.updatePoints(state, geo.points, source, target);
+        this.updateFloatingTerminalPoints(state, source, target);
+
+        var pts = state.absolutePoints;
+
+        if (state.cell != this.currentRoot && (pts == null || pts.length < 2 ||
+            pts[0] == null || pts[pts.length - 1] == null))
+        {
+            // This will remove edges with invalid points from the list of states in the view.
+            // Happens if the one of the terminals and the corresponding terminal point is null.
+            this.clear(state.cell, true);
+        }
+        else
+        {
+            this.updateEdgeBounds(state);
+            this.updateEdgeLabelOffset(state);
+        }
+    }
+};
+
+
 // delete connection points icons
 mxGraphView.prototype.removeState = function(cell)
 {
@@ -1404,10 +1450,9 @@ mxGraphView.prototype.removeState = function(cell)
     return state;
 };
 
-mxGraphViewBP.prototype = Object.create(mxGraphView.prototype);
 
 // draw connection points of all bp shapes (call show constraint)
-mxGraphViewBP.prototype.validate = function(cell)
+mxGraphView.prototype.validate = function(cell)
 {
     var t0 = mxLog.enter('mxGraphView.validate');
     window.status = mxResources.get(this.updatingDocumentResource) ||
@@ -1999,8 +2044,6 @@ mxGraphSelectionModel.prototype.setCells = function(cells)
     }
 };
 
-mxCell.prototype.isBPCell = function() {return this.bp_cell != null && this.bp_cell && this.bp_type != 'startnode'; }
-
 // relocate connection points labels according to connection points labels
 mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell) {
     if (cell == null || cell.children == null)
@@ -2023,6 +2066,7 @@ mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell) {
     }
 
 };
+
 //cancel the option that a block will be another block parent
 mxCell.prototype.setParent = function(parent)
 {
@@ -2060,4 +2104,11 @@ mxCell.prototype.insert = function(child, index)
     }
 
     return child;
+};
+
+
+mxCell.prototype.isBPCell = function() {return this.bp_cell != null && this.bp_cell && this.bp_type != 'startnode'; }
+
+mxCell.prototype.isInnerChild = function(){
+    return (this.bp_type != null && (this.bp_type == 'data' || this.bp_type== 'divider'));
 };
