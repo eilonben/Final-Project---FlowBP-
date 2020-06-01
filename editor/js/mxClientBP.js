@@ -1249,7 +1249,7 @@ mxGraphModelBP.prototype = Object.create(mxGraphModel.prototype);
 
 //repaint edges or shapes in black after they were painted in red
 // Prevent connect start node as a target
-mxGraphModelBP.prototype.terminalForCellChanged = function(edge, terminal, isSource)
+mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSource)
 {
 
     var previous = this.getTerminal(edge, isSource);
@@ -2065,6 +2065,43 @@ mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell) {
         this.getModel().setGeometry(ConnectionPointLabelCell, geo);
     }
 
+};
+
+
+
+mxGraphModel.prototype.parentForCellChanged = function(cell, parent, index)
+{
+    var previous = this.getParent(cell);
+
+    if (parent != null)
+    {
+        if(parent.bp_cell)
+            return previous;
+        if (parent != previous || previous.getIndex(cell) != index)
+        {
+            parent.insert(cell, index);
+        }
+    }
+    else if (previous != null)
+    {
+        var oldIndex = previous.getIndex(cell);
+        previous.remove(oldIndex);
+    }
+
+    // Adds or removes the cell from the model
+    var par = this.contains(parent);
+    var pre = this.contains(previous);
+
+    if (par && !pre)
+    {
+        this.cellAdded(cell);
+    }
+    else if (pre && !par)
+    {
+        this.cellRemoved(cell);
+    }
+
+    return previous;
 };
 
 //cancel the option that a block will be another block parent

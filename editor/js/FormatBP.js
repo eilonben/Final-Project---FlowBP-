@@ -58,21 +58,6 @@ FormatBP.prototype.validateNewConstraint = function (cell, graph){
 };
 
 
-
-
-// //after debug all the graph moves - fix thr connection point labels and edges
-// FormatBP.prototype.fixConnectionRelatedBugs = function (graph){
-//     var cells = Object.values(graph.getModel().cells) || [];
-//     for( var i=0; i< cells.length; i++) {
-//         var cell = cells[i];
-//         if(getshape(cell.getStyle()) == "general") {
-//             graph.getModel().beginUpdate();
-//             fixConnectionPointsLabelLocation(graph, cell, cell.geometry.x, cell.geometry.y);
-//             graph.getModel().endUpdate();
-//         }
-//     }
-// };
-
 // compute constraint new position
 FormatBP.prototype.computeNewPosition = function(cell, numOfOutputs, index){
     // var cellHeight = cell.geometry.height;
@@ -82,7 +67,7 @@ FormatBP.prototype.computeNewPosition = function(cell, numOfOutputs, index){
     // return new mxPoint(mxConnectionHandlerBP.defultOutputX,(cellTitle/cellHeight) + interval * index);
     var interval = 1 / (numOfOutputs + 1);
     return new mxPoint(mxConnectionHandlerBP.defultOutputX, interval * index);
-}
+};
 
 
 // update connection point number
@@ -99,7 +84,6 @@ FormatBP.prototype.adjustConnectionPoints = function (cell, numOfOutputs, graph)
     // input constraint Should be at the end of the list
     cell.new_constraints = cell.new_constraints.concat(inputConstraint);
     graph.connectionHandler.constraintHandler.showConstraint(graph.view.getState(cell,false));
-
 };
 
 
