@@ -140,9 +140,10 @@ function runInNewBT(c, payload, bpEngine, model, curTime) {
             window.executeError = true;
             return;
         }
+        let scen;
         //checking if we are in debug mode
         if(bpEngine.deb!=null) {
-            bpEngine.deb.newScen(c, curTime, cloned);
+            scen = bpEngine.deb.newScen(c, curTime, cloned);
         }
 
         if (c.getAttribute("Request") !== undefined || c.getAttribute("Wait") !==undefined || c.getAttribute("Block")!==undefined ) {
@@ -161,12 +162,12 @@ function runInNewBT(c, payload, bpEngine, model, curTime) {
             if(block === -1) {
                 return;
             }else{
-                let stmt = JSON.parse("{\"request\":" + JSON.stringify(requested) + ", \"wait\":" + JSON.stringify(wait)+ ",\"block\":" + JSON.stringify(block) + "}");
+                let stmt = JSON.parse("{\"request\":" + JSON.stringify(requested) + ", \"wait\":" + JSON.stringify(wait)+ ",\"block\":" + JSON.stringify(block) + ",\"c\":\"" + c.id + "\"}");
                 yield stmt;
             }
         }
 
-        yield* goToFollowers(c, cloned, bpEngine,model,outputs, c.scenarioID);
+        yield* goToFollowers(c, cloned, bpEngine,model,outputs, scen);
     }());
 
 };
@@ -248,7 +249,7 @@ function* runInSameBT(c, payload, bpEngine, model, scen) {
         if(block === -1) {
             return;
         }else{
-           let stmt = JSON.parse("{\"request\":" + JSON.stringify(requested) + ", \"wait\":" + JSON.stringify(wait)+ ",\"block\":" + JSON.stringify(block) + "}");
+           let stmt = JSON.parse("{\"request\":" + JSON.stringify(requested) + ", \"wait\":" + JSON.stringify(wait)+ ",\"block\":" + JSON.stringify(block) + ",\"c\":\"" + c.id + "\"}");
            yield stmt;
         }
     }
