@@ -30,6 +30,9 @@ BPEngine.prototype.run = function*(){
             if (isReqWait(bt, e)) {
                 bt.stmt = fixStmt(bt.iterator.next().value)
             }
+            else if(this.deb!=null) {
+                this.deb.addBlocked(bt.stmt.c);
+            }
         })
     }
 };
