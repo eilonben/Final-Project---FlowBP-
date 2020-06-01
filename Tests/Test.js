@@ -140,7 +140,7 @@ var testRandomOrder = function () {
 }
 
 var testPayload =function () {
-    var expected = ["[{\"x\":3},{\"y\":4}]"];
+    var expected = ["{\"x\":3},{\"y\":4}"];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/Payloads.xml");
     try {
@@ -154,7 +154,7 @@ var testPayload =function () {
 }
 
 var testPayloadChange =function () {
-    var expected = ["[{\"x\":5},{\"y\":6}]"];
+    var expected = ["{\"x\":5}"];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/PayloadsChange.xml");
     try {

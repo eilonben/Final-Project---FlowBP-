@@ -1,69 +1,69 @@
 
-
-// DELETE - do nothing
-function mxVertexHandlerBP(state){
-    mxVertexHandler.call(this, state);
-};
-
-mxVertexHandlerBP.prototype = Object.create(mxVertexHandler.prototype);
-
-
-// DELETE (old objective: when resizing shape move her connection point)
-mxVertexHandlerBP.prototype.updateLivePreview = function(me)
-{
-    // TODO: Apply child offset to children in live preview
-    var scale = this.graph.view.scale;
-    var tr = this.graph.view.translate;
-
-    // Saves current state
-    var tempState = this.state.clone();
-
-    // Temporarily changes size and origin
-    this.state.x = this.bounds.x;
-    this.state.y = this.bounds.y;
-    this.state.origin = new mxPoint(this.state.x / scale - tr.x, this.state.y / scale - tr.y);
-    this.state.width = this.bounds.width;
-    this.state.height = this.bounds.height;
-
-    // Redraws cell and handles
-    var off = this.state.absoluteOffset;
-    off = new mxPoint(off.x, off.y);
-
-    // Required to store and reset absolute offset for updating label position
-    this.state.absoluteOffset.x = 0;
-    this.state.absoluteOffset.y = 0;
-    var geo = this.graph.getCellGeometry(this.state.cell);
-
-    if (geo != null) {
-        var offset = geo.offset || this.EMPTY_POINT;
-
-        if (offset != null && !geo.relative) {
-            this.state.absoluteOffset.x = this.state.view.scale * offset.x;
-            this.state.absoluteOffset.y = this.state.view.scale * offset.y;
-        }
-
-        this.state.view.updateVertexLabelOffset(this.state);
-    }
-
-    // Draws the live preview
-    this.state.view.graph.cellRenderer.redraw(this.state, true);
-
-
-    // Redraws connected edges TODO: Include child edges
-    this.state.view.invalidate(this.state.cell);
-    this.state.invalid = false;
-    this.state.view.validate();
-    this.redrawHandles();
-
-    // Hides folding icon
-    if (this.state.control != null && this.state.control.node != null) {
-        this.state.control.node.style.visibility = 'hidden';
-    }
-
-    // Restores current state
-    this.state.setState(tempState);
-};
-
+//
+// // DELETE - do nothing
+// function mxVertexHandlerBP(state){
+//     mxVertexHandler.call(this, state);
+// };
+//
+// mxVertexHandlerBP.prototype = Object.create(mxVertexHandler.prototype);
+//
+//
+// // DELETE (old objective: when resizing shape move her connection point)
+// mxVertexHandlerBP.prototype.updateLivePreview = function(me)
+// {
+//     // TODO: Apply child offset to children in live preview
+//     var scale = this.graph.view.scale;
+//     var tr = this.graph.view.translate;
+//
+//     // Saves current state
+//     var tempState = this.state.clone();
+//
+//     // Temporarily changes size and origin
+//     this.state.x = this.bounds.x;
+//     this.state.y = this.bounds.y;
+//     this.state.origin = new mxPoint(this.state.x / scale - tr.x, this.state.y / scale - tr.y);
+//     this.state.width = this.bounds.width;
+//     this.state.height = this.bounds.height;
+//
+//     // Redraws cell and handles
+//     var off = this.state.absoluteOffset;
+//     off = new mxPoint(off.x, off.y);
+//
+//     // Required to store and reset absolute offset for updating label position
+//     this.state.absoluteOffset.x = 0;
+//     this.state.absoluteOffset.y = 0;
+//     var geo = this.graph.getCellGeometry(this.state.cell);
+//
+//     if (geo != null) {
+//         var offset = geo.offset || this.EMPTY_POINT;
+//
+//         if (offset != null && !geo.relative) {
+//             this.state.absoluteOffset.x = this.state.view.scale * offset.x;
+//             this.state.absoluteOffset.y = this.state.view.scale * offset.y;
+//         }
+//
+//         this.state.view.updateVertexLabelOffset(this.state);
+//     }
+//
+//     // Draws the live preview
+//     this.state.view.graph.cellRenderer.redraw(this.state, true);
+//
+//
+//     // Redraws connected edges TODO: Include child edges
+//     this.state.view.invalidate(this.state.cell);
+//     this.state.invalid = false;
+//     this.state.view.validate();
+//     this.redrawHandles();
+//
+//     // Hides folding icon
+//     if (this.state.control != null && this.state.control.node != null) {
+//         this.state.control.node.style.visibility = 'hidden';
+//     }
+//
+//     // Restores current state
+//     this.state.setState(tempState);
+// };
+//
 
 /*
 objectives:
@@ -432,7 +432,7 @@ mxConnectionHandler.prototype.mouseMove = function(sender, me)
 
 //
 mxConnectionHandlerBP.prototype.isInnerChild = function(cell){
-    return (cell != null && cell.bp_type != null && cell.bp_type == 'data');
+    return (cell != null && cell.bp_type != null && (cell.bp_type == 'data' || cell.bp_type== 'divider'));
 };
 
 
@@ -596,6 +596,7 @@ objectives:
  */
 function mxConstraintHandlerBP(graph){
     mxConstraintHandler.call(this, graph);
+    //{key: cell id; value: connection point image}
     this.focusIcons = {};
 
 };
@@ -604,10 +605,10 @@ function mxConstraintHandlerBP(graph){
 mxConstraintHandlerBP.prototype = Object.create(mxConstraintHandler.prototype);
 
 
-mxConstraintHandlerBP.prototype.OutputPointImage = new mxImage(mxClient.imageBasePath + '/output-onlinepngtools (1).png', 10, 10);
+mxConstraintHandlerBP.prototype.OutputPointImage = new mxImage(mxClient.imageBasePath + '/output.png', 10, 10);
 
 
-mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input2.png', 10, 10);
+mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input.png', 10, 10);
 
 
 mxConstraintHandlerBP.prototype.highlightColor = '#808080';
@@ -637,10 +638,9 @@ mxConstraintHandlerBP.prototype.reset = function()
     this.focusPoints = null;
 };
 
-//  redraw all connection icons of all shapes after destroy focus shape
+// do not delete connection points icons
 mxConstraintHandlerBP.prototype.destroyIcons = function()
 {
-    this.showConstraint();
     return;
 };
 
@@ -767,34 +767,51 @@ mxConstraintHandlerBP.prototype.update = function(me, source, existingEdge, poin
     }
 };
 
-// unused yet - may help setting focus on shape when mouse on the his child or connection points
-mxConstraintHandlerBP.prototype.getCellForEvent = function(me, point)
+// // unused yet - may help setting focus on shape when mouse on the his child or connection points
+// mxConstraintHandlerBP.prototype.getCellForEvent = function(me, point)
+// {
+//     var cell = me.getCell();
+//
+//     // Gets cell under actual point if different from event location
+//     if (cell == null && point != null && (me.getGraphX() != point.x || me.getGraphY() != point.y))
+//     {
+//         cell = this.graph.getCellAt(point.x, point.y);
+//     }
+//
+//     // Uses connectable parent vertex if one exists
+//     if (cell != null && !this.graph.isCellConnectable(cell))
+//     {
+//         var parent = this.graph.getModel().getParent(cell);
+//
+//         if (this.graph.getModel().isVertex(parent) && this.graph.isCellConnectable(parent))
+//         {
+//             cell = parent;
+//         }
+//     }
+//
+//
+//     cell = (this.graph.isCellLocked(cell)) ? null : cell;
+//     if(cell != null)
+//         return cell;
+//     return null;
+// };
+
+// define the connection points location on the cell by the type of connection
+mxConstraintHandlerBP.prototype.getConstraintLocation = function (state, constraints, size)
 {
-    var cell = me.getCell();
+    var cp = this.graph.getConnectionPoint(state, constraints);
+    var img = this.getImageForConstraint(state, constraints, cp);
+    var cell = state.cell;
+    var point  = new mxPoint();
 
-    // Gets cell under actual point if different from event location
-    if (cell == null && point != null && (me.getGraphX() != point.x || me.getGraphY() != point.y))
-    {
-        cell = this.graph.getCellAt(point.x, point.y);
-    }
-
-    // Uses connectable parent vertex if one exists
-    if (cell != null && !this.graph.isCellConnectable(cell))
-    {
-        var parent = this.graph.getModel().getParent(cell);
-
-        if (this.graph.getModel().isVertex(parent) && this.graph.isCellConnectable(parent))
-        {
-            cell = parent;
-        }
-    }
-
-
-    cell = (this.graph.isCellLocked(cell)) ? null : cell;
-    if(cell != null)
-        return cell;
-    return null;
+    if( (cell.bp_type != null && cell.bp_type == 'startnode') || (constraints != null && constraints.name == 'I'))
+        point.x = Math.round(cp.x - (img.width * size));
+    else
+        point.x = cp.x;
+    point.y =  Math.round(cp.y - (img.height * size) / 2);
+    return point;
 };
+
 
 // Adjust the function for changes in class
 mxConstraintHandlerBP.prototype.redraw = function()
@@ -813,8 +830,9 @@ mxConstraintHandlerBP.prototype.redraw = function()
             var cp = this.graph.getConnectionPoint(state, this.constraints[i]);
             var img = this.getImageForConstraint(state, this.constraints[i], cp);
 
-            var bounds = new mxRectangle(Math.round(cp.x - img.width * size),
-                Math.round(cp.y - img.height * size / 2), img.width, img.height);
+            var imgPoint = this.getConstraintLocation(state, this.constraints[i], size);
+            var bounds = new mxRectangle(imgPoint.x , imgPoint.y, img.width * size, img.height * size);
+
             allIcons[i].bounds = bounds;
             allIcons[i].redraw();
             this.currentFocusArea.add(allIcons[i].bounds);
@@ -823,21 +841,6 @@ mxConstraintHandlerBP.prototype.redraw = function()
     }
 };
 
-// define the connection points location on the cell by the type of connection
-mxConstraintHandlerBP.prototype.getConstraintLocation = function (state, constraints, size)
-{
-    var cp = this.graph.getConnectionPoint(state, constraints);
-    var img = this.getImageForConstraint(state, constraints, cp);
-    var cell = state.cell;
-    var point  = new mxPoint();
-
-    if( (cell.bp_type != null && cell.bp_type == 'startnode') || (constraints != null && constraints.name == 'I'))
-        point.x = Math.round(cp.x - (img.width * size));
-    else
-        point.x = cp.x;
-    point.y =  Math.round(cp.y - (img.height * size) / 2);
-    return point;
-};
 
 // hide input connection points
 mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
@@ -926,14 +929,14 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
         this.currentFocusArea.grow(this.getTolerance(me));
     }
     else {
-        this.destroyIcons();
+        this.showConstraint();
         this.destroyFocusHighlight();
     }
 };
 
 
 
-//state is optional - draw all connection points for all shapes
+// draw all connection points for all shapes, state is optional
 mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
 {
     var size = this.graph.view.scale;
@@ -1007,7 +1010,7 @@ function mxGraphHandlerBP(graph){
 };
 
 // do not remove any child from his parent
-mxGraphHandler.prototype.isRemoveCellsFromParent = function(value)
+mxGraphHandlerBP.prototype.isRemoveCellsFromParent = function(value)
 {
     return false;
 };
@@ -1020,12 +1023,12 @@ mxGraphHandlerBP.prototype = Object.create(mxGraphHandler.prototype);
 // and preventing move locked cells
 mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, evt)
 {
-
-    // //this is new
-    const edges = cells.filter(cell => cell.getStyle().includes("edgeStyle"));
-    const shapes = cells.filter(cell => cell.getStyle().includes('shape'));
-    var validEdges = edges.filter(edge => (cells.includes(edge.target) && cells.includes(edge.source)));
-    cells = shapes.concat(validEdges);
+    //this is new
+    let edges = cells.filter(cell => cell.isEdge());
+    let shapes = cells.filter(cell => cell.bp_type != null);
+    let noneShapeOrEdge = cells.filter(cell => !cell.isEdge() && cell.bp_type == null);
+    let validEdges = edges.filter(edge => (cells.includes(edge.target) && cells.includes(edge.source)));
+    cells = shapes.concat(validEdges).concat(noneShapeOrEdge);
 
 
     //this is old
@@ -1098,140 +1101,140 @@ mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, ev
     }
 };
 
-
-// unused
-mxGraphHandlerBP.prototype.updateLivePreview = function(dx, dy)
-{
-    if (!this.suspended)
-    {
-        var states = [];
-
-        if (this.allCells != null)
-        {
-            this.allCells.visit(mxUtils.bind(this, function(key, state)
-            {
-                // Saves current state
-                var tempState = state.clone();
-                states.push([state, tempState]);
-
-                // Makes transparent for events to detect drop targets
-                if (state.shape != null)
-                {
-                    if (state.shape.originalPointerEvents == null)
-                    {
-                        state.shape.originalPointerEvents = state.shape.pointerEvents;
-                    }
-
-                    state.shape.pointerEvents = false;
-
-                    if (state.text != null)
-                    {
-                        if (state.text.originalPointerEvents == null)
-                        {
-                            state.text.originalPointerEvents = state.text.pointerEvents;
-                        }
-
-                        state.text.pointerEvents = false;
-                    }
-                }
-
-                // Temporarily changes position
-                if (this.graph.model.isVertex(state.cell))
-                {
-                    state.x += dx;
-                    state.y += dy;
-
-                    // Draws the live preview
-                    if (!this.cloning)
-                    {
-                        state.view.graph.cellRenderer.redraw(state, true);
-
-                        // Forces redraw of connected edges after all states
-                        // have been updated but avoids update of state
-                        state.view.invalidate(state.cell);
-                        state.invalid = false;
-
-                        // Hides folding icon
-                        if (state.control != null && state.control.node != null)
-                        {
-                            state.control.node.style.visibility = 'hidden';
-                        }
-                    }
-                }
-            }));
-        }
-
-        // Redraws connected edges
-        var s = this.graph.view.scale;
-
-        for (var i = 0; i < states.length; i++)
-        {
-            var state = states[i][0];
-
-            if (this.graph.model.isEdge(state.cell))
-            {
-                var geometry = this.graph.getCellGeometry(state.cell);
-                var points = [];
-
-                if (geometry != null && geometry.points != null)
-                {
-                    for (var j = 0; j < geometry.points.length; j++)
-                    {
-                        if (geometry.points[j] != null)
-                        {
-                            points.push(new mxPoint(
-                                geometry.points[j].x + dx / s,
-                                geometry.points[j].y + dy / s));
-                        }
-                    }
-                }
-
-                var source = state.visibleSourceState;
-                var target = state.visibleTargetState;
-                var pts = states[i][1].absolutePoints;
-
-                if (source == null || !this.isCellMoving(source.cell))
-                {
-                    var pt0 = pts[0];
-                    state.setAbsoluteTerminalPoint(new mxPoint(pt0.x + dx, pt0.y + dy), true);
-                    source = null;
-                }
-                else
-                {
-                    state.view.updateFixedTerminalPoint(state, source, true,
-                        this.graph.getConnectionConstraint(state, source, true));
-                }
-
-                if (target == null || !this.isCellMoving(target.cell))
-                {
-                    var ptn = pts[pts.length - 1];
-                    state.setAbsoluteTerminalPoint(new mxPoint(ptn.x + dx, ptn.y + dy), false);
-                    target = null;
-                }
-                else
-                {
-                    state.view.updateFixedTerminalPoint(state, target, false,
-                        this.graph.getConnectionConstraint(state, target, false));
-                }
-
-                state.view.updatePoints(state, points, source, target);
-                state.view.updateFloatingTerminalPoints(state, source, target);
-                state.view.updateEdgeLabelOffset(state);
-                state.invalid = false;
-
-                // Draws the live preview but avoids update of state
-                if (!this.cloning)
-                {
-                    state.view.graph.cellRenderer.redraw(state, true);
-                }
-            }
-        }
-
-        this.graph.view.validate();
-        this.redrawHandles(states);
-        this.resetPreviewStates(states);
-    }
-};
+//
+// // unused
+// mxGraphHandlerBP.prototype.updateLivePreview = function(dx, dy)
+// {
+//     if (!this.suspended)
+//     {
+//         var states = [];
+//
+//         if (this.allCells != null)
+//         {
+//             this.allCells.visit(mxUtils.bind(this, function(key, state)
+//             {
+//                 // Saves current state
+//                 var tempState = state.clone();
+//                 states.push([state, tempState]);
+//
+//                 // Makes transparent for events to detect drop targets
+//                 if (state.shape != null)
+//                 {
+//                     if (state.shape.originalPointerEvents == null)
+//                     {
+//                         state.shape.originalPointerEvents = state.shape.pointerEvents;
+//                     }
+//
+//                     state.shape.pointerEvents = false;
+//
+//                     if (state.text != null)
+//                     {
+//                         if (state.text.originalPointerEvents == null)
+//                         {
+//                             state.text.originalPointerEvents = state.text.pointerEvents;
+//                         }
+//
+//                         state.text.pointerEvents = false;
+//                     }
+//                 }
+//
+//                 // Temporarily changes position
+//                 if (this.graph.model.isVertex(state.cell))
+//                 {
+//                     state.x += dx;
+//                     state.y += dy;
+//
+//                     // Draws the live preview
+//                     if (!this.cloning)
+//                     {
+//                         state.view.graph.cellRenderer.redraw(state, true);
+//
+//                         // Forces redraw of connected edges after all states
+//                         // have been updated but avoids update of state
+//                         state.view.invalidate(state.cell);
+//                         state.invalid = false;
+//
+//                         // Hides folding icon
+//                         if (state.control != null && state.control.node != null)
+//                         {
+//                             state.control.node.style.visibility = 'hidden';
+//                         }
+//                     }
+//                 }
+//             }));
+//         }
+//
+//         // Redraws connected edges
+//         var s = this.graph.view.scale;
+//
+//         for (var i = 0; i < states.length; i++)
+//         {
+//             var state = states[i][0];
+//
+//             if (this.graph.model.isEdge(state.cell))
+//             {
+//                 var geometry = this.graph.getCellGeometry(state.cell);
+//                 var points = [];
+//
+//                 if (geometry != null && geometry.points != null)
+//                 {
+//                     for (var j = 0; j < geometry.points.length; j++)
+//                     {
+//                         if (geometry.points[j] != null)
+//                         {
+//                             points.push(new mxPoint(
+//                                 geometry.points[j].x + dx / s,
+//                                 geometry.points[j].y + dy / s));
+//                         }
+//                     }
+//                 }
+//
+//                 var source = state.visibleSourceState;
+//                 var target = state.visibleTargetState;
+//                 var pts = states[i][1].absolutePoints;
+//
+//                 if (source == null || !this.isCellMoving(source.cell))
+//                 {
+//                     var pt0 = pts[0];
+//                     state.setAbsoluteTerminalPoint(new mxPoint(pt0.x + dx, pt0.y + dy), true);
+//                     source = null;
+//                 }
+//                 else
+//                 {
+//                     state.view.updateFixedTerminalPoint(state, source, true,
+//                         this.graph.getConnectionConstraint(state, source, true));
+//                 }
+//
+//                 if (target == null || !this.isCellMoving(target.cell))
+//                 {
+//                     var ptn = pts[pts.length - 1];
+//                     state.setAbsoluteTerminalPoint(new mxPoint(ptn.x + dx, ptn.y + dy), false);
+//                     target = null;
+//                 }
+//                 else
+//                 {
+//                     state.view.updateFixedTerminalPoint(state, target, false,
+//                         this.graph.getConnectionConstraint(state, target, false));
+//                 }
+//
+//                 state.view.updatePoints(state, points, source, target);
+//                 state.view.updateFloatingTerminalPoints(state, source, target);
+//                 state.view.updateEdgeLabelOffset(state);
+//                 state.invalid = false;
+//
+//                 // Draws the live preview but avoids update of state
+//                 if (!this.cloning)
+//                 {
+//                     state.view.graph.cellRenderer.redraw(state, true);
+//                 }
+//             }
+//         }
+//
+//         this.graph.view.validate();
+//         this.redrawHandles(states);
+//         this.resetPreviewStates(states);
+//     }
+// };
 
 
 /*
@@ -1403,7 +1406,7 @@ mxGraphView.prototype.removeState = function(cell)
 
 mxGraphViewBP.prototype = Object.create(mxGraphView.prototype);
 
-// drow connection points of all bp shapes (call show constraint)
+// draw connection points of all bp shapes (call show constraint)
 mxGraphViewBP.prototype.validate = function(cell)
 {
     var t0 = mxLog.enter('mxGraphView.validate');
@@ -1675,7 +1678,7 @@ Objectives
  */
 mxGraph.headLineSize = 26;
 
-mxGraph.prototype.cellsEditable = false;
+mxGraph.prototype.cellsEditable = true;
 
 mxGraph.prototype.vertexLabelsMovable = false;
 
@@ -1708,12 +1711,13 @@ mxGraph.prototype.getChildByType = function(cell, type)
     return child;
 };
 
-// relocate diviser to be at the defult size
-mxGraph.prototype.fixBPChildren = function(cell){
-
+// relocate divider to be at the defult size
+mxGraph.prototype.fixBPChildren = function(cell, dividerGeomtry){
     var divider = this.getChildByType(cell, 'divider');
-    if(divider != null)
+    if(divider != null) {
         divider.geometry.y = mxGraph.headLineSize * 0.7;
+        divider.geometry.height =  dividerGeomtry != null ?dividerGeomtry.height : divider.geometry.height;
+    }
     //
     var cellHeight = cell.geometry.height;
     var data = this.getChildByType(cell, 'data');
@@ -1765,11 +1769,11 @@ mxGraph.prototype.createGraphHandler = function()
     return new mxGraphHandlerBP(this);
 };
 
-
-mxGraph.prototype.createVertexHandler = function(state)
-{
-    return new mxVertexHandlerBP(state);
-};
+//
+// mxGraph.prototype.createVertexHandler = function(state)
+// {
+//     return new mxVertexHandlerBP(state);
+// };
 
 
 mxGraph.prototype.createConnectionHandler = function()
@@ -1825,15 +1829,21 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
 // after resizing cell fix his connection point label location
 mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
 {
+    var dividerGeomtry;
+    if(cell != null && cell.isBPCell())
+        dividerGeomtry = this.getChildByType(cell, 'divider').geometry;
     var output =  this.resizeCells([cell], [bounds], recurse)[0];
     this.fixConnectionPointsLabelLocation(cell);
-    this.fixBPChildren(cell);
+    this.fixBPChildren(cell, dividerGeomtry);
     return output;
 };
 
 // use lock attribute
 mxGraph.prototype.isCellLocked = function(cell)
 {
+    if (cell.bp_cell != null && !cell.bp_cell)
+        return true;
+
     var geometry = this.model.getGeometry(cell);
 
     return this.isCellsLocked() || (geometry != null && this.model.isVertex(cell) && geometry.relative) ||
@@ -1948,16 +1958,16 @@ mxGraph.prototype.isCellSelectable = function(cell)
     return this.isCellsSelectable();
 };
 
-// mxGraph.prototype.isCellEditable = function(cell)
-// {
-//     if(cell != null && cell.lock != null && cell.lock)
-//         return false;
-//
-//     var state = this.view.getState(cell);
-//     var style = (state != null) ? state.style : this.getCellStyle(cell);
-//
-//     return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
-// };
+mxGraph.prototype.isCellEditable = function(cell)
+{
+    if(cell != null && cell.bp_type != null || cell.isEdge())
+        return false;
+
+    var state = this.view.getState(cell);
+    var style = (state != null) ? state.style : this.getCellStyle(cell);
+
+    return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
+};
 
 
 mxGraph.prototype.createGraphView = function()
@@ -2012,4 +2022,42 @@ mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell) {
         this.getModel().setGeometry(ConnectionPointLabelCell, geo);
     }
 
+};
+//cancel the option that a block will be another block parent
+mxCell.prototype.setParent = function(parent)
+{
+    // if(this.bp_cell && parent.bp_cell)
+    //     return;
+    this.parent = parent;
+};
+
+mxCell.prototype.insert = function(child, index)
+{
+    if (child != null)
+    {
+        if (index == null)
+        {
+            index = this.getChildCount();
+
+            if (child.getParent() == this)
+            {
+                index--;
+            }
+        }
+
+        child.removeFromParent();
+        child.setParent(this);
+
+        if (this.children == null)
+        {
+            this.children = [];
+            this.children.push(child);
+        }
+        else
+        {
+            this.children.splice(index, 0, child);
+        }
+    }
+
+    return child;
 };

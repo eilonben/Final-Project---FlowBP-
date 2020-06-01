@@ -39,7 +39,7 @@ var BSyncForm = function (editorUi, cell) {
     var linkInput = {};
 
     addSec = function (lbl) {
-        mxUtils.write(td, lbl+"function(payload)");
+        mxUtils.write(td, lbl+"Function(payload)");
         linkInput[lbl] = document.createElement('input');
         linkInput[lbl].setAttribute('type', 'text');
         linkInput[lbl].style.marginTop = '6px';
@@ -75,12 +75,22 @@ var BSyncForm = function (editorUi, cell) {
         value.setAttribute("Request", linkInput["Request"].value);
         value.setAttribute("Wait", linkInput["Wait"].value);
         value.setAttribute("Block", linkInput["Block"].value);
-        var cellData = cell.children != null ?  cell.children.filter(x => x.bp_type != null && x.bp_type == 'data')[0] : null;
+        var cellData = graph.getChildByType(cell, 'data');
+        var divider = graph.getChildByType(cell, 'divider');
+
         if(cellData != null) {
+            graph.getModel().beginUpdate();
             cellData.value = "Request: " + linkInput["Request"].value + "\nWait: " + linkInput["Wait"].value + "\nBlock: " + linkInput["Block"].value;
-            graph.updateCellSize(cellData, true);
+            graph.fixSizes(cell);
+            //graph.updateCellSize(cellData, true);
+            //divider.geometry.width=cellData.geometry.width;
+            // cellData.geometry.width = 0;
+            // cellData.geometry.height = 0;
+            cell.geometry.height = cellData.geometry.y + cellData.geometry.height;
+            graph.getModel().endUpdate();
         }
         // value.setAttribute("label","Request: "+linkInput["Request"].value+"\nWait: "+linkInput["Wait"].value+"\nBlock: "+linkInput["Block"].value);
+
         graph.getModel().setValue(cell, value);
 
         //graph.updateCellSize(cell, true);
@@ -138,7 +148,7 @@ var CodeEditorDialog = function (editorUi, cell) {
     title.style.fontSize="18px";
     td.appendChild(title);
     var code =document.createElement("code");
-    code.innerText="GeneralBlockFunction(payloads){";
+    code.innerText="GeneralBlockFunction(payload){";
     code.style.fontSize="14px";
     code.style.display = "block";
     code.style.marginTop = "15px";
@@ -208,7 +218,7 @@ var CodeEditorDialog = function (editorUi, cell) {
         let genericBtn = mxUtils.button(mxResources.get('apply'), function () {
 
             try {
-                let syntax = esprima.parse(" let d = function(payloads){ " + editor.getValue() + "}");
+                let syntax = esprima.parse(" let d = function(payload){ " + editor.getValue() + "}");
                 console.log(JSON.stringify(syntax, null, 4));
             }
             catch (error) {
@@ -269,7 +279,7 @@ var ConsoleBlockSidebar = function (editorUi, cell) {
     title.style.fontSize="18px";;
     row.appendChild(title);
     var code =document.createElement("code");
-    code.innerText="function(payloads){";
+    code.innerText="function(payload){";
     code.style.fontSize="14px";
     code.style.display = "block";
     code.style.marginTop = "15px";
@@ -338,7 +348,7 @@ var ConsoleBlockSidebar = function (editorUi, cell) {
         let genericBtn = mxUtils.button(mxResources.get('apply'), function () {
 
             try {
-                let syntax = esprima.parse(" let d = function(payloads){ " + editor.getValue() + "}");
+                let syntax = esprima.parse(" let d = function(payload){ " + editor.getValue() + "}");
                 console.log(JSON.stringify(syntax, null, 4));
             }
             catch (error) {
