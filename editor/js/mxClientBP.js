@@ -998,24 +998,22 @@ mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
 /*
 Objectives
 1. Prevent removal of data cell from bp cell
+2. prevent move edge without its source and target cells
  */
 function mxGraphHandlerBP(graph){
     mxGraphHandler.call(this, graph);
 
 };
 
-// do not remove any child from his parent
+// Prevent removal of data cell from bp cell
 mxGraphHandlerBP.prototype.isRemoveCellsFromParent = function(value)
 {
     return false;
 };
 
-
 mxGraphHandlerBP.prototype = Object.create(mxGraphHandler.prototype);
 
-
-// This is for preventing moving only an edge without its source and target
-// and preventing move locked cells
+// prevent move edge without its source and target cells
 mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, evt)
 {
     //this is new
