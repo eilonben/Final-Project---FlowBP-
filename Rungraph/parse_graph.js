@@ -46,9 +46,14 @@ function findInvalidCells(model) {
     return invalidCells;
 };
 
-//decode the xml string received from Actions.js
+/**
+ * @param xml_code
+ * @param debug
+ * receives the xml_code from the editor, and decodes it into in MxGraphModel in order to
+ * send it to the interpreter.
+ * Param debug is used to determine if running on debug mode.
+ */
 function parse_graph(xml_code, debug) {
-    // console.log(xml_code);
     let doc = mxUtils.parseXml(xml_code);
     let codec = new mxCodec(doc);
     let model = new mxGraphModel();

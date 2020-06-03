@@ -1,3 +1,9 @@
+/*
+ * debbugerBP responsibility is to record information during a program execution.
+ * The constructor gets the relevant UI as an argument in order to make the changes needed for debugging display.
+ *
+ */
+
 function debuggerBP(ui){
     this.ui = ui;
     this.editor = ui.editor;
@@ -19,16 +25,16 @@ debuggerBP.prototype.scenCounter = 0
 debuggerBP.prototype.scenarios = {};
 debuggerBP.prototype.consoleSteps = [""];
 debuggerBP.prototype.events = [];
-
+debuggerBP.prototype.events = [];
 
 // Saves pre-debugging info such as stencils sizes, last undo index in undo manager and cell labels
 debuggerBP.prototype.savePreDebuggingInfo = function () {
     this.lastUndo = this.editor.undoManager.indexOfNextAdd;
-    //this.lastLabels = this.getLabels();
     this.lastCellsSizes = this.getCellsSizes();
     this.lastCellValues = this.getValues();
 }
 
+// Return a map of cells ID's and their values
 debuggerBP.prototype.getValues = function(){
     var res = {};
 
@@ -42,6 +48,7 @@ debuggerBP.prototype.getValues = function(){
     return res;
 }
 
+// Builds an array of messages which should be displayed on the console in every step of the debugging
 debuggerBP.prototype.setConsoleSteps = function (rec) {
     let i = 0;
     rec.forEach(stage => {
@@ -65,40 +72,46 @@ debuggerBP.prototype.makePayloadSectionsVisible = function (bool) {
     })
 }
 
-debuggerBP.prototype.fixCellsChildrenSizes = function(){
-    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
-    cells.forEach(cell => {
-        this.setToOriginal(cell)
-    })
-}
-
-debuggerBP.prototype.startDebugging = function(){
-
-    this.makePayloadSectionsVisible(true);
-    this.savePreDebuggingInfo();
-
-    //lock the option to create news edges
-    let tmpCells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
-    tmpCells.forEach(cell => cell.connectable=false);
-
-
-    // Locks all layers
-    let isLocked = this.editor.undoManager.indexOfNextAdd;
-    this.graph.lockLayers(true);
-    this.isLocked = this.editor.undoManager.indexOfNextAdd - isLocked;
-
-
+// Fixes cells sizes at the beginning of the debugging.
+debuggerBP.prototype.fixAllSizes = function () {
     let isFixed = this.editor.undoManager.indexOfNextAdd;
     let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
     cells.forEach(cell => this.fixSizes(cell, false));
     this.fixAllOutputsLabels();
     //this.ui.fixView();
     this.isFixed = this.editor.undoManager.indexOfNextAdd - isFixed;
+}
 
-    var rec = this.getProgramRecord()
+debuggerBP.prototype.setDebuggingSteps = function () {
+    var rec = this.getProgramRecord();
     this.updateVertexCells(rec);
     this.setConsoleSteps(rec);
+}
 
+debuggerBP.prototype.startDebugging = function(){
+
+    this.makePayloadSectionsVisible(true);
+    this.savePreDebuggingInfo();
+    updateConsoleMessage("");
+
+    this.editor.undoManager.size = 10000;
+
+    //lock the option to create news edges
+    let tmpCells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
+    tmpCells.forEach(cell => cell.connectable=false);
+
+    // Locks all layers in order to prevent changes during the debugging
+    let isLocked = this.editor.undoManager.indexOfNextAdd;
+    this.graph.lockLayers(true);
+    this.isLocked = this.editor.undoManager.indexOfNextAdd - isLocked;
+
+    // Fixes the sizes of every cell according to it's content
+    this.fixAllSizes();
+
+    this.setDebuggingSteps();
+
+    // After setting the changes on the graph for every step in the debugging, returns the graph state
+    // to the beginning of the debugging (right after locking the layers and setting all cells' sizes);
     let numOfUndos = this.editor.undoManager.indexOfNextAdd - this.lastUndo - this.isFixed - this.isLocked;
     for (let i = 0; i < numOfUndos; i++) {
         this.mod.beginUpdate();
@@ -108,12 +121,12 @@ debuggerBP.prototype.startDebugging = function(){
         this.mod.endUpdate();
     }
 
+    // Clears selected cells, which appears after undoing an action on a graph
     this.graph.clearSelection();
     this.ui.noUndoRedo();
 
     if (numOfUndos == 0)
         this.ui.enableDebugNext(false);
-
 };
 
 debuggerBP.prototype.endDebugging = function() {
@@ -122,6 +135,8 @@ debuggerBP.prototype.endDebugging = function() {
     let tmpCells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
     tmpCells.forEach(cell => cell.connectable=true);
 
+    // Undoes all the actions occurred from the start of the debugging,
+    // and also pops them from the undoManger
     this.editor.undoManager.indexOfNextAdd = this.editor.undoManager.history.length;
     var numOfNewUndos = this.editor.undoManager.history.length - this.lastUndo;
     while (numOfNewUndos-- > 0) {
@@ -138,6 +153,8 @@ debuggerBP.prototype.endDebugging = function() {
     this.makePayloadSectionsVisible(false);
 }
 
+// Preforms a step back (debugging-wise) by preforming a undo (using the undoManger)
+// and changing the console to the correct message
 debuggerBP.prototype.back = function () {
     if (this.editor.undoManager.indexOfNextAdd > this.lastUndo) {
         this.mod.beginUpdate();
@@ -147,6 +164,7 @@ debuggerBP.prototype.back = function () {
         this.ui.noUndoRedo();
 
         this.mod.endUpdate();
+
         updateConsoleMessage(this.curConsoleMessage());
 
         if (this.editor.undoManager.indexOfNextAdd == this.lastUndo + this.isLocked + this.isFixed)
@@ -161,6 +179,8 @@ debuggerBP.prototype.curConsoleMessage = function() {
     return this.consoleSteps[index];
 }
 
+// Preforms a step forward (debugging-wise) by preforming a redo (using the undoManger)
+// and changing the console to the correct message
 debuggerBP.prototype.next = function () {
     this.graph.getModel().beginUpdate();
 
@@ -175,23 +195,6 @@ debuggerBP.prototype.next = function () {
         this.ui.enableDebugBack(true);
     else if (this.editor.undoManager.indexOfNextAdd == this.editor.undoManager.history.length)
         this.ui.enableDebugNext(false);
-}
-
-debuggerBP.prototype.getLabels = function() {
-    var res = {};
-
-    let cells = Object.values(this.mod.cells).filter(cell => cell.bp_type);
-    cells.forEach(cell => {
-        let label = cell.getAttribute('label');
-        res[cell.id] = label != undefined ? label : "";
-        if(cell.bp_type !== "startnode")
-            cell.children.forEach(child => {
-                let clabel = child.getAttribute('label');
-                res[child.id] = clabel != undefined ? clabel : "";
-            })
-    });
-
-    return res;
 }
 
 debuggerBP.prototype.getCellsSizes = function() {
@@ -219,47 +222,16 @@ debuggerBP.prototype.fixSizes = function(cell, toDef) {
     }
     else {
         this.graph.fixSizes(cell);
-        // var dWidth = 0;
-        // var pWidth = 0;
-        // var dHeight = 0;
-        // var pHeight = 0;
-        // var geo = this.mod.getGeometry(cell).clone();
-        // var payloads = this.graph.getChildByType(cell, 'payloads');
-        // var data = this.graph.getChildByType(cell, 'data');
-        // var divider = this.graph.getChildByType(cell, 'divider2');
-        // if (cell.children !== null && cell.children !== undefined) {
-        //     this.graph.cellSizeUpdated(data, true);
-        //     //this.graph.updateCellSize(cell.children[0], true);
-        //     dWidth = this.mod.getGeometry(data).width;
-        //     dHeight = this.mod.getGeometry(data).height;
-        //     this.graph.cellSizeUpdated(payloads, true);
-        //     //this.graph.updateCellSize(cell.children[2], true);
-        //     pWidth = this.mod.getGeometry(payloads).width;
-        //     pHeight = this.mod.getGeometry(payloads).height;
-        //     //this.fixSizes(cell.children[2], width, height);
-        // }
-        // geo.width = Math.max(dWidth, pWidth, geo.width);
-        // geo.height = dHeight + pHeight + divider.getGeometry().height + 32;
-        // this.mod.setGeometry(cell, geo);
-        // var tmpGeo = this.mod.getGeometry(data).clone();
-        // tmpGeo.width = Math.max(geo.width, dWidth, pWidth);
-        // this.mod.setGeometry(data, tmpGeo);
-        //
-        // var dividerGeo = this.mod.getGeometry(divider).clone();
-        // dividerGeo.y = this.mod.getGeometry(payloads).y;
-        // this.mod.setGeometry(divider, dividerGeo);
-        // //this.graph.cellSizeUpdated(cell, true);
-        // this.editor.graph.fixConnectionPointsLabelLocation(cell);
     }
 }
 
 debuggerBP.prototype.convertPayloadToString = function(payload) {
-    let i = 0;
+    let i = 1;
     var res = "";
     var width = 0;
     if(payload.constructor === Array) {
         payload.forEach(cur => {
-            var curRes = "Payloads[" + i++ + "]: " + JSON.stringify(cur) + "\n";
+            var curRes = "Payload " + i++ + ": " + JSON.stringify(cur) + "\n";
             width = Math.max(width, curRes.length);
             res += curRes;
         })
@@ -276,13 +248,16 @@ debuggerBP.prototype.convertPayloadToString = function(payload) {
 debuggerBP.prototype.colorCell = function(cell, color) {
     mxUtils.setCellStyles(this.mod, [ cell], 'fillColor', color);
 }
-debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
+
+// Updates cell's size, content and color
+debuggerBP.prototype.updateCell = function(cell, payload, blocked) {//blocked, payload) {
     this.colorCell(cell, "none");
     if(cell.isBPCell()) {
         cell.children.forEach(child => {
             if (payload !== undefined && child.bp_type == "payloads") {
-                this.colorCell(child, "#99ff99");
-                this.mod.setValue(child, this.convertPayloadToString(payload));
+                let color = blocked ? "#ff6666" : "#99ff99";
+                this.colorCell(child, color);
+                this.mod.setValue(child, child.getValue() + this.convertPayloadToString(payload));
             } else
                 this.colorCell(child, "none");
         });
@@ -293,6 +268,7 @@ debuggerBP.prototype.updateCell = function(cell, payload) {//blocked, payload) {
 
 }
 
+// Sets cell's size, content and color to their original (pre-debugging) values
 debuggerBP.prototype.setToOriginal = function (cell) {
     var geo = this.mod.getGeometry(cell).clone();
     geo.width = this.lastCellsSizes[cell.id].width;
@@ -306,8 +282,7 @@ debuggerBP.prototype.setToOriginal = function (cell) {
     mxUtils.setCellStyles(this.mod, cell, 'fillColor', 'none');
     this.mod.setGeometry(cell, geo);
     this.mod.setValue(cell, val);
-}
-
+};
 
 
 debuggerBP.prototype.fixAllOutputsLabels = function() {
@@ -327,6 +302,8 @@ debuggerBP.prototype.fixDataCells = function() {
     })
 };
 
+// Using mxGraph's undoManager, sets the graph at each debugging step,
+// by changing sizes, fill colors and content of every node (if needed).
 debuggerBP.prototype.updateVertexCells = function(record) {
     let cells = Object.values(this.mod.cells).filter(cell => cell.bp_cell);
 
@@ -338,7 +315,7 @@ debuggerBP.prototype.updateVertexCells = function(record) {
         cells.forEach(cell => {
             this.setToOriginal(cell);
             //this.graph.fixValue(cell);
-            this.updateCell(cell, curStage[cell.id])
+            this.updateCell(cell, curStage[cell.id], record[i].blocked.includes(cell.id))
         });
 
         //this.ui.fixView();
@@ -347,25 +324,30 @@ debuggerBP.prototype.updateVertexCells = function(record) {
 
         this.mod.endUpdate();
     }
-}
+};
 
-debuggerBP.prototype.setLabels = function() {
-    let cells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
-    cells.forEach(cell => cell.setAttribute('label', this.lastLabels[cell.id]));
-}
+function updateConsoleMessage(msg) {
+    let myConsole = document.getElementById("ConsoleText1");
+    if (myConsole !== undefined && myConsole !== null) {
+        myConsole.value = msg;
+    }
+};
 
+// Fixes all the scanriod to the current "time (max length of the scenarios)
 debuggerBP.prototype.fixStages = function() {
-    let scens = Object.values(this.scenarios)
+    let scens = Object.values(this.scenarios);
     const lengths = scens.map(x => x.length);
-    let curTime = Math.max(...lengths)
+    let curTime = Math.max(...lengths);
     for (let i = 0; i < scens.length; i++) {
         let curScen = scens[i];
         let numOfFixes = curTime - curScen.length;
         for (let j = 0; j < numOfFixes; j++)
             curScen.push(curScen[curScen.length - 1]);
     }
-}
+};
 
+// Adds an event to the events array, after fixing the length of the array
+// (and of the blocked array as well) to the current "time" (max length of the scenarios)
 debuggerBP.prototype.addEvent = function(e) {
     let scens = Object.values(this.scenarios)
     const lengths = scens.map(x => x.length);
@@ -380,8 +362,17 @@ debuggerBP.prototype.addEvent = function(e) {
     for (let j = 0; j < numOfFixes; j++)
         this.events.push(-1);
     this.events.push(e);
+
+    // fix blocked
+    numOfFixes = curTime - this.blocked.length;
+    for (let j = 0; j < numOfFixes; j++)
+        this.blocked.push(null);
+    this.blocked.push([]);
 }
 
+debuggerBP.prototype.addBlocked = function(c) {
+    this.blocked[this.events.length - 1].push(c);
+}
 
 debuggerBP.prototype.getNumOfSteps = function(){
     let scen = Object.values(this.scenarios);
@@ -390,19 +381,28 @@ debuggerBP.prototype.getNumOfSteps = function(){
     return 0;
 }
 
+// Builds a program record, where each cell of the output contains the content of cells,
+// the selected event and the blocked/wait blocks
 debuggerBP.prototype.getProgramRecord = function() {
     var res = []
+    var curBlocked = [];
 
     for(let step = 0; step < this.getNumOfSteps(); step++){
-        var curStage = {stages: {}, eventSelected: null}
+        var curStage = {stages: {}, eventSelected: null, blocked: []}
         var scens = Object.values(this.scenarios);
         curStage.stages = {};
         for (let j = 0; j < scens.length; j++) {
-            if(scens[j][step][0] != -1)
-                curStage.stages[scens[j][step][0]] = scens[j][step][1];
+            if (scens[j][step][0] != -1)
+                if (scens[j][step][0] in curStage.stages)
+                    curStage.stages[scens[j][step][0]].push(scens[j][step][1]);
+                else
+                    curStage.stages[scens[j][step][0]] = [scens[j][step][1]];
         }
         if(this.events[step] != -1)
             curStage.eventSelected = this.events[step];
+        if(this.blocked[step] != null)
+            curBlocked = this.blocked[step];
+        curStage.blocked = curBlocked;
         if(Object.values(curStage.stages).length > 0 || curStage.eventSelected !== undefined)
             res.push(curStage)
     }
@@ -410,32 +410,26 @@ debuggerBP.prototype.getProgramRecord = function() {
     return res;
 }
 
-function updateConsoleMessage(msg) {
-    let myConsole = document.getElementById("ConsoleText1");
-    if (myConsole !== undefined && myConsole !== null) {
-        myConsole.value = msg;
-    }
-}
-
 debuggerBP.prototype.initDebug = function() {
     this.consoleSteps = [""];
     this.scenarios = {}
     this.events = [];
+    this.blocked = [];
     this.scenCounter = 0;
     updateConsoleMessage("");
 }
 
+// Adds a new scen to the record (filling it with curTime irrelevant cells)
 debuggerBP.prototype.newScen = function(c, curTime, cloned) {
     let scen = this.scenCounter++;
-    c.scenarioID = scen;
     this.scenarios[scen] = [];
     for (let i = 0; i < curTime; i++)
         this.scenarios[scen].push([-1, null]);
     this.scenarios[scen].push([c.id, cloned]);
+    return scen;
 }
 
 debuggerBP.prototype.updateScen = function(scen, c, cloned) {
-    //c.setAttribute("scenarioID", scen);
     this.scenarios[scen].push([c.id, cloned]);
 }
 
@@ -446,26 +440,3 @@ debuggerBP.prototype.endScen = function(scen) {
 debuggerBP.prototype.getScenarioTime = function(scen) {
     return this.scenarios[scen].length;
 }
-
-// function getBlockedEvents() {
-//     var res = []
-//     window.bpEngine.BThreads.forEach(bt => {
-//         bt.stmt.block.forEach(e => res.push(e));
-//     });
-//     return res;
-// }
-
-
-
-
-///////
-//let blockedEvents = getBlockedEvents();
-//let curBlocked = []
-//blockedEvents.forEach(e => {
-//window.bpEngine.BThreads.forEach(bt => {
-//if(isReqWait(bt, e))
-//curBlocked.push(bt.stmt.cellID);
-//});
-//});
-//window.debug.blockedBlocks.push(curBlocked);
-////////

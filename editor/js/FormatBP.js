@@ -341,8 +341,8 @@ FormatBP.prototype.refresh = function () {
             value = obj;
         }
         if (graph.getModel().isEdge(cell)) {
-
-        } else if (getshape(cell.getStyle()) == "bsync") {
+          //Creates the right-handed toolbar for a Bsync block
+        } else if (getshape(cell.getStyle()) === "bsync") {
                 var dlg = new BSyncForm(ui, cell);
                 //dlg.container.style.width="100%";
                 var cont = document.getElementsByClassName("geFormatContainer")[0];
@@ -356,8 +356,8 @@ FormatBP.prototype.refresh = function () {
                 dlg.init();
                 cont.appendChild(bsyncDIV);
 
-
-        } else if (getshape(cell.getStyle()) == "general") {
+        //Creates the right-handed toolbar for a general block
+        } else if (getshape(cell.getStyle()) === "general") {
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
             var generalDIV = document.createElement('div');
@@ -405,7 +405,7 @@ FormatBP.prototype.refresh = function () {
             generalDIV.appendChild(nodeTitleDIV);
 
 
-            //Number of outputs
+            //The code responsible for creating multiple outputs in a general block
             var NumberOfOutPutDIV = document.createElement('div');
             var NumberOfOutPutText = document.createElement("p");
             NumberOfOutPutText.innerHTML = '<font size="2">Number of outputs:</font>';
@@ -415,7 +415,7 @@ FormatBP.prototype.refresh = function () {
             NumberOfOutPutBox.setAttribute("type", "number");
             NumberOfOutPutBox.setAttribute("max", 6);
             NumberOfOutPutBox.setAttribute("min", 0);
-            if (undefined != value.getAttribute("numberOfOutputs")) {
+            if (undefined !== value.getAttribute("numberOfOutputs")) {
                 NumberOfOutPutBox.setAttribute("value", value.getAttribute("numberOfOutputs"));
             } else {
                 NumberOfOutPutBox.setAttribute("value", "1");
@@ -444,7 +444,7 @@ FormatBP.prototype.refresh = function () {
             NumberOfOutPutDIV.appendChild(AreaNumberOfOutPutText);
             generalDIV.appendChild(NumberOfOutPutDIV);
 
-            //Output label - <not made change>
+
             var OutputLabelDIV = document.createElement('div');
             var OutputLabelText = document.createElement("p");
             OutputLabelText.innerHTML = '<font size="2">Output labels:</font>';
@@ -459,7 +459,7 @@ FormatBP.prototype.refresh = function () {
                     var OutputLabelTextBox = document.createElement("INPUT");
                     OutputLabelTextBox.id = "nodeID" + cell.id + "Outputnumber" + (i + 1);
                     OutputLabelTextBox.setAttribute("type", "text");
-                    if (undefined != value.getAttribute("Outputnumber" + (i + 1))) {
+                    if (undefined !== value.getAttribute("Outputnumber" + (i + 1))) {
                         OutputLabelTextBox.setAttribute("value", value.getAttribute("Outputnumber" + (i + 1)));
                     }
                     oneTextLabelDiv.appendChild(OutputLabelTextBox);
@@ -491,7 +491,7 @@ FormatBP.prototype.refresh = function () {
             //add the DIV to cont
             cont.appendChild(generalDIV);
 
-
+            //Creates the right-handed toolbar for a start block
         } else if (getshape(cell.getStyle()) === "startnode") {
             // var dlg = new StartNodeForm(ui, cell);
             var cont = document.getElementsByClassName("geFormatContainer")[0];
@@ -501,11 +501,8 @@ FormatBP.prototype.refresh = function () {
             var textnode = document.createElement("p");
             textnode.innerHTML = '<font size="3">Start Node</font>';
             startnodeDIV.appendChild(textnode);
-            // startnodeDIV.appendChild(dlg.container);
-            // dlg.init();
 
-
-            //creating a div for defnining number of payloads on a start node
+            //Creating a div for defining number of payloads on a start node
             var NumberOfPayloadsDIV = document.createElement('div');
             var NumberOfPayloadsText = document.createElement("p");
             NumberOfPayloadsText.innerHTML = '<font size="2">Number of Payloads:</font>';
@@ -515,7 +512,7 @@ FormatBP.prototype.refresh = function () {
             NumberOfPayloadsBox.setAttribute("type", "number");
             NumberOfPayloadsBox.setAttribute("max", 10);
             NumberOfPayloadsBox.setAttribute("min", 1);
-            if (undefined != value.getAttribute("numberOfPayloads")) { // fetching the last number of payloads from the node itself
+            if (undefined !== value.getAttribute("numberOfPayloads")) { // fetching the last number of payloads from the node itself
                 NumberOfPayloadsBox.setAttribute("value", value.getAttribute("numberOfPayloads"));
             } else {
                 NumberOfPayloadsBox.setAttribute("value", "1");
@@ -589,7 +586,7 @@ FormatBP.prototype.refresh = function () {
             cont.appendChild(startnodeDIV);
 
         }
-
+        //Creates the right-handed toolbar for a console block
         else if (getshape(cell.getStyle()) === "console"){
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
@@ -619,35 +616,3 @@ FormatBP.prototype.refresh = function () {
 
 };
 
-//
-// FormatBP.prototype.roundableShapes = ['label', 'rectangle', 'internalStorage', 'corner',
-//     'parallelogram', 'swimlane', 'triangle', 'trapezoid',
-//     'ext', 'step', 'tee', 'process', 'link',
-//     'rhombus', 'offPageConnector', 'loopLimit', 'hexagon',
-//     'manualInput', 'curlyBracket', 'singleArrow', 'callout',
-//     'doubleArrow', 'flexArrow', 'card', 'umlLifeline','flow.hadas'];
-//
-// /**
-//  * Returns information about the current selection.
-//  */
-// FormatBP.prototype.isComicState = function(state)
-// {
-//     var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
-//
-//     return mxUtils.indexOf(['label', 'rectangle', 'internalStorage', 'corner', 'parallelogram', 'note', 'collate',
-//         'swimlane', 'triangle', 'trapezoid', 'ext', 'step', 'tee', 'process', 'link', 'rhombus',
-//         'offPageConnector', 'loopLimit', 'hexagon', 'manualInput', 'singleArrow', 'doubleArrow',
-//         'flexArrow', 'filledEdge', 'card', 'umlLifeline', 'connector', 'folder', 'component', 'sortShape',
-//         'cross', 'umlFrame', 'cube', 'isoCube', 'isoRectangle', 'partialRectangle', 'flow.hadas'], shape) >= 0;
-// };
-//
-// Format.prototype.isGlassState = function(state)
-// {
-//     var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
-//
-//     return (shape == 'label' || shape == 'rectangle' || shape == 'internalStorage' ||
-//         shape == 'ext' || shape == 'umlLifeline' || shape == 'swimlane' ||
-//         shape == 'process' || shape == 'flow.hadas');
-// };
-
-// FormatBP.prototype.constructor = Format;
