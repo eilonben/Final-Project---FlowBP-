@@ -16,7 +16,7 @@
 				// Small hack to support import
 				if (window.parent.openNew)
 				{
-					window.parent.open(window.parent.location.href);
+					window.parent.open(window.parent.location.href.split('?')[0]);
 				}
 				
 				var reader = new FileReader();

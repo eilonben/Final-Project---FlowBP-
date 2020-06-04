@@ -8,14 +8,14 @@ window.MAX_AREA = window.MAX_AREA || 15000 * 15000;
 // URLs for save and export
 window.EXPORT_URL = window.EXPORT_URL || '../resources/mxgraph/javascript/examples/grapheditor/www/export';
 window.SAVE_URL = window.SAVE_URL || '../resources/mxgraph/javascript/examples/grapheditor/www/save';
-window.OPEN_URL = window.OPEN_URL || '../resources/mxgraph/javascript/examples/grapheditor/www/open';
+window.OPEN_URL = window.OPEN_URL || '../editor/open';
 window.RESOURCES_PATH = window.RESOURCES_PATH || '../resources/mxgraph/javascript/examples/grapheditor/www/resources';
 window.RESOURCE_BASE = window.RESOURCE_BASE || window.RESOURCES_PATH + '/grapheditor';
 window.STENCIL_PATH = window.STENCIL_PATH || 'stencils';
 window.IMAGE_PATH = window.IMAGE_PATH || '../resources/mxgraph/javascript/examples/grapheditor/www/images';
 window.STYLE_PATH = window.STYLE_PATH || '../resources/mxgraph/javascript/examples/grapheditor/www/styles';
 window.CSS_PATH = window.CSS_PATH || '../resources/mxgraph/javascript/examples/grapheditor/www/styles';
-window.OPEN_FORM = window.OPEN_FORM || '../resources/mxgraph/javascript/examples/grapheditor/www/open.html';
+window.OPEN_FORM = window.OPEN_FORM || '../editor/open.html';
 
 // Sets the base path, the UI language via URL param and configures the
 // supported languages to avoid 404s. The loading of all core language
