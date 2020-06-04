@@ -18,7 +18,6 @@ EditorUiBP.prototype.preDebugActions = []
 
 function EditorUiBP(editor, container, lightbox) {
     EditorUi.call(this,editor, container, lightbox);
-
 };
 
 EditorUiBP.prototype = Object.create(EditorUi.prototype);

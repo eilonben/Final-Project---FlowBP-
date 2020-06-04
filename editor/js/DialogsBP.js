@@ -1,3 +1,9 @@
+/**create the bsync dialog in the right toolbar(when bsync is selected on the board)
+ *
+ * @param editorUi
+ * @param cell - bsync node
+ * @constructor
+ */
 var BSyncForm = function (editorUi, cell) {
 
     var graph = editorUi.editor.graph;
