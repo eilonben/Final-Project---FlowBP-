@@ -1,5 +1,7 @@
 var xml_for_test="";
 var debug = new debuggerBP(uiBP);
+
+
 function readTextFile(file)
 {
     var rawFile = new XMLHttpRequest();
@@ -18,11 +20,17 @@ function readTextFile(file)
     rawFile.send(null);
 }
 
+/** load the string of the xml file
+ *
+ * @param filePath -string
+ * @returns {string}
+ */
 function loadXMl(filePath) {
     xml_for_test="";
     readTextFile("./"+filePath);
     return xml_for_test;
 }
+
 
 function printToIndex(testName,resulte) {
     var body= document.getElementById("001");

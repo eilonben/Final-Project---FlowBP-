@@ -1685,13 +1685,21 @@ mxGraph.prototype.vertexLabelsMovable = false;
 mxGraph.prototype.dropEnabled = false;
 
 
-
-
+/**
+ * if the edge get out from the source
+ * @param source - node
+ * @param edge
+ * @returns {boolean}
+ */
 mxGraph.prototype.isOutEdge = function(source,edge) {
     return edge.source.getId() == source.getId();
 };
 
-
+/**
+ * get the number of edges that get out from the source node
+ * @param source - node
+ * @returns {number}
+ */
 mxGraph.prototype.getNumOfOutEdges = function(source){
     var result = 0 ;
     for(var i=0 ; i<source.getEdgeCount() ; i++){
@@ -1743,7 +1751,11 @@ mxGraph.prototype.findCurrLabel = function(source, state) {
     return index+1;
 }
 
-
+/** get all the out edges of the source node
+ *
+ * @param source - node
+ * @returns {Array}
+ */
 mxGraph.prototype.getOutEdges = function(source) {
     var outEdges = [];
     for (let i = 0; i < source.getEdgeCount(); i++) {
@@ -1782,6 +1794,7 @@ mxGraph.prototype.createConnectionHandler = function()
 };
 
 // Block connection to start node, and set edge label
+// return null for delete the new edge
 mxGraph.prototype.createEdge = function(parent, id, value, source, target, style, state)
 {
     // Creates the edge

@@ -7,7 +7,7 @@ function getLabelsFromChildren(cell){
 };
 
 
-
+// get cell styles in map object
 function getMapStyle(style) {
     var result = new Map();
 
@@ -37,6 +37,7 @@ FormatBP = function (editorUi, container) {
 
 FormatBP.prototype = Object.create(Format.prototype);
 
+//remove the attribute (name) from the node (cell)
 FormatBP.prototype.removeAttribute = function (cell, name) {
     var userObject = cell.getValue();
     if (userObject != null && userObject.nodeType == mxConstants.NODETYPE_ELEMENT)
@@ -194,6 +195,12 @@ FormatBP.prototype.adjustEdges = function (cell, numOfOutputs, graph) {
     }
 };
 
+/**
+ * update the edges lables that get out from the general node
+ * @param cell - general node
+ * @param graph - model
+ * @param cellValue - the value of the general node (cell.getValue)
+ */
 FormatBP.prototype.updateEdgesLabels = function (cell, graph, cellValue ) {
     var graphModel = graph.getModel();
     var outEdges = graph.getOutEdges(cell);
@@ -210,7 +217,9 @@ FormatBP.prototype.updateEdgesLabels = function (cell, graph, cellValue ) {
 };
 
 
-// origin format.js function, that update the right toolbar for the selected shapes
+/**
+ * origin format.js function, update the right toolbar for the selected shapes
+ */
 FormatBP.prototype.refresh = function () {
 
     var format = this;
@@ -240,6 +249,7 @@ FormatBP.prototype.refresh = function () {
     label.style.width = '100%';
     this.container.appendChild(div);
 
+    //no shape is selected
     if (graph.isSelectionEmpty()) {
         /*mxUtils.write(label, mxResources.get('diagram'));
 
@@ -273,12 +283,12 @@ FormatBP.prototype.refresh = function () {
         div.appendChild(label);
         this.panels.push(new DiagramFormatPanel(this, ui, div));*/
     }
-    else if (graph.isEditing()) {
+    else if (graph.isEditing()) { //edge shape selected
         mxUtils.write(label, mxResources.get('text'));
         div.appendChild(label);
         this.panels.push(new TextFormatPanel(this, ui, div));
     }
-    else {
+    else { // node shape selected
         var containsLabel = this.getSelectionState().containsLabel;
         var currentLabel = null;
         var currentPanel = null;
@@ -332,7 +342,7 @@ FormatBP.prototype.refresh = function () {
         label2.style.backgroundColor = this.inactiveTabBackgroundColor;
         label3.style.backgroundColor = this.inactiveTabBackgroundColor;
 
-
+        //get type of shape from cell style
         var getshape = function (str) {
             var arr = str.split(";");
             var styleShape = arr[0].split("=")[1] ;
@@ -340,6 +350,7 @@ FormatBP.prototype.refresh = function () {
             return styleShape;
 
         };
+
 
         var createApplyButton = function () {
             var newButton = document.createElement("BUTTON");
@@ -360,9 +371,8 @@ FormatBP.prototype.refresh = function () {
             obj.setAttribute('label', value || '');
             value = obj;
         }
-        if (graph.getModel().isEdge(cell)) {
-
-        } else if (getshape(cell.getStyle()) == "bsync") {
+        //bsync node is selected
+        if (getshape(cell.getStyle()) == "bsync") {
                 var dlg = new BSyncForm(ui, cell);
                 //dlg.container.style.width="100%";
                 var cont = document.getElementsByClassName("geFormatContainer")[0];
@@ -376,7 +386,7 @@ FormatBP.prototype.refresh = function () {
                 dlg.init();
                 cont.appendChild(bsyncDIV);
 
-
+         //general node is selected
         } else if (getshape(cell.getStyle()) == "general") {
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
@@ -511,7 +521,7 @@ FormatBP.prototype.refresh = function () {
             //add the DIV to cont
             cont.appendChild(generalDIV);
 
-
+        // start node is selected
         } else if (getshape(cell.getStyle()) === "startnode") {
             // var dlg = new StartNodeForm(ui, cell);
             var cont = document.getElementsByClassName("geFormatContainer")[0];
@@ -609,7 +619,7 @@ FormatBP.prototype.refresh = function () {
             cont.appendChild(startnodeDIV);
 
         }
-
+        //console node is selected
         else if (getshape(cell.getStyle()) === "console"){
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
