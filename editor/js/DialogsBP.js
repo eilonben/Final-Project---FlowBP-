@@ -41,9 +41,8 @@ var BSyncForm = function (editorUi, cell) {
     this.init = function () {
 
     };
-
+    //A data structure to hold the properties of each Bsync field (Request,Block,Wait)
     var linkInput = {};
-
     addSec = function (lbl) {
         mxUtils.write(td, lbl+"Function(payload)");
         linkInput[lbl] = document.createElement('input');
@@ -121,6 +120,7 @@ var BSyncForm = function (editorUi, cell) {
 
 /**
  * Constructs a new code editor dialog.
+ * The dialog is created when editing the code section in general blocks
  */
 var CodeEditorDialog = function (editorUi, cell) {
 
@@ -189,7 +189,7 @@ var CodeEditorDialog = function (editorUi, cell) {
     this.init = function () {
         nameInput.focus();
         nameInput.scrollTop = 0;
-
+        //adding the CodeMirror package for syntax highlighting
         editor = CodeMirror.fromTextArea(this.textarea, {
             lineNumbers: true,
             // fixedGutter: true,
@@ -224,6 +224,7 @@ var CodeEditorDialog = function (editorUi, cell) {
         let genericBtn = mxUtils.button(mxResources.get('apply'), function () {
 
             try {
+                //Using esprima package for static javascript syntax analysis
                 let syntax = esprima.parse(" let d = function(payload){ " + editor.getValue() + "}");
                 console.log(JSON.stringify(syntax, null, 4));
             }
@@ -251,7 +252,10 @@ var CodeEditorDialog = function (editorUi, cell) {
     table.appendChild(tbody);
     this.container = table;
 };
-
+/**
+ * Constructs a new console code editor dialog.
+ * The dialog is created when editing the code section in console blocks
+ */
 var ConsoleBlockSidebar = function (editorUi, cell) {
 
     var graph = editorUi.editor.graph;
@@ -382,55 +386,11 @@ var ConsoleBlockSidebar = function (editorUi, cell) {
     this.container = table;
 };
 
-// var showConsoleDialog = function (editorUi) {
-//
-//     var td,row;
-//     var table = document.createElement('table');
-//     var tbody = document.createElement('tbody');
-//
-//     row = document.createElement('tr');
-//     td = document.createElement('td');
-//     td.style.fontSize = '10pt';
-//     td.style.width = '100px';
-//     mxUtils.write(td, "Current Console Log: ");
-//     row.appendChild(td);
-//     tbody.appendChild(row);
-//     row = document.createElement('tr');
-//     td = document.createElement('td');
-//     var textarea = document.createElement('textarea');
-//     textarea.setAttribute("id","ConsoleText1");
-//     textarea.setAttribute('wrap', 'off');
-//     textarea.setAttribute('spellcheck', 'false');
-//     textarea.setAttribute('autocorrect', 'off');
-//     textarea.setAttribute('autocomplete', 'off');
-//     textarea.setAttribute('autocapitalize', 'off');
-//     textarea.readOnly = true;
-//     textarea.style.overflow = 'auto';
-//     textarea.style.resize = 'none';
-//     textarea.style.width = '600px';
-//     textarea.style.height = '150px';
-//     textarea.style.marginBottom = '16px';
-//     if (window.consoleLog === undefined) {
-//         textarea.value = "";
-//     }
-//     else {
-//         textarea.value = window.consoleLog;
-//     }
-//     td.appendChild(textarea);
-//     this.init = function () {
-//         textarea.focus();
-//     };
-//     var okBtn = mxUtils.button(mxResources.get('ok'), function () {
-//         editorUi.hideDialog();
-//     });
-//     okBtn.className = 'geBtn gePrimaryBtn';
-//     td.appendChild(okBtn);
-//     row.appendChild(td);
-//     tbody.appendChild(row);
-//     table.appendChild(tbody);
-//     this.container = table;
-// };
 
+/**
+ * Creates a console window that prints the event selected in every sync point,
+ * and prints the objects sent to console nodes in the diagram
+ */
 var myConsoleWindow = function(editorUi, x, y, w, h)
 {
 

@@ -1,4 +1,7 @@
-
+/**
+ * @param message
+ * Writes the message received to the console window
+ */
 function writeToConsole(message) {
     let myConsole = document.getElementById("ConsoleText1");
     if (myConsole !== undefined && myConsole !== null) {
@@ -6,77 +9,19 @@ function writeToConsole(message) {
     }
 }
 
-// window.bpEngine = {
-//     deb : null,
-//     BThreads: [],
-//
-//     sync: function* (stmt) {
-//         yield stmt;
-//     },
-//
-//     registerBThread: (bt) => {
-//         let x = bt.next().value;
-//         let b = {iterator: bt, stmt: fixStmt(x)};
-//         window.bpEngine.BThreads.push(b);
-//     },
-//
-//     run: function* () {
-//         while (true) {
-//             window.bpEngine.deb.fixStages();
-//             let e = getEvent();
-//             if (e === null)
-//                 yield 'waiting for an event';
-//             window.bpEngine.deb.addEvent(e);
-//             console.log(e + "\n");
-//             writeToConsole("event selected: " + e);
-//             window.bpEngine.BThreads.forEach(bt => {
-//                 if (isReqWait(bt, e)) {
-//                     bt.stmt = fixStmt(bt.iterator.next().value)
-//                 }
-//             })
-//         }
-//     }
-// };
-//
-// // // to be implemented
-// // function waitForEvent() {
-// // }
-//
-// function fixStmt(stmt) {
-//     if (stmt === undefined)
-//         return {request: [], block: [], wait: []};
-//     if (stmt.request === undefined)
-//         stmt.request = [];
-//     if (stmt.block === undefined)
-//         stmt.block = [];
-//     if (stmt.wait === undefined)
-//         stmt.wait = [];
-//     return stmt
-// }
-//
-// function isReqWait(bt, e) {
-//     return bt.stmt.request.includes(e) || bt.stmt.wait.includes(e)
-// }
-//
-// function getEvent() {
-//     let requests = new Set();
-//     let blocks = new Set();
-//     window.bpEngine.BThreads.forEach(bt => {
-//         bt.stmt.request.forEach(requests.add, requests);
-//         bt.stmt.block.forEach(blocks.add, blocks);
-//     });
-//     let diff = [...requests].filter(x => ![...blocks].includes(x));
-//     return getRandomItem(diff);
-// }
-//
-// // get random item from a Set
-// function getRandomItem(set) {
-//     let items = Array.from(set);
-//     if (items.length === 0)
-//         return null;
-//     return items[Math.floor(Math.random() * items.length)];
-// }
-
+/**
+ *
+ * @param c
+ * @param payload
+ * @param bpEngine
+ * @param model
+ * @param outputs
+ * @param scen
+ * Handles the transition of the execution from one block to other block/blocks.
+ * If there are multiple outputs, determines which payloads
+ * are sent to which outputs(using the code on the general block)
+ * and registers new BThreads for any extra output.
+ */
 function* goToFollowers(c, payload, bpEngine, model, outputs, scen) {
     let edg = model.getEdges(c, false, true, true);
 
@@ -124,11 +69,16 @@ function* goToFollowers(c, payload, bpEngine, model, outputs, scen) {
     }
 }
 
-/*
-A function which is called in 2 cases:
-1. When the interpreter encounters a start node
-2. When the interpreter encounters a split from a general node into 2 different nodes
-c describes the current cell the interpreter is parsing
+/**
+ * @param c
+ * @param payload
+ * @param bpEngine
+ * @param model
+ * @param curTime
+ * A function which is called in 2 cases:
+ * 1. When the interpreter encounters a start node
+ * 2. When the interpreter encounters a split from a general node into 2 different nodes
+ * c describes the current cell the interpreter is parsing
  */
 function runInNewBT(c, payload, bpEngine, model, curTime) {
     bpEngine.registerBThread(function* () {
@@ -147,9 +97,6 @@ function runInNewBT(c, payload, bpEngine, model, curTime) {
         }
 
         if (c.getAttribute("Request") !== undefined || c.getAttribute("Wait") !==undefined || c.getAttribute("Block")!==undefined ) {
-            // let stmt = JSON.parse(c.getAttribute("sync"));
-            // yield stmt;
-            // cloned["selected"] = window.eventSelected;
             let requested = handleBsync("Request",c,cloned);
             if(requested === -1) {
                 return;
@@ -179,12 +126,18 @@ function getshape(str) {
     arr = arr[0].split("=")[1] != null ? arr[0].split("=")[1].split(".")[1] : "";
     return arr;
 }
-/*
-A function that handles all the fields inside a node relevant for executing BP flow programs
-"code" for the code editor in general blocks
-"sync" for the sync section in bsync nodes
-"log" for the code section in console nodes
- */
+
+
+/**
+ * @param c
+ * @param outputs
+ * @param cloned
+ * @param payload
+ * A function that handles all the fields inside a node relevant for executing BP flow programs
+ * "code" for the code editor in general blocks
+ * "sync" for the sync section in bsync nodes
+ * "log" for the code section in console nodes
+ **/
 function handleNodeAttributes(c, outputs, cloned, payload) {
     if(getshape(c.getStyle()) === "console") {
         writeToConsole(JSON.stringify(payload));
@@ -217,6 +170,16 @@ function handleNodeAttributes(c, outputs, cloned, payload) {
     return outputs;
 }
 
+/**
+ *
+ * @param c
+ * @param payload
+ * @param bpEngine
+ * @param model
+ * @param scen
+ * A function which is called on transition between blocks in order to continue the execution
+ * of the scenario in the same BThread it was running until the function call point
+ */
 function* runInSameBT(c, payload, bpEngine, model, scen) {
     let outputs = {};
     let cloned = JSON.parse(JSON.stringify(payload));
@@ -257,6 +220,16 @@ function* runInSameBT(c, payload, bpEngine, model, scen) {
     yield* goToFollowers(c, cloned, bpEngine, model, outputs, scen);
 }
 
+/**
+ * @param section
+ * @param c
+ * @param payload
+ *
+ * A function that handles the Bsync fields and checks that the code written in the fields
+ * is returning a string array.
+ * section param determines which section is being processed (Request, Wait or Block).
+ * If there are no errors, returns the string array to the caller.
+ */
 const handleBsync = function(section,c,payload) {
     try {
         if (c.getAttribute(section) === undefined || c.getAttribute(section) === null || c.getAttribute(section) === "")
@@ -288,6 +261,12 @@ const handleBsync = function(section,c,payload) {
     }
 };
 
+/**
+ * @param model
+ * @param debug
+ * The entry function that starts the work of the interpreter.
+ * Receives the MxGraphModel from the caller (param model), and a debugger object if in debug mode.
+ */
 function startRunning(model, debug) {
     // Start the context nodes
     window.executeError= false;
@@ -317,30 +296,3 @@ function startRunning(model, debug) {
     bpEngine.run().next();
     bpEngine.BThreads = [];
 }
-
-
-
-
-
-// function f1(){}
-// function f2(){}
-// function f3(){}
-// function f4(){}
-// let c1 ={getId: function(){return 1},
-// 	     sync: {request:['hot']}
-// 	};
-// let c2 ={getId: function(){return 2},
-//     sync: {request:['cold']}
-// };
-// let c3 ={getId: function(){return 3},
-//     sync: {wait:['hot'],block:['cold']}
-// };
-// let c4 ={getId: function(){return 4},
-//     sync: {request:["hhhhhh"]}
-// };
-// bpEngine1=Object.create(bpEngine)
-// runInNewBT(c1,{},bpEngine1);
-// runInNewBT(c2,{},bpEngine1);
-// runInNewBT(c3,{},bpEngine1);
-// bpEngine1.run().next();
-

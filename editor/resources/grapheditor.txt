@@ -315,6 +315,5 @@ zoomIn=Zoom In
 zoomOut=Zoom Out
 runModel=runModel
 editCode=Edit Code
-editBsync=Edit BSync
 editCounter=Edit Counter
 editMoodle=Edit Moodle
