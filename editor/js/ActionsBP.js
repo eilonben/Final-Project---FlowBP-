@@ -123,7 +123,7 @@ ActionsBP.prototype.init = function (actions) {
 
     }, null, null);
 
-    //open new file with new URL
+    //new file with new URL
     actions.addAction('new...', function() {
         graph.openLink(ui.getUrl().split('?')[0]);
     });
