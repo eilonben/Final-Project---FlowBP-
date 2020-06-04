@@ -746,9 +746,9 @@ mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSourc
 
     if (terminal != null)
     {
-        //denny connect start node
-        if (getshape(terminal.getStyle())=="startnode" && !isSource)
-            return previous;
+        // //denny connect start node
+        // if (getshape(terminal.getStyle())=="startnode" && !isSource)
+        //     return previous;
 
         terminal.insertEdge(edge, isSource);
 
@@ -880,6 +880,12 @@ mxGraphView.prototype.updateEdgeState = function(state, geo)
     if (target!= null && target.cell.isInnerChild()) {
         var targetCell = target.cell.parent;
         target = this.getState(targetCell)
+    }
+
+    //If this is a bp child connect to his parent
+    if (source!= null && source.cell.isInnerChild()) {
+        var sourceCell = source.cell.parent;
+        source = this.getState(sourceCell)
     }
 
 
@@ -1241,6 +1247,13 @@ mxGraph.prototype.getNumOfOutEdges = function(source){
     return result;
 };
 
+
+/**
+ * get inner child by his type
+ * @param cell - mxCell
+ * @param type - string
+ * @returns {mxCell}
+ */
 mxGraph.prototype.getChildByType = function(cell, type)
 {
     var child = null;
@@ -1251,7 +1264,12 @@ mxGraph.prototype.getChildByType = function(cell, type)
     return child;
 };
 
-// Adjust the inner cells of the cell
+
+/**
+ * Adjust the inner cells of the cell
+ * @param cell - mxCell
+ * @param oldDividerGeometry - geometry
+ */
 mxGraph.prototype.fixBPChildren = function(cell, oldDividerGeometry){
     if(cell == null || !cell.bp_cell)
         return
@@ -1271,7 +1289,12 @@ mxGraph.prototype.fixBPChildren = function(cell, oldDividerGeometry){
 
 };
 
-// return the label index
+/**
+ * get the label index
+ * @param source - mxCell
+ * @param state - State
+ * @returns {number}
+ */
 mxGraph.prototype.findCurrLabel = function(source, state) {
     //there is only one constraint point
     if(source.new_constraints == null)
@@ -1321,6 +1344,7 @@ mxGraph.prototype.createConnectionHandler = function()
     return new mxConnectionHandlerBP(this);
 };
 
+//TODO: delete Block connection to start node, and set edge label
 // Block connection to start node, and set edge label
 // return null for delete the new edge
 mxGraph.prototype.createEdge = function(parent, id, value, source, target, style, state)
@@ -1331,9 +1355,9 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
     edge.setEdge(true);
     edge.geometry.relative = true;
 
-    //check basic legal Edge
-    if(source!=null && ( target ==null || getshape(target.getStyle())=="startnode"))
-        return null;
+    // //check basic legal Edge
+    // if(source!=null && ( target ==null || getshape(target.getStyle())=="startnode"))
+    //     return null;
 
     //cases by nodes
     if(source!=null && getshape(source.getStyle())=="general" ){
@@ -1471,8 +1495,6 @@ mxGraph.prototype.intersects = function(state, x, y)
                 x = pt.x;
                 y = pt.y;
             }
-            //if (state.cell.contains(state, x, y))
-            //change if function
             if (this.shapeContains(state, x, y))
             {
                 return true;
@@ -1484,14 +1506,22 @@ mxGraph.prototype.intersects = function(state, x, y)
 };
 
 
-// unsed -> may use to prevent connect start node as target
+// edges constraints
 mxGraph.prototype.isValidConnection = function(source, target)
 {
-    // if(getshape(target.getStyle())=="startnode" || source == null || target == null)
-    //     return false;
+    //edge must have source and target
+    if(source == null || target == null)
+        return false;
+    // start node coulde not be a target
+    if(target.isStartNode())
+        return false;
+    // bpsync and start node could have only on exit edge
+    if((source.isStartNode() || source.isBsyncNode()) && this.getNumOfOutEdges(source) > 0)
+        return false;
     return this.isValidSource(source) && this.isValidTarget(target);
 };
 
+// use selectable field of mxCell
 mxGraph.prototype.isCellSelectable = function(cell)
 {
     if(cell != null && cell.selectable != null && !cell.selectable)
@@ -1517,7 +1547,11 @@ mxGraph.prototype.createGraphView = function()
     return new mxGraphViewBP(this);
 };
 
-// relocate connection points labels according to connection points locations
+
+/** relocate connection points labels according to connection points locations
+ *
+ * @param cell - mxCell
+ */
 mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell) {
     if (cell == null || cell.children == null)
         return;
@@ -1540,7 +1574,10 @@ mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell) {
 
 };
 
-// initial new_constraints filed
+/** initial new_constraints filed of cell
+*
+* @param cell - mxCell
+*/
 mxGraph.prototype.validateConstraints = function (cell){
     if(cell != null && cell.new_constraints == null){
         var state = this.view.getState(cell, false);
@@ -1549,7 +1586,7 @@ mxGraph.prototype.validateConstraints = function (cell){
 };
 
 
-//cancel the option that a bp related shapes will be another cell parent
+// deny the option that a bp related shapes will be another bp related shape parent
 mxGraphModel.prototype.parentForCellChanged = function(cell, parent, index)
 {
     var previous = this.getParent(cell);
@@ -1600,4 +1637,20 @@ mxCell.prototype.isBPCell = function() {return this.bp_cell != null && this.bp_c
 
 mxCell.prototype.isInnerChild = function(){
     return (this.bp_type != null && (this.bp_type == 'data' || this.bp_type== 'divider'));
+};
+
+mxCell.prototype.isStartNode = function(){
+    return (this.bp_type != null && this.bp_type =='startnode');
+};
+
+mxCell.prototype.isBsyncNode = function(){
+    return (this.bp_type != null && this.bp_type =='BSync');
+};
+
+mxCell.prototype.isGeneralNode = function(){
+    return (this.bp_type != null && this.bp_type =='General');
+};
+
+mxCell.prototype.isConsoleNode = function(){
+    return (this.bp_type != null && this.bp_type =='Console');
 };
