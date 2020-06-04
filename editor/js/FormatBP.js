@@ -1,41 +1,16 @@
-
-function getLabelsFromChildren(cell){
-    var children = cell.children || [];
-    var labels = children.filter(x => x.label_index != null);
-    labels = labels.sort(function(a, b) {return a.label_index - b.label_index});
-    return labels;
-};
-
-
-
-function getMapStyle(style) {
-    var result = new Map();
-
-    if (style != null) {
-        var pairs = style.split(';');
-
-        for (var i = 0; i < pairs.length; i++) {
-            var pair = pairs[i].split('=');
-            if (pair.length == 2)
-                result.set(pair[0], pair[1])
-        }
-    }
-
-    return result;
-};
-
-function getValueByKey(style, key, defult) {
-    var map = getMapStyle(style);
-    return map.get(key) || defult;
-
-};
-
-
+/*
+Objectives
+1. set right side bar of start node
+2. set right side bar of bsync node
+3. set right side bar of general node
+4. set right side bar of console node
+ */
 FormatBP = function (editorUi, container) {
     Format.call(this, editorUi, container);
 };
 
 FormatBP.prototype = Object.create(Format.prototype);
+
 
 FormatBP.prototype.removeAttribute = function (cell, name) {
     var userObject = cell.getValue();
@@ -43,59 +18,47 @@ FormatBP.prototype.removeAttribute = function (cell, name) {
         userObject.removeAttribute(name);
 };
 
-FormatBP.prototype.deletePrevLabels = function (cell, value, graph) {
+// delete labels in cell attributes
+FormatBP.prototype.deletePrevLabels = function (cell, value) {
     var prevAmount = cell.getAttribute('numberOfOutputs', 1);
     for (let i = prevAmount; i > value; i--) {
         this.removeAttribute(cell, 'Outputnumber' + i);
     }
 };
 
-FormatBP.prototype.validateNewConstraint = function (cell, graph){
-    if(cell != null && cell.new_constraints == null){
-        var state = graph.view.getState(cell, false);
-        cell.new_constraints = graph.getAllConnectionConstraints(state, true);
-    }
-};
-
-
-// compute constraint new position
+// compute output point position
 FormatBP.prototype.computeNewPosition = function(cell, numOfOutputs, index){
-    
-    var interval = 1 / (numOfOutputs + 1);
+    let interval = 1 / (numOfOutputs + 1);
     return new mxPoint(mxConnectionHandlerBP.defultOutputX, interval * index);
 };
 
 
-// update connection point number
-FormatBP.prototype.adjustConnectionPoints = function (cell, numOfOutputs, graph) {
-    this.validateNewConstraint(cell, graph);
-    // input constraint always at the end of the list
-
+// update connection points of cell
+FormatBP.prototype.updateConnectionPoints = function (cell, numOfOutputs, graph) {
+    graph.validateConstraints(cell);
     var inputConstraint = cell.new_constraints.filter(x => x.name == "I");
     cell.new_constraints = [];
     for (var i = 1; i <= numOfOutputs; i++) {
-        var newLocationPoint = this.computeNewPosition(cell, numOfOutputs, i);
-        cell.new_constraints.push(new mxConnectionConstraint(newLocationPoint, true, "O", newLocationPoint.x, newLocationPoint.y));
+        var LocationPoint = this.computeNewPosition(cell, numOfOutputs, i);
+        cell.new_constraints.push(new mxConnectionConstraint(LocationPoint, true, "O", LocationPoint.x, LocationPoint.y));
     }
-    // input constraint Should be at the end of the list
+    // input constraint are at the end of the list
     cell.new_constraints = cell.new_constraints.concat(inputConstraint);
     graph.connectionHandler.constraintHandler.showConstraint(graph.view.getState(cell,false));
 };
 
 
-//update the connection points labels
-FormatBP.prototype.updateConnectionPointsLabels = function (graph, cell, labels){
-    this.validateNewConstraint(cell, graph);
+// update output labels of the cell
+FormatBP.prototype.updateOutputsLabels = function (graph, cell, labels){
+    graph.validateConstraints(cell);
     graph.getModel().beginUpdate();
     try {
-        // labels related to cell connection points
-        var cell_labels_cells = getLabelsFromChildren(cell);
+        var OutputLabelsCells = cell.getOutputLabels();
         for (var i = 0; i < labels.length; i++) {
             var label = labels[i];
-
-            // the label exist -> only change its value
-            if( cell_labels_cells.length > i) {
-                var ConnectionPointLabelCell = cell_labels_cells[i];
+            // the label exist -> change its value
+            if( OutputLabelsCells.length > i) {
+                var ConnectionPointLabelCell = OutputLabelsCells[i];
                 ConnectionPointLabelCell.value = label;
             }
             // create new label
@@ -122,10 +85,10 @@ FormatBP.prototype.updateConnectionPointsLabels = function (graph, cell, labels)
     graph.view.revalidate();
 };
 
-// after changing number of output adjust the Connection PointsLabels accordingly
-FormatBP.prototype.adjustConnectionPointsLabels = function (graph, cell, newOutputNumber)
+// delete and relocate existing output labels
+FormatBP.prototype.updateLabelsPositions = function (graph, cell, newOutputNumber)
 {
-    var labels = getLabelsFromChildren(cell);
+    var labels = cell.getOutputLabels();
     newOutputNumber = newOutputNumber != null ? newOutputNumber : cell.new_constraints.length ;
     graph.getModel().beginUpdate();
     try {
@@ -147,24 +110,21 @@ FormatBP.prototype.adjustConnectionPointsLabels = function (graph, cell, newOutp
 
 };
 
-// after changing number of output adjust the edges exit point accordingly
+// relocate edges exit location
 FormatBP.prototype.adjustEdges = function (cell, numOfOutputs, graph) {
-
-    //need to adjust old arrows to new location
     var graphModel = graph.getModel();
     var outEdges = graph.getOutEdges(cell);
     var numOfOutputs = numOfOutputs != null ? numOfOutputs : outEdges.length;
     graphModel.beginUpdate();
     try {
         for (let i = 0; i < outEdges.length; i++) {
-            // get old location of edge
-            var constraintNumber = parseInt(outEdges[i].getAttribute('labelNum'));
-            //check if edge should erase
-            if (constraintNumber > numOfOutputs)
+            var edgeIndex = parseInt(outEdges[i].getAttribute('labelNum'));
+            // check if edge should erase
+            if (edgeIndex > numOfOutputs)
                 graphModel.remove(outEdges[i], true);
             else {
-                //    relocate edge exit location of edge
-                var newLocationPoint = this.computeNewPosition(cell, numOfOutputs, constraintNumber);
+                // relocate edge exit location of edge
+                var newLocationPoint = this.computeNewPosition(cell, numOfOutputs, edgeIndex);
                 var new_style = mxUtils.setStyle(outEdges[i].style, 'exitY', newLocationPoint.y);
                 graphModel.setStyle(outEdges[i], new_style);
             }
@@ -174,6 +134,7 @@ FormatBP.prototype.adjustEdges = function (cell, numOfOutputs, graph) {
     }
 };
 
+// update edge label
 FormatBP.prototype.updateEdgesLabels = function (cell, graph, cellValue ) {
     var graphModel = graph.getModel();
     var outEdges = graph.getOutEdges(cell);
@@ -428,10 +389,10 @@ FormatBP.prototype.refresh = function () {
                     NumberOfOutPutBox.value = value.getAttribute("numberOfOutputs");
                     return;
                 }
-                format.adjustConnectionPoints(cell, outputNumber, graph);
-                format.deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
+                format.updateConnectionPoints(cell, outputNumber, graph);
+                format.deletePrevLabels(cell, NumberOfOutPutBox.value);
                 format.adjustEdges(cell, outputNumber, graph);
-                format.adjustConnectionPointsLabels(graph, cell, outputNumber);
+                format.updateLabelsPositions(graph, cell, outputNumber);
 
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
                 graph.getModel().setValue(cell, value);
@@ -459,6 +420,7 @@ FormatBP.prototype.refresh = function () {
                     var OutputLabelTextBox = document.createElement("INPUT");
                     OutputLabelTextBox.id = "nodeID" + cell.id + "Outputnumber" + (i + 1);
                     OutputLabelTextBox.setAttribute("type", "text");
+
                     if (undefined !== value.getAttribute("Outputnumber" + (i + 1))) {
                         OutputLabelTextBox.setAttribute("value", value.getAttribute("Outputnumber" + (i + 1)));
                     }
@@ -477,7 +439,7 @@ FormatBP.prototype.refresh = function () {
                             labels.push(label);
                         }
                         format.updateEdgesLabels(cell, graph, value);
-                        format.updateConnectionPointsLabels(graph, cell, labels);
+                        format.updateOutputsLabels(graph, cell, labels);
                         graph.getModel().setValue(cell, value);
                     };
                     InnerDIVOutputLabel.appendChild(applyButtonLabels);
