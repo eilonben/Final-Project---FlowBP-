@@ -385,7 +385,7 @@ FormatBP.prototype.refresh = function () {
             NumberOfOutPutBox.setAttribute("type", "number");
             NumberOfOutPutBox.setAttribute("max", 6);
             NumberOfOutPutBox.setAttribute("min", 0);
-            if (undefined !== value.getAttribute("numberOfOutputs")) {
+            if (undefined != value.getAttribute("numberOfOutputs")) {
                 NumberOfOutPutBox.setAttribute("value", value.getAttribute("numberOfOutputs"));
             } else {
                 NumberOfOutPutBox.setAttribute("value", "1");
@@ -430,7 +430,7 @@ FormatBP.prototype.refresh = function () {
                     OutputLabelTextBox.id = "nodeID" + cell.id + "Outputnumber" + (i + 1);
                     OutputLabelTextBox.setAttribute("type", "text");
 
-                    if (undefined !== value.getAttribute("Outputnumber" + (i + 1))) {
+                    if (undefined != value.getAttribute("Outputnumber" + (i + 1))) {
                         OutputLabelTextBox.setAttribute("value", value.getAttribute("Outputnumber" + (i + 1)));
                     }
                     oneTextLabelDiv.appendChild(OutputLabelTextBox);
