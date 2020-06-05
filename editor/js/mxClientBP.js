@@ -920,6 +920,15 @@ mxGraphView.prototype.updateEdgeState = function(state, geo)
             this.updateEdgeLabelOffset(state);
         }
     }
+//    fix edge
+    state.cell.source = source.cell;
+    state.cell.target = target.cell;
+
+    // if(target != null && !target.cell.edges.includes(state.cell))
+    //     target.cell.edges.push(state.cell);
+    //
+    // if(source && !source.cell.edges.includes(state.cell))
+    //     source.cell.edges.push(source.cell);
 };
 
 
@@ -1249,7 +1258,7 @@ mxGraph.prototype.getNumOfOutEdges = function(source){
 
 
 /**
- * get inner child by his type
+ * get bp cell child by his type
  * @param cell - mxCell
  * @param type - string
  * @returns {mxCell}
@@ -1290,7 +1299,7 @@ mxGraph.prototype.fixBPChildren = function(cell, oldDividerGeometry){
 };
 
 /**
- * get the label index
+ * get the output label index
  * @param source - mxCell
  * @param state - State
  * @returns {number}
@@ -1457,7 +1466,7 @@ mxGraph.prototype.getConnectionConstraint = function(edge, terminal, source)
 };
 
 
-// consider connection points as part of the shape when mouse is hover (call shapeContains)
+// hover bp cell consider also his connection points as part of the shape
 mxGraph.prototype.intersects = function(state, x, y)
 {
     if (state != null)
@@ -1495,6 +1504,7 @@ mxGraph.prototype.intersects = function(state, x, y)
                 x = pt.x;
                 y = pt.y;
             }
+            // check if (x,y) contains cell or his connection points
             if (this.shapeContains(state, x, y))
             {
                 return true;
@@ -1506,7 +1516,7 @@ mxGraph.prototype.intersects = function(state, x, y)
 };
 
 
-// edges constraints
+// edges validation rules
 mxGraph.prototype.isValidConnection = function(source, target)
 {
     //edge must have source and target
