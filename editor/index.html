@@ -120,7 +120,7 @@
 			var editoruibp = new EditorUiBP(new EditorBP(urlParams['chrome'] == '0', themes));
 			if(urlParams['model'] != undefined) {
 				var doc = mxUtils.parseXml(decodeURIComponent(urlParams['model']));
-				editoruibp.editor.graph.setSelectionCells(editoruibp.editor.graph.importGraphModel(doc.documentElement));
+				editoruibp.editor.graph.importGraphModel(doc.documentElement);
 			}
         }, function()
         {
