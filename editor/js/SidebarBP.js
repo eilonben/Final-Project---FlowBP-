@@ -37,7 +37,9 @@ SidebarBP.prototype.defaultImageWidth = 150;
 SidebarBP.prototype.defaultImageHeight = 100;
 
 
-//Duplication This function is designed to replace the call to Graph into GraphBP
+/** Override
+ * change the call from Graph to GraphBP
+ */
 SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
 {
     if (this.enableTooltips && this.showTooltips)
@@ -211,7 +213,17 @@ SidebarBP.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
     }
 };
 
-//initial shape attributes
+/**
+ * initial shape attributes
+ *
+ * @param value - <String>
+ * @param geometry - <mxGeometry>
+ * @param style - <String>
+ * @param type - <String>
+ * @param bpCell - <boolean>
+ * @param visible - <boolean>
+ * @returns {mxCell}
+ */
 SidebarBP.prototype.setCellAttributes = function(value, geometry, style, type, bpCell, visible){
     let cell = new mxCell(value, geometry, style);
     cell.vertex = true;
@@ -222,7 +234,12 @@ SidebarBP.prototype.setCellAttributes = function(value, geometry, style, type, b
     return cell;
 };
 
-// create bp shape
+/**
+ * create bp shape
+ * @param name - <String> name of shape
+ * @param shape - <String> type of shape
+ * @returns {mxCell}
+ */
 SidebarBP.prototype.createBPShape = function(name, shape)
 {
     // data
@@ -256,7 +273,9 @@ SidebarBP.prototype.createBPShape = function(name, shape)
     return cell;
 };
 
-// Adds all bp shapes palette to the sidebar.
+/**
+ * Adds all bp shapes palette to the sidebar.
+ */
 SidebarBP.prototype.addFlowBPPalette = function()
 {
     var sb = this;
@@ -295,14 +314,18 @@ SidebarBP.prototype.addFlowBPPalette = function()
     this.addPaletteFunctions('Flow', 'Flow',  false, fns);
 };
 
-
-
-// Limits drop style to non-transparent source shapes
+/**
+ * Limits drop style to non-transparent source shapes
+ * @returns {boolean}
+ */
 Sidebar.prototype.isDropStyleEnabled = function(cells, firstVertex)
 {
     return false;
 };
 
+/**
+ * Delete refresh functionality
+ */
 SidebarBP.prototype.createDragSource = function(elt, dropHandler, preview, cells, bounds)
 {
     // Checks if the cells contain any vertices

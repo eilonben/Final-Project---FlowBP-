@@ -11,14 +11,22 @@ FormatBP = function (editorUi, container) {
 
 FormatBP.prototype = Object.create(Format.prototype);
 
-//remove the attribute (name) from the node (cell)
+/**
+ * remove the attribute (name) from the node (cell)
+ * @param cell - <mxCell> cell to remove his attribute
+ * @param name - <String> attribute to remove
+ */
 FormatBP.prototype.removeAttribute = function (cell, name) {
     var userObject = cell.getValue();
     if (userObject != null && userObject.nodeType == mxConstants.NODETYPE_ELEMENT)
         userObject.removeAttribute(name);
 };
 
-// delete labels in cell attributes
+/**
+ * delete labels in cell attributes
+ * @param cell - <mxCell> cell to delete his labels
+ * @param value - <number> new number of labels
+ */
 FormatBP.prototype.deletePrevLabels = function (cell, value) {
     var prevAmount = cell.getAttribute('numberOfOutputs', 1);
     for (let i = prevAmount; i > value; i--) {
@@ -26,14 +34,24 @@ FormatBP.prototype.deletePrevLabels = function (cell, value) {
     }
 };
 
-// compute output point position
+/**
+ * compute output point position
+ * @param cell - <mxCell>
+ * @param numOfOutputs - <number>
+ * @param index - <number>
+ * @returns {mxPoint}
+ */
 FormatBP.prototype.computeNewPosition = function(cell, numOfOutputs, index){
     let interval = 1 / (numOfOutputs + 1);
     return new mxPoint(mxConnectionHandlerBP.defultOutputX, interval * index);
 };
 
-
-// update connection points of cell
+/**
+ * update connection points of cell
+ * @param cell - <mxCell> to update his connection points
+ * @param numOfOutputs - <number>
+ * @param graph - <mxGraph> who contains the cell
+ */
 FormatBP.prototype.updateConnectionPoints = function (cell, numOfOutputs, graph) {
     graph.validateConstraints(cell);
     var inputConstraint = cell.new_constraints.filter(x => x.name == "I");
@@ -47,8 +65,12 @@ FormatBP.prototype.updateConnectionPoints = function (cell, numOfOutputs, graph)
     graph.connectionHandler.constraintHandler.showConstraint(graph.view.getState(cell,false));
 };
 
-
-// update output labels of the cell
+/**
+ * update output labels of the cell
+ * @param graph - <mxGraph> who contains the cell
+ * @param cell - <mxCell> who his output labels are updates
+ * @param labels - <array<String>>
+ */
 FormatBP.prototype.updateOutputsLabels = function (graph, cell, labels){
     graph.validateConstraints(cell);
     graph.getModel().beginUpdate();
@@ -85,7 +107,12 @@ FormatBP.prototype.updateOutputsLabels = function (graph, cell, labels){
     graph.view.revalidate();
 };
 
-// delete and relocate existing output labels
+/**
+ * delete and relocate existing output labels
+ * @param graph - <mxGraph> who contains the cell
+ * @param cell - who his labels positions are updated
+ * @param newOutputNumber - <number> new output number
+ */
 FormatBP.prototype.updateLabelsPositions = function (graph, cell, newOutputNumber)
 {
     var labels = cell.getOutputLabels();
@@ -110,7 +137,12 @@ FormatBP.prototype.updateLabelsPositions = function (graph, cell, newOutputNumbe
 
 };
 
-// relocate edges exit location
+/**
+ * relocate edges exit location
+ * @param cell - <mxCell> who his edges are relocated
+ * @param numOfOutputs - <number>
+ * @param graph - <mxGraph> how contains the cell
+ */
 FormatBP.prototype.adjustEdges = function (cell, numOfOutputs, graph) {
     var graphModel = graph.getModel();
     var outEdges = graph.getOutEdges(cell);
