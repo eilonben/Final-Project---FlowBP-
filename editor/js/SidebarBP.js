@@ -303,6 +303,7 @@ Sidebar.prototype.isDropStyleEnabled = function(cells, firstVertex)
     return false;
 };
 
+// Delete refresh functionality
 SidebarBP.prototype.createDragSource = function(elt, dropHandler, preview, cells, bounds)
 {
     // Checks if the cells contain any vertices
