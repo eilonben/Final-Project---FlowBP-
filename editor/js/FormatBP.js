@@ -417,7 +417,7 @@ FormatBP.prototype.refresh = function () {
             NumberOfOutPutBox.setAttribute("type", "number");
             NumberOfOutPutBox.setAttribute("max", 6);
             NumberOfOutPutBox.setAttribute("min", 0);
-            if (undefined !== value.getAttribute("numberOfOutputs")) {
+            if (undefined != value.getAttribute("numberOfOutputs")) {
                 NumberOfOutPutBox.setAttribute("value", value.getAttribute("numberOfOutputs"));
             } else {
                 NumberOfOutPutBox.setAttribute("value", "1");
@@ -462,7 +462,7 @@ FormatBP.prototype.refresh = function () {
                     OutputLabelTextBox.id = "nodeID" + cell.id + "Outputnumber" + (i + 1);
                     OutputLabelTextBox.setAttribute("type", "text");
 
-                    if (undefined !== value.getAttribute("Outputnumber" + (i + 1))) {
+                    if (undefined != value.getAttribute("Outputnumber" + (i + 1))) {
                         OutputLabelTextBox.setAttribute("value", value.getAttribute("Outputnumber" + (i + 1)));
                     }
                     oneTextLabelDiv.appendChild(OutputLabelTextBox);
@@ -515,7 +515,7 @@ FormatBP.prototype.refresh = function () {
             NumberOfPayloadsBox.setAttribute("type", "number");
             NumberOfPayloadsBox.setAttribute("max", 10);
             NumberOfPayloadsBox.setAttribute("min", 1);
-            if (undefined !== value.getAttribute("numberOfPayloads")) { // fetching the last number of payloads from the node itself
+            if (undefined != value.getAttribute("numberOfPayloads")) { // fetching the last number of payloads from the node itself
                 NumberOfPayloadsBox.setAttribute("value", value.getAttribute("numberOfPayloads"));
             } else {
                 NumberOfPayloadsBox.setAttribute("value", "1");
@@ -551,7 +551,7 @@ FormatBP.prototype.refresh = function () {
                     PayloadsLabelTextBox.setAttribute("type", "text");
                     //checking if there was a former definition for the i'th payload holder
                     var parsed = JSON.parse(value.getAttribute("Payloads"));
-                    if (parsed !== null && parsed !== undefined && parsed[i] != null && parsed[i] !== undefined) {
+                    if (parsed != null && parsed != undefined && parsed[i] != null && parsed[i] != undefined) {
                         PayloadsLabelTextBox.setAttribute("value", JSON.stringify(parsed[i]));
                     }
                     oneTextLabelDiv.appendChild(PayloadsLabelTextBox);
