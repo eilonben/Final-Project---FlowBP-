@@ -28,8 +28,7 @@ EditorUiBP.prototype.createHoverIcons = function()
     return new HoverIconsBP(this.editor.graph);
 };
 
-
-
+//
 EditorUiBP.prototype.createFormat = function(container)
 {
     return new FormatBP(this, container);

@@ -18,7 +18,9 @@ mxConnectionHandlerBP.defultInputY = 0.5;
 
 mxConnectionHandlerBP.prototype = Object.create(mxConnectionHandler.prototype);
 
-// set the edge label if exist
+/** Override
+ * set the edge label if exist
+ * */
 mxConnectionHandlerBP.prototype.insertEdge = function(parent, id, value, source, target, style, state)
 {
     if (this.factoryMethod == null)
@@ -34,7 +36,9 @@ mxConnectionHandlerBP.prototype.insertEdge = function(parent, id, value, source,
     }
 };
 
-// change the call from constraintHandler to mxConstraintHandlerBP
+/** Override
+ * change the call from constraintHandler to mxConstraintHandlerBP
+ */
 mxConnectionHandlerBP.prototype.init = function()
 {
     this.graph.addMouseListener(this);
@@ -76,7 +80,9 @@ mxConnectionHandlerBP.prototype.init = function()
     this.graph.getView().addListener(mxEvent.UP, this.drillHandler);
 };
 
-// relocate input edge to the left side of the cell
+/** Override
+ *  relocate input edge to the left side of the cell
+*/
 mxConnectionHandlerBP.prototype.checkAndFixBorder = function(edge)
 {
     var styles = edge.style.trim().split(";");
@@ -101,7 +107,9 @@ mxConnectionHandlerBP.prototype.checkAndFixBorder = function(edge)
 };
 
 
-// when connecting into inner child of bp connect to his parent (bp cell) instead
+/** Override
+ * when connecting into inner child of bp connect to his parent (bp cell) instead
+ * */
 mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarget)
 {
 
@@ -113,8 +121,8 @@ mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarg
         var edge = null;
 
         //If this is a bp child connect to his parent
-        if (target!= null && target.isInnerChild())
-            target = target.parent;
+        // if (target!= null && target.isInnerChild())
+        //     target = target.parent;
 
         model.beginUpdate();
         try {
@@ -249,7 +257,9 @@ mxConnectionHandlerBP.prototype.connect = function(source, target, evt, dropTarg
     }
 };
 
-// do not destroy connection points icons
+/** Override
+ * do not destroy connection points icons
+ * */
 mxConnectionHandlerBP.prototype.destroyIcons = function()
 {
     return;
@@ -274,7 +284,9 @@ mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBase
 
 mxConstraintHandlerBP.prototype.highlightColor = '#808080';
 
-// returns different image depending on constraint type
+/** Override
+ * returns different image depending on constraint type
+  */
 mxConstraintHandlerBP.prototype.getImageForConstraint = function(state, constraint, point)
 {
     if(constraint != null && constraint.name == "I")
@@ -283,7 +295,10 @@ mxConstraintHandlerBP.prototype.getImageForConstraint = function(state, constrai
         return this.OutputPointImage;
 };
 
-// do not delete connection points icons
+/** Override
+ * do not delete connection points icons
+  */
+
 mxConstraintHandlerBP.prototype.reset = function()
 {
     if (this.focusHighlight != null)
@@ -299,13 +314,17 @@ mxConstraintHandlerBP.prototype.reset = function()
     this.focusPoints = null;
 };
 
-// do not delete connection points icons
+/** Override
+ * do not delete connection points icons
+ */
 mxConstraintHandlerBP.prototype.destroyIcons = function()
 {
     return;
 };
 
-// destroy shape connection points icons (use when deleting a shape)
+/** Override
+ *  destroy shape connection points icons (use when deleting a shape)
+ */
 mxConstraintHandlerBP.prototype.destroyIconsByState = function(state)
 {
     if(state == null || state.cell == null)
@@ -324,7 +343,9 @@ mxConstraintHandlerBP.prototype.destroyIconsByState = function(state)
     }
 };
 
-// focus on shape when also hover a shape connection points
+/** Override
+ * focus on shape when also hover a shape connection points
+ */
 mxConstraintHandlerBP.prototype.update = function(me, source, existingEdge, point)
 {
     if (this.isEnabled() && !this.isEventIgnored(me))
@@ -428,7 +449,9 @@ mxConstraintHandlerBP.prototype.update = function(me, source, existingEdge, poin
     }
 };
 
-// define the connection points location on the cell by the type of connection
+/** Override
+ * define the connection points location on the cell by the type of connection
+ */
 mxConstraintHandlerBP.prototype.getConstraintLocation = function (state, constraints, zoomSize)
 {
     var cp = this.graph.getConnectionPoint(state, constraints);
@@ -445,7 +468,9 @@ mxConstraintHandlerBP.prototype.getConstraintLocation = function (state, constra
 };
 
 
-// Adjust the function for the class changes
+/** Override
+ * Adjust the function for the class changes
+ */
 mxConstraintHandlerBP.prototype.redraw = function()
 {
     var zoomSize = this.graph.view.scale;
@@ -473,7 +498,9 @@ mxConstraintHandlerBP.prototype.redraw = function()
     }
 };
 
-// hide input connection points when focus a cell
+/** Override
+ * hide input connection points when focus a cell
+ */
 mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 {
     var size = this.graph.view.scale;
@@ -566,7 +593,9 @@ mxConstraintHandlerBP.prototype.setFocus = function(me, state, source)
 };
 
 
-// draw for a shape or for all shapes the connection points
+/** Override
+ * draw for a shape or for all shapes the connection points
+  */
 mxConstraintHandlerBP.prototype.showConstraint = function(inputState)
 {
     var size = this.graph.view.scale;
@@ -641,7 +670,9 @@ function mxGraphHandlerBP(graph){
 
 mxGraphHandlerBP.prototype = Object.create(mxGraphHandler.prototype);
 
-// prevent move an edge without its source and target cells
+/** Override
+ *  prevent move an edge without its source and target cells
+ */
 mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, evt)
 {
     //this is new
@@ -733,12 +764,11 @@ function mxGraphModelBP(root){
 
 };
 
-
 mxGraphModelBP.prototype = Object.create(mxGraphModel.prototype);
 
-
-//repaint edges or shapes in black after they were painted in red
-// Prevent connect start node as a target
+/** Override
+ * repaint edges or shapes in black after they were painted in red
+ */
 mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSource)
 {
 
@@ -746,9 +776,9 @@ mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSourc
 
     if (terminal != null)
     {
-        //denny connect start node
-        if (getshape(terminal.getStyle())=="startnode" && !isSource)
-            return previous;
+
+        if(terminal.isInnerChild())
+            terminal = terminal.parent;
 
         terminal.insertEdge(edge, isSource);
 
@@ -778,7 +808,9 @@ mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSourc
 };
 
 
-// change initial codec to mxGraphModelBP
+/** Override
+ * change initial codec to mxGraphModelBP
+  */
 mxCodecRegistry.register(function()
 {
     /**
@@ -870,17 +902,13 @@ function mxGraphViewBP(graph){
 
 mxGraphViewBP.prototype = Object.create(mxGraphView.prototype);
 
-// when connection an existing edge to inner child of bp cell, reconnect the edge to the cell parent (bp cell)
+/** Override
+ * when connection an existing edge to inner child of bp cell, reconnect the edge to the cell parent (bp cell)
+ */
 mxGraphView.prototype.updateEdgeState = function(state, geo)
 {
     var source = state.getVisibleTerminalState(true);
     var target = state.getVisibleTerminalState(false);
-
-    //If this is a bp child connect to his parent
-    if (target!= null && target.cell.isInnerChild()) {
-        var targetCell = target.cell.parent;
-        target = this.getState(targetCell)
-    }
 
 
     // This will remove edges with no terminals and no terminal points
@@ -914,10 +942,13 @@ mxGraphView.prototype.updateEdgeState = function(state, geo)
             this.updateEdgeLabelOffset(state);
         }
     }
+
 };
 
 
-// delete also the connection points icons
+/** Override
+ * delete also the connection points icons
+ */
 mxGraphView.prototype.removeState = function(cell)
 {
     var state = null;
@@ -939,7 +970,9 @@ mxGraphView.prototype.removeState = function(cell)
 };
 
 
-// when graph changes , draw all shapes connection points (call showConstrains)
+/** Override
+ * when graph changes , draw all shapes connection points (call showConstrains)
+ */
 mxGraphView.prototype.validate = function(cell)
 {
     var t0 = mxLog.enter('mxGraphView.validate');
@@ -1007,7 +1040,9 @@ mxGraphView.prototype.validate = function(cell)
 
 };
 
-// change the call from mxGraphView to mxGraphViewBP
+/** Override
+ * change the call from mxGraphView to mxGraphViewBP
+ */
 mxCodecRegistry.register(function()
 {
     /**
@@ -1215,12 +1250,10 @@ mxGraph.prototype.cellsEditable = true;
 
 mxGraph.prototype.vertexLabelsMovable = false;
 
-
-
 /**
- * if the edge get out from the source
- * @param source - node
- * @param edge
+ * check if the given source is the edge source
+ * @param source - <mxCell>
+ * @param edge - <mxCell> to check his source
  * @returns {boolean}
  */
 mxGraph.prototype.isOutEdge = function(source,edge) {
@@ -1228,8 +1261,8 @@ mxGraph.prototype.isOutEdge = function(source,edge) {
 };
 
 /**
- * get the number of edges that get out from the source node
- * @param source - node
+ * count out edges of the cell
+ * @param source - <mxCell> to count his out edges
  * @returns {number}
  */
 mxGraph.prototype.getNumOfOutEdges = function(source){
@@ -1241,6 +1274,12 @@ mxGraph.prototype.getNumOfOutEdges = function(source){
     return result;
 };
 
+/**
+ * get bp cell child by his type
+ * @param cell - <mxCell> parent cell
+ * @param type - <string> wanted type of the child
+ * @returns {mxCell}
+ */
 mxGraph.prototype.getChildByType = function(cell, type)
 {
     var child = null;
@@ -1251,7 +1290,11 @@ mxGraph.prototype.getChildByType = function(cell, type)
     return child;
 };
 
-// Adjust the inner cells of the cell
+/**
+ * Adjust sizes of the inner cells
+ * @param cell - <mxCell> who his inner cells need to be adjusted
+ * @param oldDividerGeometry - <mxGeometry> of divider before the change
+ */
 mxGraph.prototype.fixBPChildren = function(cell, oldDividerGeometry){
     if(cell == null || !cell.bp_cell)
         return
@@ -1271,8 +1314,13 @@ mxGraph.prototype.fixBPChildren = function(cell, oldDividerGeometry){
 
 };
 
-// return the label index
-mxGraph.prototype.findCurrLabel = function(source, state) {
+/**
+ * get the output label index
+ * @param source - <mxCell> source of the edge
+ * @param edgeState - <Object> details of the edge
+ * @returns {number}
+ */
+mxGraph.prototype.findCurrLabel = function(source, edgeState) {
     //there is only one constraint point
     if(source.new_constraints == null)
         return 1;
@@ -1280,15 +1328,15 @@ mxGraph.prototype.findCurrLabel = function(source, state) {
     var index = 0;
     for(; index <= source.new_constraints.length; index++){
         var constraint = source.new_constraints[index];
-        if(constraint.point.x == state.exitX && constraint.point.y == state.exitY)
+        if(constraint.point.x == edgeState.exitX && constraint.point.y == edgeState.exitY)
             break;
     }
     return index+1;
 }
 
-/** get all the out edges of the source node
- *
- * @param source - node
+/**
+ * get all the out edges of the source node
+ * @param source - <mxCell>
  * @returns {Array}
  */
 mxGraph.prototype.getOutEdges = function(source) {
@@ -1301,7 +1349,9 @@ mxGraph.prototype.getOutEdges = function(source) {
     return outEdges;
 }
 
-// set edge label by his source connection point
+/** Override
+ * set edge label by his source connection point
+ */
 mxGraph.prototype.insertEdge = function(parent, id, value, source, target, style, state)
 {
     var edge = this.createEdge(parent, id, value, source, target, style, state);
@@ -1310,19 +1360,25 @@ mxGraph.prototype.insertEdge = function(parent, id, value, source, target, style
     return this.addEdge(edge, parent, source, target);
 };
 
-
+/** Override
+ * change the call from mxGraphHandler to mxGraphHandlerBP
+ */
 mxGraph.prototype.createGraphHandler = function()
 {
     return new mxGraphHandlerBP(this);
 };
 
+/** Override
+ * change the call from mxConnectionHandler to mxConnectionHandlerBP
+ */
 mxGraph.prototype.createConnectionHandler = function()
 {
     return new mxConnectionHandlerBP(this);
 };
 
-// Block connection to start node, and set edge label
-// return null for delete the new edge
+/** Override
+ * set edge label and prevents creation of new invalid edge
+ */
 mxGraph.prototype.createEdge = function(parent, id, value, source, target, style, state)
 {
     // Creates the edge
@@ -1331,8 +1387,8 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
     edge.setEdge(true);
     edge.geometry.relative = true;
 
-    //check basic legal Edge
-    if(source!=null && ( target ==null || getshape(target.getStyle())=="startnode"))
+    // edge must have a target
+    if(source != null && target == null)
         return null;
 
     //cases by nodes
@@ -1340,20 +1396,19 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
         var numberOfOutEdges = this.getNumOfOutEdges(source);
         // if(numberOfOutEdges >= source.getAttribute('numberOfOutputs',1))
         //     return null;
-        var indexLabel =this.findCurrLabel(source, state);
-        var label = source.getAttribute('Outputnumber'+(indexLabel),' ');
+        var indexLabel = this.findCurrLabel(source, state);
+        var label = source.getAttribute('Outputnumber' + (indexLabel), ' ');
 
         var doc = mxUtils.createXmlDocument();
         var obj = doc.createElement('object');
-        obj.setAttribute('label','');
+        obj.setAttribute('label', '');
         var value = obj;
 
-        value.setAttribute('labelNum',indexLabel);
-        value.setAttribute('label',label);
+        value.setAttribute('labelNum', indexLabel.toString());
+        value.setAttribute('label', label);
         edge.setValue(value);
-
-    }else
-    if(source!=null && getshape(source.getStyle())=="bsync" ){
+    }
+    else if(source!=null && getshape(source.getStyle())=="bsync" ){
         var numberOfOutEdges = this.getNumOfOutEdges(source);
         if(numberOfOutEdges >= 1)
             return null;
@@ -1367,7 +1422,9 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
 };
 
 
-// after resizing cell fix output labels and inner cells appearance
+/** Override
+ *  after resizing cell fix output labels and inner cells appearance
+ */
 mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
 {
     var dividerGeomtry;
@@ -1379,7 +1436,9 @@ mxGraph.prototype.resizeCell = function(cell, bounds, recurse)
     return output;
 };
 
-// lock inner cells of bp cell
+/** Override
+ * lock inner cells of bp cell
+ */
 mxGraph.prototype.isCellLocked = function(cell)
 {
     if (cell.bp_cell != null && !cell.bp_cell)
@@ -1391,7 +1450,9 @@ mxGraph.prototype.isCellLocked = function(cell)
         (cell.lock != null && cell.lock);
 };
 
-// relocate input edge to the left side of the cell
+/** Override
+ * relocate input edge to the left side of the cell
+ */
 mxGraph.prototype.getConnectionConstraint = function(edge, terminal, source)
 {
 
@@ -1433,7 +1494,9 @@ mxGraph.prototype.getConnectionConstraint = function(edge, terminal, source)
 };
 
 
-// consider connection points as part of the shape when mouse is hover (call shapeContains)
+/** Override
+ * hover bp cell consider also his connection points as part of the shape
+ */
 mxGraph.prototype.intersects = function(state, x, y)
 {
     if (state != null)
@@ -1471,8 +1534,7 @@ mxGraph.prototype.intersects = function(state, x, y)
                 x = pt.x;
                 y = pt.y;
             }
-            //if (state.cell.contains(state, x, y))
-            //change if function
+            // check if (x,y) contains cell or his connection points
             if (this.shapeContains(state, x, y))
             {
                 return true;
@@ -1484,14 +1546,23 @@ mxGraph.prototype.intersects = function(state, x, y)
 };
 
 
-// unsed -> may use to prevent connect start node as target
+/** Override
+ * edges validation rules
+ */
 mxGraph.prototype.isValidConnection = function(source, target)
 {
-    // if(getshape(target.getStyle())=="startnode" || source == null || target == null)
-    //     return false;
+    //edge must have source and target
+    if(source == null || target == null)
+        return false;
+    // start node could not be a target
+    if(target.isStartNode())
+        return false;
     return this.isValidSource(source) && this.isValidTarget(target);
 };
 
+/** Override
+ * use selectable field of mxCell
+  */
 mxGraph.prototype.isCellSelectable = function(cell)
 {
     if(cell != null && cell.selectable != null && !cell.selectable)
@@ -1499,7 +1570,9 @@ mxGraph.prototype.isCellSelectable = function(cell)
     return this.isCellsSelectable();
 };
 
-// set bp related shapes and edges uneditable
+/** Override
+ * set bp related shapes and edges uneditable
+  */
 mxGraph.prototype.isCellEditable = function(cell)
 {
     if(cell != null && cell.bp_type != null || cell.isEdge())
@@ -1511,13 +1584,19 @@ mxGraph.prototype.isCellEditable = function(cell)
     return this.isCellsEditable() && !this.isCellLocked(cell) && style[mxConstants.STYLE_EDITABLE] != 0;
 };
 
-
+/** Override
+ *
+ */
 mxGraph.prototype.createGraphView = function()
 {
     return new mxGraphViewBP(this);
 };
 
-// relocate connection points labels according to connection points locations
+
+/**
+ * relocate connection points labels according to connection points locations
+ * @param cell - <mxCell> to fix his connection points location
+ */
 mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell) {
     if (cell == null || cell.children == null)
         return;
@@ -1540,7 +1619,10 @@ mxGraph.prototype.fixConnectionPointsLabelLocation = function(cell) {
 
 };
 
-// initial new_constraints filed
+/**
+* initial new_constraints filed of cell
+* @param cell - <mxCell> to initial his new_constraint field if needed
+*/
 mxGraph.prototype.validateConstraints = function (cell){
     if(cell != null && cell.new_constraints == null){
         var state = this.view.getState(cell, false);
@@ -1549,7 +1631,9 @@ mxGraph.prototype.validateConstraints = function (cell){
 };
 
 
-//cancel the option that a bp related shapes will be another cell parent
+/**
+ * deny the option that a bp related shapes will be another bp related shape parent
+ */
 mxGraphModel.prototype.parentForCellChanged = function(cell, parent, index)
 {
     var previous = this.getParent(cell);
@@ -1585,19 +1669,67 @@ mxGraphModel.prototype.parentForCellChanged = function(cell, parent, index)
     return previous;
 };
 
-// return the sorted list of output labels (sort by label index)
+//
+/**
+ * return all output labels
+ * @returns {Array} sorted(by label index)
+ */
 mxCell.prototype.getOutputLabels = function(){
     let children = this.children || [];
     let labels = children.filter(x => x.label_index != null);
     return labels.sort(function(a, b) {return a.label_index - b.label_index});
 };
 
+/**
+ * check if cell is label
+ * @returns {boolean}
+ */
 mxCell.prototype.isLabel = function(){
     return this.style.search('label') != -1;
 };
 
+/**
+ * check if cell is bp cell and not start node
+ * @returns {boolean}
+ */
 mxCell.prototype.isBPCell = function() {return this.bp_cell != null && this.bp_cell && this.bp_type != 'startnode'; };
 
+/**
+ * check if cell is inner cell of bp cell
+ * @returns {boolean}
+ */
 mxCell.prototype.isInnerChild = function(){
     return (this.bp_type != null && (this.bp_type == 'data' || this.bp_type== 'divider'));
+};
+
+/**
+ * check if cell is is start node
+ * @returns {boolean}
+ */
+mxCell.prototype.isStartNode = function(){
+    return (this.bp_type != null && this.bp_type =='startnode');
+};
+
+/**
+ * check if cell is is bsync node
+ * @returns {boolean}
+ */
+mxCell.prototype.isBsyncNode = function(){
+    return (this.bp_type != null && this.bp_type =='BSync');
+};
+
+/**
+ * check if cell is is general node
+ * @returns {boolean}
+ */
+mxCell.prototype.isGeneralNode = function(){
+    return (this.bp_type != null && this.bp_type =='General');
+};
+
+/**
+ * check if cell is is console node
+ * @returns {boolean}
+ */
+mxCell.prototype.isConsoleNode = function(){
+    return (this.bp_type != null && this.bp_type =='Console');
 };
