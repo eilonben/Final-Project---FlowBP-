@@ -1,5 +1,8 @@
 
-function writeToConsole(message) {
+function writeToConsole(bpEngine, message, curTime, scen) {
+    if(bpEngine.deb !== null && (curTime !== -1 || scen !== -1)){
+        bpEngine.deb.addMessage(message, curTime, scen);
+    }
     let myConsole = document.getElementById("ConsoleText1");
     if (myConsole !== undefined && myConsole !== null) {
         myConsole.value += message +"\n" ;
@@ -135,7 +138,7 @@ function runInNewBT(c, payload, bpEngine, model, curTime) {
         let outputs = {};
         //cloning the payload object
         let cloned = JSON.parse(JSON.stringify(payload));
-        outputs = handleNodeAttributes(c,outputs,cloned,payload);
+        outputs = handleNodeAttributes(bpEngine, c,outputs,cloned,payload,curTime, -1);
         if(outputs === -1){
             window.executeError = true;
             return;
@@ -185,9 +188,9 @@ A function that handles all the fields inside a node relevant for executing BP f
 "sync" for the sync section in bsync nodes
 "log" for the code section in console nodes
  */
-function handleNodeAttributes(c, outputs, cloned, payload) {
+function handleNodeAttributes(bpEngine, c, outputs, cloned, payload, curTime, scen) {
     if(getshape(c.getStyle()) === "console") {
-        writeToConsole(JSON.stringify(payload));
+        writeToConsole(bpEngine, JSON.stringify(payload), curTime, scen);
     }
     if (c.getAttribute("code") !== undefined) {
         try {
@@ -205,7 +208,7 @@ function handleNodeAttributes(c, outputs, cloned, payload) {
             eval('var func = function(payload){' + c.getAttribute("log") + '\n}');
             let consoleString = func(cloned);
             if (consoleString !== undefined) {
-                writeToConsole(consoleString);
+                writeToConsole(bpEngine, consoleString, curTime, scen);
             }
         }
         catch (e) {
@@ -227,7 +230,7 @@ function* runInSameBT(c, payload, bpEngine, model, scen) {
 
     cloned = JSON.parse(JSON.stringify(payload));
 
-    outputs = handleNodeAttributes(c, outputs, cloned, payload);
+    outputs = handleNodeAttributes(bpEngine, c, outputs, cloned, payload, -1, scen);
     if(outputs === -1){
         window.executeError = true;
         return;
