@@ -6,12 +6,24 @@ function BPEngine(){
 BPEngine.prototype.sync = function*(stmt){
     yield stmt;
 };
-
+/**
+* Registering a new BThread to the engine
+* The BThread is an object with an iterator that saves
+* the current state(which yield point to resume to)
+* and the current statement(requested,blocked and waited for events)
+**/
 BPEngine.prototype.registerBThread = function(bt){
     let x = bt.next().value;
     let b = {iterator: bt, stmt: fixStmt(x)};
     this.BThreads.push(b);
 };
+/**
+ * The main function of the BP engine.
+ * Runs in an infinite loop, and when all the registered BThreads enter a sync point,
+ * chooses a random event from the set of Requested Set-minus Blocked events.
+ * After selecting an event, all the BThreads that have requested the event or have
+ * been waiting for the event, will continue their run from the bsync point, until the next bsync point
+ */
 BPEngine.prototype.run = function*(){
     while (true) {
         if(this.deb!=null) {

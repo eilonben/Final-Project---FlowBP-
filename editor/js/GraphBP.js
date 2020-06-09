@@ -1,11 +1,16 @@
-// Duplicate HoverIconsBP is designed to erase the "Connect and Duplicate" arrows
-
+/*
+ Objectives:
+ 1. delete "Connect and Duplicate" arrows functionality
+  */
 HoverIconsBP = function(graph)
 {
     HoverIcons.call(this,graph);
 };
 HoverIconsBP.prototype = Object.create(HoverIcons.prototype);
 
+/** Override
+ * delete "Connect and Duplicate" arrows functionality
+ */
 HoverIconsBP.prototype.repaint = function()
 {
     this.bbox = null;
@@ -146,10 +151,10 @@ HoverIconsBP.prototype.repaint = function()
     }
 };
 
-
-
-// Duplicate GraphBP is designed to adjust connections point According to the number of outgoing arrows.
-
+/*
+ Objectives:
+ 1. adjust connections point According to the number of outgoing arrows.
+  */
 GraphBP = function(container, model, renderHint, stylesheet, themes, standalone)
 {
     Graph.call(this, container, model, renderHint, stylesheet, themes, standalone);
@@ -157,7 +162,9 @@ GraphBP = function(container, model, renderHint, stylesheet, themes, standalone)
 
 GraphBP.prototype = Object.create(Graph.prototype);
 
-
+/** Override
+ * if new_constraints field exist return him else return the original function
+ */
 GraphBP.prototype.getAllConnectionConstraints = function(terminal, source){
      if (terminal != null && terminal.cell != null && terminal.cell.new_constraints != null)
      {
@@ -200,6 +207,9 @@ GraphBP.prototype.fixValue = function(cell) {
     cell.setValue(value);
 }
 
+/** Override
+ * check if (x,y) contains bp shape or his connection points
+ */
 GraphBP.prototype.shapeContains = function(state, x, y) {
     var size = this.view.scale;
     var contains = state.x <= x && state.x + state.width >= x &&
@@ -229,57 +239,10 @@ GraphBP.prototype.shapeContains = function(state, x, y) {
 Graph.prototype.selectAllForDebugging = function() {
     mxGraph.prototype.selectAll.apply(this, arguments);
 };
-
-// get the bp cell in (x,y) cordinate
-Graph.prototype.getScaledCellAt = function(x, y, parent, vertices, edges, ignoreFn)
-{
-    vertices = (vertices != null) ? vertices : true;
-    edges = (edges != null) ? edges : true;
-
-    if (parent == null)
-    {
-        parent = this.getCurrentRoot();
-
-        if (parent == null)
-        {
-            parent = this.getModel().getRoot();
-        }
-    }
-
-    if (parent != null)
-    {
-        var childCount = this.model.getChildCount(parent);
-
-        for (var i = childCount - 1; i >= 0; i--)
-        {
-            var cell = this.model.getChildAt(parent, i);
-            var result = this.getScaledCellAt(x, y, cell, vertices, edges, ignoreFn);
-
-            if (result != null)
-            {
-                return result;
-            }
-            else if (this.isCellVisible(cell) && (edges && this.model.isEdge(cell) ||
-                vertices && this.model.isVertex(cell)))
-            {
-                var state = this.view.getState(cell);
-
-                if (state != null && (ignoreFn == null || !ignoreFn(state, x, y)) &&
-                    this.intersects(state, x, y))
-                {
-                    // if(cell.bp_cell == null || (cell.bp_cell != null && cell.bp_cell))
-                        return cell;
-                    // else if(cell.bp_cell != null && !cell.bp_cell)
-                    //     return cell.parent;
-                }
-            }
-        }
-    }
-
-    return null;
-};
-
-// GraphBP.prototype = Object.create(Graph.prototype);
+/**
+ * adjust all inner cells sizes of bp shape cell
+ * @param cell - <mxCell>
+ */
 GraphBP.prototype.fixSizes = function(cell) {
     var mod = this.getModel();
     var payloads = this.getChildByType(cell, 'payloads');

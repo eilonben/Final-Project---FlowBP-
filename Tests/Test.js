@@ -1,5 +1,7 @@
 var xml_for_test="";
 var debug = new debuggerBP(uiBP);
+
+
 function readTextFile(file)
 {
     var rawFile = new XMLHttpRequest();
@@ -18,11 +20,17 @@ function readTextFile(file)
     rawFile.send(null);
 }
 
+/** load the string of the xml file
+ *
+ * @param filePath -string
+ * @returns {string}
+ */
 function loadXMl(filePath) {
     xml_for_test="";
     readTextFile("./"+filePath);
     return xml_for_test;
 }
+
 
 function printToIndex(testName,resulte) {
     var body= document.getElementById("001");
@@ -252,6 +260,34 @@ var testExceptionHandle2 =function () {
     return false;
 }
 
+var testTicTacToe = function(){
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/TicTacToe.xml");
+    try {
+        parse_graph(xml,debug);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    if(resulte.length!=9)
+        return false;
+    // not duplicate places
+    var places = {};
+    var sign =  resulte.map((x)=>{return x.substring(0,1);});
+    var turn = "X";
+    for (let i = 0; i < 9 ; i++) {
+        if (turn != sign[i])
+            return false;
+        else turn == "X" ? turn="O" : turn="X";
+        if (places[resulte[i].substring(1)] != undefined)
+            return false;
+        places[resulte[i].substring(1)]=1;
+
+    }
+    return true;
+};
+
 
 var  debug_compareResulte = function(resulte,expected){
     for (let i = 0; i < resulte.length; i++) {
@@ -328,7 +364,7 @@ var debug_testHotCold = function () {
         {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":"Hot"},
         {"stages":{"60":[{}],"67":[{}]},"eventSelected":null},
         {"stages":{"60":[{}],"67":[{}]},"eventSelected":"Cold"},
-        {"stages":{"36":[{}]},"eventSelected":null}]
+        {"stages":{"36":[{}]},"eventSelected":null}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HotCold.xml");
     try {
@@ -449,9 +485,9 @@ var debug_testPayload =function () {
 }
 
 var debug_testPayloadChange =function () {
-    var expected = [{"stages":{"2":[{"x":3},{"y":2}]}},
-        {"stages":{"9":[{"x":3},{"y":2}]}},
-        {"stages":{"14":[{"x":5},{"y":6}]}}];
+    var expected = [{"stages":{"2":[{"x":3}]}},
+        {"stages":{"9":[{"x":3}]}},
+        {"stages":{"14":[{"x":5}]}}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/PayloadsChange.xml");
     try {
@@ -465,7 +501,7 @@ var debug_testPayloadChange =function () {
 }
 
 var debug_testPayloadsIfElse =function () {
-    var expected = [{"stages":{"3":[{"x":5},{"x":3},{}]}},
+    var expected = [{"stages":{"20":[{"x":5},{"x":3},{}]}},
         {"stages":{"6":[{"x":5},{"x":3},{}]}},
         {"stages":{"10":{"x":3}}},
         {"stages":{}}];
@@ -483,6 +519,7 @@ var debug_testPayloadsIfElse =function () {
 
 var runTests = function() {
     document.getElementById("001").innerText="";
+    window.alert = function() {};
     function run(name,func) {
         initConsole();
         printToIndex(name,func());
@@ -500,6 +537,7 @@ var runTests = function() {
     run("LegalGraph", testLegalGraph);
     run("ExceptionHandle", testExceptionHandle);    //check that when occur error while executing the JS code on node the execution is terminated.
     run("ExceptionHandle2", testExceptionHandle2);
+    run("TicTacToe", testTicTacToe);
 
     run("debug_HelloWorld", debug_testHelloWorld);
     run("debug_RandomOrder", debug_testRequestsList);

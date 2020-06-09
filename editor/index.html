@@ -20,11 +20,11 @@
         var urlParams = (function(url)
         {
             var result = new Object();
-            var idx = url.lastIndexOf('?');
+            var idx = url.indexOf('?');
 
             if (idx > 0)
             {
-                var params = url.substring(idx + 1).split('&');
+                var params = url.substring(idx + 1).split('&&');
 
                 for (var i = 0; i < params.length; i++)
                 {
@@ -117,7 +117,11 @@
             themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement();
 
             // Main
-            new EditorUiBP(new EditorBP(urlParams['chrome'] == '0', themes));
+			var editoruibp = new EditorUiBP(new EditorBP(urlParams['chrome'] == '0', themes));
+			if(urlParams['model'] != undefined) {
+				var doc = mxUtils.parseXml(decodeURIComponent(urlParams['model']));
+				editoruibp.editor.graph.importGraphModel(doc.documentElement);
+			}
         }, function()
         {
             document.body.innerHTML = '<center style="margin-top:10%;">Error loading resource files. Please check browser console.</center>';

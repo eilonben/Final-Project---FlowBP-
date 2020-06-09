@@ -18,7 +18,6 @@ EditorUiBP.prototype.preDebugActions = []
 
 function EditorUiBP(editor, container, lightbox) {
     EditorUi.call(this,editor, container, lightbox);
-
 };
 
 EditorUiBP.prototype = Object.create(EditorUi.prototype);
@@ -29,8 +28,7 @@ EditorUiBP.prototype.createHoverIcons = function()
     return new HoverIconsBP(this.editor.graph);
 };
 
-
-
+//
 EditorUiBP.prototype.createFormat = function(container)
 {
     return new FormatBP(this, container);

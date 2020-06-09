@@ -1,121 +1,86 @@
-
-function getLabelsFromChildren(cell){
-    var children = cell.children || [];
-    var labels = children.filter(x => x.label_index != null);
-    labels = labels.sort(function(a, b) {return a.label_index - b.label_index});
-    return labels;
-};
-
-
-
-function getMapStyle(style) {
-    var result = new Map();
-
-    if (style != null) {
-        var pairs = style.split(';');
-
-        for (var i = 0; i < pairs.length; i++) {
-            var pair = pairs[i].split('=');
-            if (pair.length == 2)
-                result.set(pair[0], pair[1])
-        }
-    }
-
-    return result;
-};
-
-function getValueByKey(style, key, defult) {
-    var map = getMapStyle(style);
-    return map.get(key) || defult;
-
-};
-
-
+/*
+Objectives
+1. set right side bar of start node
+2. set right side bar of bsync node
+3. set right side bar of general node
+4. set right side bar of console node
+ */
 FormatBP = function (editorUi, container) {
     Format.call(this, editorUi, container);
 };
 
 FormatBP.prototype = Object.create(Format.prototype);
 
+/**
+ * remove the attribute (name) from the node (cell)
+ * @param cell - <mxCell> cell to remove his attribute
+ * @param name - <String> attribute to remove
+ */
 FormatBP.prototype.removeAttribute = function (cell, name) {
     var userObject = cell.getValue();
     if (userObject != null && userObject.nodeType == mxConstants.NODETYPE_ELEMENT)
         userObject.removeAttribute(name);
 };
 
-FormatBP.prototype.deletePrevLabels = function (cell, value, graph) {
+/**
+ * delete labels in cell attributes
+ * @param cell - <mxCell> cell to delete his labels
+ * @param value - <number> new number of labels
+ */
+FormatBP.prototype.deletePrevLabels = function (cell, value) {
     var prevAmount = cell.getAttribute('numberOfOutputs', 1);
     for (let i = prevAmount; i > value; i--) {
         this.removeAttribute(cell, 'Outputnumber' + i);
     }
 };
 
-FormatBP.prototype.validateNewConstraint = function (cell, graph){
-    if(cell != null && cell.new_constraints == null){
-        var state = graph.view.getState(cell, false);
-        cell.new_constraints = graph.getAllConnectionConstraints(state, true);
-    }
+/**
+ * compute output point position
+ * @param cell - <mxCell>
+ * @param numOfOutputs - <number>
+ * @param index - <number>
+ * @returns {mxPoint}
+ */
+FormatBP.prototype.computeNewPosition = function(cell, numOfOutputs, index){
+    let interval = 1 / (numOfOutputs + 1);
+    return new mxPoint(mxConnectionHandlerBP.defultOutputX, interval * index);
 };
 
-
-
-
-// //after debug all the graph moves - fix thr connection point labels and edges
-// FormatBP.prototype.fixConnectionRelatedBugs = function (graph){
-//     var cells = Object.values(graph.getModel().cells) || [];
-//     for( var i=0; i< cells.length; i++) {
-//         var cell = cells[i];
-//         if(getshape(cell.getStyle()) == "general") {
-//             graph.getModel().beginUpdate();
-//             fixConnectionPointsLabelLocation(graph, cell, cell.geometry.x, cell.geometry.y);
-//             graph.getModel().endUpdate();
-//         }
-//     }
-// };
-
-// compute constraint new position
-FormatBP.prototype.computeNewPosition = function(cell, numOfOutputs, index){
-    // var cellHeight = cell.geometry.height;
-    // var cellTitle = mxGraph.headLineSize *0.7;
-    // var cellContent = cellHeight -  cellTitle;
-    // var interval = (cellContent / cellHeight ) / (numOfOutputs + 1);
-    // return new mxPoint(mxConnectionHandlerBP.defultOutputX,(cellTitle/cellHeight) + interval * index);
-    var interval = 1 / (numOfOutputs + 1);
-    return new mxPoint(mxConnectionHandlerBP.defultOutputX, interval * index);
-}
-
-
-// update connection point number
-FormatBP.prototype.adjustConnectionPoints = function (cell, numOfOutputs, graph) {
-    this.validateNewConstraint(cell, graph);
-    // input constraint always at the end of the list
-
+/**
+ * update connection points of cell
+ * @param cell - <mxCell> to update his connection points
+ * @param numOfOutputs - <number>
+ * @param graph - <mxGraph> who contains the cell
+ */
+FormatBP.prototype.updateConnectionPoints = function (cell, numOfOutputs, graph) {
+    graph.validateConstraints(cell);
     var inputConstraint = cell.new_constraints.filter(x => x.name == "I");
     cell.new_constraints = [];
     for (var i = 1; i <= numOfOutputs; i++) {
-        var newLocationPoint = this.computeNewPosition(cell, numOfOutputs, i);
-        cell.new_constraints.push(new mxConnectionConstraint(newLocationPoint, true, "O", newLocationPoint.x, newLocationPoint.y));
+        var LocationPoint = this.computeNewPosition(cell, numOfOutputs, i);
+        cell.new_constraints.push(new mxConnectionConstraint(LocationPoint, true, "O", LocationPoint.x, LocationPoint.y));
     }
-    // input constraint Should be at the end of the list
+    // input constraint are at the end of the list
     cell.new_constraints = cell.new_constraints.concat(inputConstraint);
     graph.connectionHandler.constraintHandler.showConstraint(graph.view.getState(cell,false));
-
 };
 
-
-//update the connection points labels
-FormatBP.prototype.updateConnectionPointsLabels = function (graph, cell, labels){
-    this.validateNewConstraint(cell, graph);
+/**
+ * update output labels of the cell
+ * @param graph - <mxGraph> who contains the cell
+ * @param cell - <mxCell> who his output labels are updates
+ * @param labels - <array<String>>
+ */
+FormatBP.prototype.updateOutputsLabels = function (graph, cell, labels){
+    graph.validateConstraints(cell);
     graph.getModel().beginUpdate();
     try {
-        // labels related to cell connection points
-        var cell_labels_cells = getLabelsFromChildren(cell);
+        var OutputLabelsCells = cell.getOutputLabels();
         for (var i = 0; i < labels.length; i++) {
             var label = labels[i];
-
-            // the label exist -> only change its value
-            if( cell_labels_cells.length > i) {
-                var ConnectionPointLabelCell = cell_labels_cells[i];
+            // the label exist -> change its value
+            if( OutputLabelsCells.length > i) {
+                var ConnectionPointLabelCell = OutputLabelsCells[i];
                 ConnectionPointLabelCell.value = label;
             }
             // create new label
@@ -142,10 +107,15 @@ FormatBP.prototype.updateConnectionPointsLabels = function (graph, cell, labels)
     graph.view.revalidate();
 };
 
-// after changing number of output adjust the Connection PointsLabels accordingly
-FormatBP.prototype.adjustConnectionPointsLabels = function (graph, cell, newOutputNumber)
+/**
+ * delete and relocate existing output labels
+ * @param graph - <mxGraph> who contains the cell
+ * @param cell - who his labels positions are updated
+ * @param newOutputNumber - <number> new output number
+ */
+FormatBP.prototype.updateLabelsPositions = function (graph, cell, newOutputNumber)
 {
-    var labels = getLabelsFromChildren(cell);
+    var labels = cell.getOutputLabels();
     newOutputNumber = newOutputNumber != null ? newOutputNumber : cell.new_constraints.length ;
     graph.getModel().beginUpdate();
     try {
@@ -167,24 +137,26 @@ FormatBP.prototype.adjustConnectionPointsLabels = function (graph, cell, newOutp
 
 };
 
-// after changing number of output adjust the edges exit point accordingly
+/**
+ * relocate edges exit location
+ * @param cell - <mxCell> who his edges are relocated
+ * @param numOfOutputs - <number>
+ * @param graph - <mxGraph> how contains the cell
+ */
 FormatBP.prototype.adjustEdges = function (cell, numOfOutputs, graph) {
-
-    //need to adjust old arrows to new location
     var graphModel = graph.getModel();
     var outEdges = graph.getOutEdges(cell);
     var numOfOutputs = numOfOutputs != null ? numOfOutputs : outEdges.length;
     graphModel.beginUpdate();
     try {
         for (let i = 0; i < outEdges.length; i++) {
-            // get old location of edge
-            var constraintNumber = parseInt(outEdges[i].getAttribute('labelNum'));
-            //check if edge should erase
-            if (constraintNumber > numOfOutputs)
+            var edgeIndex = parseInt(outEdges[i].getAttribute('labelNum'));
+            // check if edge should erase
+            if (edgeIndex > numOfOutputs)
                 graphModel.remove(outEdges[i], true);
             else {
-                //    relocate edge exit location of edge
-                var newLocationPoint = this.computeNewPosition(cell, numOfOutputs, constraintNumber);
+                // relocate edge exit location of edge
+                var newLocationPoint = this.computeNewPosition(cell, numOfOutputs, edgeIndex);
                 var new_style = mxUtils.setStyle(outEdges[i].style, 'exitY', newLocationPoint.y);
                 graphModel.setStyle(outEdges[i], new_style);
             }
@@ -194,6 +166,12 @@ FormatBP.prototype.adjustEdges = function (cell, numOfOutputs, graph) {
     }
 };
 
+/**
+ * update the edges lables that get out from the general node
+ * @param cell - general node
+ * @param graph - model
+ * @param cellValue - the value of the general node (cell.getValue)
+ */
 FormatBP.prototype.updateEdgesLabels = function (cell, graph, cellValue ) {
     var graphModel = graph.getModel();
     var outEdges = graph.getOutEdges(cell);
@@ -210,7 +188,9 @@ FormatBP.prototype.updateEdgesLabels = function (cell, graph, cellValue ) {
 };
 
 
-// origin format.js function, that update the right toolbar for the selected shapes
+/**
+ * origin format.js function, update the right toolbar for the selected shapes
+ */
 FormatBP.prototype.refresh = function () {
 
     var format = this;
@@ -240,6 +220,7 @@ FormatBP.prototype.refresh = function () {
     label.style.width = '100%';
     this.container.appendChild(div);
 
+    //no shape is selected
     if (graph.isSelectionEmpty()) {
         /*mxUtils.write(label, mxResources.get('diagram'));
 
@@ -273,12 +254,12 @@ FormatBP.prototype.refresh = function () {
         div.appendChild(label);
         this.panels.push(new DiagramFormatPanel(this, ui, div));*/
     }
-    else if (graph.isEditing()) {
+    else if (graph.isEditing()) { //edge shape selected
         mxUtils.write(label, mxResources.get('text'));
         div.appendChild(label);
         this.panels.push(new TextFormatPanel(this, ui, div));
     }
-    else {
+    else { // node shape selected
         var containsLabel = this.getSelectionState().containsLabel;
         var currentLabel = null;
         var currentPanel = null;
@@ -332,7 +313,7 @@ FormatBP.prototype.refresh = function () {
         label2.style.backgroundColor = this.inactiveTabBackgroundColor;
         label3.style.backgroundColor = this.inactiveTabBackgroundColor;
 
-
+        //get type of shape from cell style
         var getshape = function (str) {
             var arr = str.split(";");
             var styleShape = arr[0].split("=")[1] ;
@@ -340,6 +321,7 @@ FormatBP.prototype.refresh = function () {
             return styleShape;
 
         };
+
 
         var createApplyButton = function () {
             var newButton = document.createElement("BUTTON");
@@ -361,8 +343,8 @@ FormatBP.prototype.refresh = function () {
             value = obj;
         }
         if (graph.getModel().isEdge(cell)) {
-
-        } else if (getshape(cell.getStyle()) == "bsync") {
+          //Creates the right-handed toolbar for a Bsync block
+        } else if (getshape(cell.getStyle()) === "bsync") {
                 var dlg = new BSyncForm(ui, cell);
                 //dlg.container.style.width="100%";
                 var cont = document.getElementsByClassName("geFormatContainer")[0];
@@ -376,8 +358,8 @@ FormatBP.prototype.refresh = function () {
                 dlg.init();
                 cont.appendChild(bsyncDIV);
 
-
-        } else if (getshape(cell.getStyle()) == "general") {
+        //Creates the right-handed toolbar for a general block
+        } else if (getshape(cell.getStyle()) === "general") {
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
             var generalDIV = document.createElement('div');
@@ -425,7 +407,7 @@ FormatBP.prototype.refresh = function () {
             generalDIV.appendChild(nodeTitleDIV);
 
 
-            //Number of outputs
+            //The code responsible for creating multiple outputs in a general block
             var NumberOfOutPutDIV = document.createElement('div');
             var NumberOfOutPutText = document.createElement("p");
             NumberOfOutPutText.innerHTML = '<font size="2">Number of outputs:</font>';
@@ -448,10 +430,10 @@ FormatBP.prototype.refresh = function () {
                     NumberOfOutPutBox.value = value.getAttribute("numberOfOutputs");
                     return;
                 }
-                format.adjustConnectionPoints(cell, outputNumber, graph);
-                format.deletePrevLabels(cell, NumberOfOutPutBox.value, graph.getModel());
+                format.updateConnectionPoints(cell, outputNumber, graph);
+                format.deletePrevLabels(cell, NumberOfOutPutBox.value);
                 format.adjustEdges(cell, outputNumber, graph);
-                format.adjustConnectionPointsLabels(graph, cell, outputNumber);
+                format.updateLabelsPositions(graph, cell, outputNumber);
 
                 value.setAttribute("numberOfOutputs", NumberOfOutPutBox.value);
                 graph.getModel().setValue(cell, value);
@@ -464,7 +446,7 @@ FormatBP.prototype.refresh = function () {
             NumberOfOutPutDIV.appendChild(AreaNumberOfOutPutText);
             generalDIV.appendChild(NumberOfOutPutDIV);
 
-            //Output label - <not made change>
+
             var OutputLabelDIV = document.createElement('div');
             var OutputLabelText = document.createElement("p");
             OutputLabelText.innerHTML = '<font size="2">Output labels:</font>';
@@ -479,6 +461,7 @@ FormatBP.prototype.refresh = function () {
                     var OutputLabelTextBox = document.createElement("INPUT");
                     OutputLabelTextBox.id = "nodeID" + cell.id + "Outputnumber" + (i + 1);
                     OutputLabelTextBox.setAttribute("type", "text");
+
                     if (undefined != value.getAttribute("Outputnumber" + (i + 1))) {
                         OutputLabelTextBox.setAttribute("value", value.getAttribute("Outputnumber" + (i + 1)));
                     }
@@ -497,7 +480,7 @@ FormatBP.prototype.refresh = function () {
                             labels.push(label);
                         }
                         format.updateEdgesLabels(cell, graph, value);
-                        format.updateConnectionPointsLabels(graph, cell, labels);
+                        format.updateOutputsLabels(graph, cell, labels);
                         graph.getModel().setValue(cell, value);
                     };
                     InnerDIVOutputLabel.appendChild(applyButtonLabels);
@@ -511,7 +494,7 @@ FormatBP.prototype.refresh = function () {
             //add the DIV to cont
             cont.appendChild(generalDIV);
 
-
+            //Creates the right-handed toolbar for a start block
         } else if (getshape(cell.getStyle()) === "startnode") {
             // var dlg = new StartNodeForm(ui, cell);
             var cont = document.getElementsByClassName("geFormatContainer")[0];
@@ -521,11 +504,8 @@ FormatBP.prototype.refresh = function () {
             var textnode = document.createElement("p");
             textnode.innerHTML = '<font size="3">Start Node</font>';
             startnodeDIV.appendChild(textnode);
-            // startnodeDIV.appendChild(dlg.container);
-            // dlg.init();
 
-
-            //creating a div for defnining number of payloads on a start node
+            //Creating a div for defining number of payloads on a start node
             var NumberOfPayloadsDIV = document.createElement('div');
             var NumberOfPayloadsText = document.createElement("p");
             NumberOfPayloadsText.innerHTML = '<font size="2">Number of Payloads:</font>';
@@ -571,7 +551,7 @@ FormatBP.prototype.refresh = function () {
                     PayloadsLabelTextBox.setAttribute("type", "text");
                     //checking if there was a former definition for the i'th payload holder
                     var parsed = JSON.parse(value.getAttribute("Payloads"));
-                    if (parsed !== null && parsed !== undefined && parsed[i] != null && parsed[i] !== undefined) {
+                    if (parsed != null && parsed != undefined && parsed[i] != null && parsed[i] != undefined) {
                         PayloadsLabelTextBox.setAttribute("value", JSON.stringify(parsed[i]));
                     }
                     oneTextLabelDiv.appendChild(PayloadsLabelTextBox);
@@ -609,7 +589,7 @@ FormatBP.prototype.refresh = function () {
             cont.appendChild(startnodeDIV);
 
         }
-
+        //Creates the right-handed toolbar for a console block
         else if (getshape(cell.getStyle()) === "console"){
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
@@ -639,35 +619,3 @@ FormatBP.prototype.refresh = function () {
 
 };
 
-//
-// FormatBP.prototype.roundableShapes = ['label', 'rectangle', 'internalStorage', 'corner',
-//     'parallelogram', 'swimlane', 'triangle', 'trapezoid',
-//     'ext', 'step', 'tee', 'process', 'link',
-//     'rhombus', 'offPageConnector', 'loopLimit', 'hexagon',
-//     'manualInput', 'curlyBracket', 'singleArrow', 'callout',
-//     'doubleArrow', 'flexArrow', 'card', 'umlLifeline','flow.hadas'];
-//
-// /**
-//  * Returns information about the current selection.
-//  */
-// FormatBP.prototype.isComicState = function(state)
-// {
-//     var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
-//
-//     return mxUtils.indexOf(['label', 'rectangle', 'internalStorage', 'corner', 'parallelogram', 'note', 'collate',
-//         'swimlane', 'triangle', 'trapezoid', 'ext', 'step', 'tee', 'process', 'link', 'rhombus',
-//         'offPageConnector', 'loopLimit', 'hexagon', 'manualInput', 'singleArrow', 'doubleArrow',
-//         'flexArrow', 'filledEdge', 'card', 'umlLifeline', 'connector', 'folder', 'component', 'sortShape',
-//         'cross', 'umlFrame', 'cube', 'isoCube', 'isoRectangle', 'partialRectangle', 'flow.hadas'], shape) >= 0;
-// };
-//
-// Format.prototype.isGlassState = function(state)
-// {
-//     var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
-//
-//     return (shape == 'label' || shape == 'rectangle' || shape == 'internalStorage' ||
-//         shape == 'ext' || shape == 'umlLifeline' || shape == 'swimlane' ||
-//         shape == 'process' || shape == 'flow.hadas');
-// };
-
-// FormatBP.prototype.constructor = Format;
