@@ -439,7 +439,7 @@ debuggerBP.prototype.getProgramRecord = function() {
         if(Object.values(curStage.stages).length > 0 || curStage.eventSelected !== undefined)
             res.push(curStage)
     }
-
+    res.push({stages: {}, eventSelected: null, blocked: [], messages:null})
     return res;
 }
 
@@ -468,7 +468,7 @@ debuggerBP.prototype.updateScen = function(scen, c, cloned) {
     this.scenarios[scen].push([c.id, cloned]);
 }
 
-debuggerBP.prototype.endScen = function(scen) {
+    debuggerBP.prototype.endScen = function(scen) {
     this.scenarios[scen].push([-1, null]);
 }
 
