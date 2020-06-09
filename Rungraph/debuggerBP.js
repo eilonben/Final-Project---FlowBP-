@@ -256,19 +256,35 @@ debuggerBP.prototype.fixSizes = function(cell, toDef) {
     }
 }
 
+function cutPayload(payload) {
+    let tmp = "{";
+    let first = true;
+    Object.keys(payload).forEach(function(key) {
+        if(!first)
+            tmp += "...................";
+        else first = false;
+        tmp += key + ": " + JSON.stringify(payload[key]) + ",\n";
+    });
+    if(tmp.length > 1)
+        tmp = tmp.substring(0, tmp.length - 2);
+    tmp += "}";
+    return tmp;
+}
+
 debuggerBP.prototype.convertPayloadToString = function(payload) {
     let i = 1;
     var res = "";
     var width = 0;
     if(payload.constructor === Array) {
         payload.forEach(cur => {
-            var curRes = "Payload " + i++ + ": " + JSON.stringify(cur) + "\n";
+            var curRes = "Payload " + i++ + ": " + cutPayload(cur) + "\n";
             width = Math.max(width, curRes.length);
             res += curRes;
         })
     }
     else{
-        var curRes = "Payload: " + JSON.stringify(payload) + "\n";
+        let tmp = cutPayload(payload);
+        var curRes = "Payload: " + tmp + "\n";
         width = Math.max(width, curRes.length);
         res += curRes;
     }
