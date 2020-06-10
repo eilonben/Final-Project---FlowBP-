@@ -55,6 +55,9 @@ debuggerBP.prototype.events = [];
 // events represents the event occurred during the execution at each time unit
 debuggerBP.prototype.messages = [];
 
+// events represents the event occurred during the execution at each time unit
+debuggerBP.prototype.syncing = [];
+
 // Saves pre-debugging info such as stencils sizes, last undo index in undo manager and cell labels
 debuggerBP.prototype.savePreDebuggingInfo = function () {
     this.lastUndo = this.editor.undoManager.indexOfNextAdd;
@@ -281,12 +284,13 @@ debuggerBP.prototype.colorCell = function(cell, color) {
 }
 
 // Updates cell's size, content and color
-debuggerBP.prototype.updateCell = function(cell, payload, blocked) {//blocked, payload) {
-    this.colorCell(cell, "none");
+debuggerBP.prototype.updateCell = function(cell, payload, blocked, syncing) {//blocked, payload) {
+    this.colorCell(cell, "#ffffff");
     if(cell.isBPCell()) {
         cell.children.forEach(child => {
             if (payload !== undefined && child.bp_type == "payloads") {
-                let color = blocked ? "#ff6666" : "#99ff99";
+                let color = syncing ? "#b3b3b3" : "#99ff99";
+                color = blocked ? "#ff6666" : color;
                 this.colorCell(child, color);
                 this.mod.setValue(child, child.getValue() + this.convertPayloadToString(payload));
             } else
@@ -345,7 +349,7 @@ debuggerBP.prototype.updateVertexCells = function(record) {
 
         cells.forEach(cell => {
             this.setToOriginal(cell);
-            this.updateCell(cell, curStage[cell.id], record[i].blocked.includes(cell.id))
+            this.updateCell(cell, curStage[cell.id], record[i].blocked.has(cell.id), record[i].syncing.has(cell.id))
         });
 
         if(this.toHorizontal)
@@ -366,43 +370,50 @@ function updateConsoleMessage(msg) {
 
 // Fixes all the scenarios to the current time unit (max length of the scenarios)
 debuggerBP.prototype.fixStages = function() {
+
     let scens = Object.values(this.scenarios);
     const lengths = scens.map(x => x.length);
     let curTime = Math.max(...lengths);
-    for (let i = 0; i < scens.length; i++) {
-        let curScen = scens[i];
-        let numOfFixes = curTime - curScen.length;
-        for (let j = 0; j < numOfFixes; j++)
-            curScen.push(curScen[curScen.length - 1]);
-    }
-};
 
-// Adds an event to the events array, after fixing the length of the array
-// (and of the blocked array as well) to the current "time" (max length of the scenarios)
-debuggerBP.prototype.addEvent = function(e) {
-    let scens = Object.values(this.scenarios)
-    const lengths = scens.map(x => x.length);
-    let curTime = Math.max(...lengths)
+    //fix syncing
+    let numOfFixes = curTime - this.syncing.length;
+    for (let j = 0; j < numOfFixes + 1; j++)
+        this.syncing.push([]);
+    this.syncing.push([]);
+
+    //fix scenes
     for (let i = 0; i < scens.length; i++) {
         let curScen = scens[i];
         let numOfFixes = curTime - curScen.length;
-        for (let j = 0; j < numOfFixes + 1; j++)
+        for (let j = 0; j < numOfFixes + 2; j++) {
+            if(curScen[curScen.length - 1][0] !== -1)
+                this.syncing[curScen.length].push(curScen[curScen.length - 1][0]);
             curScen.push(curScen[curScen.length - 1]);
+        }
+        curScen.push(curScen[curScen.length - 1]);
     }
-    let numOfFixes = curTime - this.events.length;
-    for (let j = 0; j < numOfFixes; j++)
+
+    //fix events
+    numOfFixes = curTime - this.events.length;
+    for (let j = 0; j < numOfFixes + 1; j++)
         this.events.push(-1);
-    this.events.push(e);
+    this.events.push([]);
 
     // fix blocked
     numOfFixes = curTime - this.blocked.length;
-    for (let j = 0; j < numOfFixes; j++)
+    for (let j = 0; j < numOfFixes + 2; j++)
         this.blocked.push(null);
     this.blocked.push([]);
+
+};
+
+debuggerBP.prototype.addEvent = function(e) {
+    this.fixStages();
+    this.events[this.events.length - 1].push(e);
 }
 
 debuggerBP.prototype.addBlocked = function(c) {
-    this.blocked[this.events.length - 1].push(c);
+    this.blocked[this.blocked.length - 1].push(c);
 }
 
 debuggerBP.prototype.getNumOfSteps = function(){
@@ -412,14 +423,27 @@ debuggerBP.prototype.getNumOfSteps = function(){
     return 0;
 }
 
+function diff(lastStage, curStage) {
+    return JSON.stringify(lastStage.stages) !== JSON.stringify(curStage.stages)  ||
+        lastStage.eventSelected !== curStage.eventSelected ||
+        !eqSet(lastStage.blocked, curStage.blocked) ||
+        !eqSet(lastStage.syncing, curStage.syncing);
+}
+
+function eqSet(as, bs) {
+    if (as.size !== bs.size) return false;
+    for (var a of as) if (!bs.has(a)) return false;
+    return true;
+}
+
 // Builds a program record, where each cell of the output contains the content of cells,
 // the selected event and the blocked/wait blocks
 debuggerBP.prototype.getProgramRecord = function() {
     var res = []
-    var curBlocked = [];
-
+    var curBlocked = new Set();
+    var lastStage ={};
     for(let step = 0; step < this.getNumOfSteps(); step++){
-        var curStage = {stages: {}, eventSelected: null, blocked: [], messages:null}
+        var curStage = {stages: {}, eventSelected: null, blocked: null, messages:null, syncing: null}
         var scens = Object.values(this.scenarios);
         curStage.stages = {};
         for (let j = 0; j < scens.length; j++) {
@@ -434,12 +458,14 @@ debuggerBP.prototype.getProgramRecord = function() {
         if(this.messages[step] != "")
             curStage.messages = this.messages[step];
         if(this.blocked[step] != null)
-            curBlocked = this.blocked[step];
+            curBlocked = new Set(this.blocked[step]);
         curStage.blocked = curBlocked;
-        if(Object.values(curStage.stages).length > 0 || curStage.eventSelected !== undefined)
+        curStage.syncing = new Set(this.syncing[step]);
+        if((Object.values(curStage.stages).length > 0 || curStage.eventSelected !== null) && diff(lastStage, curStage))
             res.push(curStage)
+        lastStage = curStage;
     }
-
+    res.push({stages: {}, eventSelected: null, blocked: new Set(), messages:null, syncing: new Set()})
     return res;
 }
 
@@ -448,6 +474,7 @@ debuggerBP.prototype.initDebug = function() {
     this.consoleSteps = [""];
     this.scenarios = {}
     this.events = [];
+    this.syncing = [];
     this.messages = [];
     this.blocked = [];
     this.scenCounter = 0;
@@ -483,4 +510,36 @@ debuggerBP.prototype.addMessage = function(message, curTime, scen) {
         this.messages.push("");
     let m = this.messages[time - 1] !== "" ? "\n" + message : message;
     this.messages[time - 1] += m;
+}
+
+debuggerBP.prototype.endRecord = function() {
+
+
+    let scens = Object.values(this.scenarios);
+    const lengths = scens.map(x => x.length);
+    let curTime = Math.max(...lengths);
+
+    //fix syncing
+    let numOfFixes = curTime - this.syncing.length;
+    for (let j = 0; j < numOfFixes; j++)
+        this.syncing.push([]);
+
+    //fix scenes
+    for (let i = 0; i < scens.length; i++) {
+        let curScen = scens[i];
+        let numOfFixes = curTime - curScen.length;
+        for (let j = 0; j < numOfFixes; j++) {
+            curScen.push([-1, null]);
+        }
+    }
+
+    //fix events
+    numOfFixes = curTime - this.events.length;
+    for (let j = 0; j < numOfFixes; j++)
+        this.events.push(-1);
+    // fix blocked
+    numOfFixes = curTime - this.blocked.length;
+    for (let j = 0; j < numOfFixes + 1; j++)
+        this.blocked.push(null);
+
 }
