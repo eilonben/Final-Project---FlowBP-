@@ -1,8 +1,7 @@
 /*
- * debbugerBP responsibility is to record information during a program execution.
+ * debbugerBP responsibility is to record information during a program execution, and display this record on demand.
  * The constructor gets the relevant UI as an argument in order to make the changes needed for debugging display.
- *
- */
+*/
 
 function debuggerBP(ui){
     this.ui = ui;
@@ -11,21 +10,50 @@ function debuggerBP(ui){
     this.mod = this.graph.getModel();
 }
 
+// The UI instance (including the editor and the graph) needed to be change for the debugging steps' display
 debuggerBP.prototype.ui = null;
 debuggerBP.prototype.editor = null;
 debuggerBP.prototype.graph = null;
 debuggerBP.prototype.mod = null;
+
+// Pre-debbuging info
+// Index of the last undo action in the Undo manager
 debuggerBP.prototype.lastUndo = 0;
-debuggerBP.prototype.lastLabels = {};
+// Cells' sizes
 debuggerBP.prototype.lastCellsSizes = {};
+// Cells' values
 debuggerBP.prototype.lastCellValues = {};
+
+// Number of actions made when the graph was fixed (size/color-wise) before the debugging started
 debuggerBP.prototype.isFixed = 0;
+// Indicator for pre-debugging layer's locking
 debuggerBP.prototype.isLocked = 0;
-debuggerBP.prototype.scenCounter = 0
+
+// Indicator for type of display during the debugging
+debuggerBP.prototype.toHorizontal = false;
+
+// Program record
+// Number of scenarios (payloads) so far in the execution
+debuggerBP.prototype.scenCounter = 0;
+
+/* Scenarios (payloads) represented as an array, where each cell represents
+ * the location of the scenario at the cell index time.
+ * For example: x = [-1, -1, -1, 4, 4] indicates that scenario x took part from time = 3,
+ * (-1 indicates this scenario didn't took part at this time),
+ * and it's payload stayed for 2 time units at block number 4 (cell.id)
+ * scenarios field holed a list of all the scenarios on the program execution
+*/
 debuggerBP.prototype.scenarios = {};
+
+// consoleSteps represents the messages at each time unit during the execution,
+// where null represents a time slot without a new message
 debuggerBP.prototype.consoleSteps = [""];
+
+// events represents the event occurred during the execution at each time unit
 debuggerBP.prototype.events = [];
-debuggerBP.prototype.events = [];
+
+// events represents the event occurred during the execution at each time unit
+debuggerBP.prototype.messages = [];
 
 // Saves pre-debugging info such as stencils sizes, last undo index in undo manager and cell labels
 debuggerBP.prototype.savePreDebuggingInfo = function () {
@@ -53,7 +81,8 @@ debuggerBP.prototype.setConsoleSteps = function (rec) {
     let i = 0;
     rec.forEach(stage => {
         let eventOcc = stage.eventSelected == null ? "" : "event selected: " + stage.eventSelected + "\n";
-        this.consoleSteps.push(this.consoleSteps[i++] + eventOcc);
+        let message = stage.messages == null ? "" : stage.messages + "\n";
+        this.consoleSteps.push(this.consoleSteps[i++] + message + eventOcc);
     });
 }
 
@@ -78,7 +107,8 @@ debuggerBP.prototype.fixAllSizes = function () {
     let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
     cells.forEach(cell => this.fixSizes(cell, false));
     this.fixAllOutputsLabels();
-    //this.ui.fixView();
+    if(this.toHorizontal)
+        this.ui.fixView();
     this.isFixed = this.editor.undoManager.indexOfNextAdd - isFixed;
 }
 
@@ -88,8 +118,9 @@ debuggerBP.prototype.setDebuggingSteps = function () {
     this.setConsoleSteps(rec);
 }
 
-debuggerBP.prototype.startDebugging = function(){
+debuggerBP.prototype.startDebugging = function(toHorizontal){
 
+    this.toHorizontal = toHorizontal;
     this.makePayloadSectionsVisible(true);
     this.savePreDebuggingInfo();
     updateConsoleMessage("");
@@ -225,19 +256,35 @@ debuggerBP.prototype.fixSizes = function(cell, toDef) {
     }
 }
 
+function cutPayload(payload) {
+    let tmp = "{";
+    let first = true;
+    Object.keys(payload).forEach(function(key) {
+        if(!first)
+            tmp += "...................";
+        else first = false;
+        tmp += key + ": " + JSON.stringify(payload[key]) + ",\n";
+    });
+    if(tmp.length > 1)
+        tmp = tmp.substring(0, tmp.length - 2);
+    tmp += "}";
+    return tmp;
+}
+
 debuggerBP.prototype.convertPayloadToString = function(payload) {
     let i = 1;
     var res = "";
     var width = 0;
     if(payload.constructor === Array) {
         payload.forEach(cur => {
-            var curRes = "Payload " + i++ + ": " + JSON.stringify(cur) + "\n";
+            var curRes = "Payload " + i++ + ": " + cutPayload(cur) + "\n";
             width = Math.max(width, curRes.length);
             res += curRes;
         })
     }
     else{
-        var curRes = "Payload: " + JSON.stringify(payload) + "\n";
+        let tmp = cutPayload(payload);
+        var curRes = "Payload: " + tmp + "\n";
         width = Math.max(width, curRes.length);
         res += curRes;
     }
@@ -314,11 +361,11 @@ debuggerBP.prototype.updateVertexCells = function(record) {
 
         cells.forEach(cell => {
             this.setToOriginal(cell);
-            //this.graph.fixValue(cell);
             this.updateCell(cell, curStage[cell.id], record[i].blocked.includes(cell.id))
         });
 
-        //this.ui.fixView();
+        if(this.toHorizontal)
+            this.ui.fixView();
 
         this.fixAllOutputsLabels();
 
@@ -333,7 +380,7 @@ function updateConsoleMessage(msg) {
     }
 };
 
-// Fixes all the scanriod to the current "time (max length of the scenarios)
+// Fixes all the scenarios to the current time unit (max length of the scenarios)
 debuggerBP.prototype.fixStages = function() {
     let scens = Object.values(this.scenarios);
     const lengths = scens.map(x => x.length);
@@ -388,7 +435,7 @@ debuggerBP.prototype.getProgramRecord = function() {
     var curBlocked = [];
 
     for(let step = 0; step < this.getNumOfSteps(); step++){
-        var curStage = {stages: {}, eventSelected: null, blocked: []}
+        var curStage = {stages: {}, eventSelected: null, blocked: [], messages:null}
         var scens = Object.values(this.scenarios);
         curStage.stages = {};
         for (let j = 0; j < scens.length; j++) {
@@ -400,20 +447,24 @@ debuggerBP.prototype.getProgramRecord = function() {
         }
         if(this.events[step] != -1)
             curStage.eventSelected = this.events[step];
+        if(this.messages[step] != "")
+            curStage.messages = this.messages[step];
         if(this.blocked[step] != null)
             curBlocked = this.blocked[step];
         curStage.blocked = curBlocked;
         if(Object.values(curStage.stages).length > 0 || curStage.eventSelected !== undefined)
             res.push(curStage)
     }
-
+    res.push({stages: {}, eventSelected: null, blocked: [], messages:null})
     return res;
 }
 
+// Initialize all the fields required for debugging record
 debuggerBP.prototype.initDebug = function() {
     this.consoleSteps = [""];
     this.scenarios = {}
     this.events = [];
+    this.messages = [];
     this.blocked = [];
     this.scenCounter = 0;
     updateConsoleMessage("");
@@ -433,10 +484,19 @@ debuggerBP.prototype.updateScen = function(scen, c, cloned) {
     this.scenarios[scen].push([c.id, cloned]);
 }
 
-debuggerBP.prototype.endScen = function(scen) {
+    debuggerBP.prototype.endScen = function(scen) {
     this.scenarios[scen].push([-1, null]);
 }
 
 debuggerBP.prototype.getScenarioTime = function(scen) {
     return this.scenarios[scen].length;
+}
+
+debuggerBP.prototype.addMessage = function(message, curTime, scen) {
+    let time = curTime !== -1 ? curTime + 1 : this.scenarios[scen].length;
+    let numOfFixes = time - this.messages.length;
+    for (let j = 0; j < numOfFixes; j++)
+        this.messages.push("");
+    let m = this.messages[time - 1] !== "" ? "\n" + message : message;
+    this.messages[time - 1] += m;
 }

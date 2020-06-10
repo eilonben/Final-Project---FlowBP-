@@ -37,7 +37,7 @@ BPEngine.prototype.run = function*(){
         }
         window.eventSelected = e;
         console.log(e + "\n");
-        writeToConsole("event selected: " + e);
+        writeToConsole(this,"event selected: " + e, -1, -1);
         this.BThreads.forEach(bt => {
             if (isReqWait(bt, e)) {
                 bt.stmt = fixStmt(bt.iterator.next().value)
