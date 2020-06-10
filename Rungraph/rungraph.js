@@ -26,22 +26,27 @@ function writeToConsole(bpEngine, message, curTime, scen) {
  * and registers new BThreads for any extra output.
  */
 function* goToFollowers(c, payload, bpEngine, model, outputs, scen) {
+    let cloned = JSON.parse(JSON.stringify(payload));
     let edg = model.getEdges(c, false, true, true);
-
+    let continued = false;
+    let block = getshape(c.getStyle());
     if (edg.length > 0) {
         // Run extra followers in new threads
         for (let i = 1; i < edg.length; i++) {
             let target = edg[i].getTerminal(false);
             if (target !== undefined) {
-                let edgeLabel = edg[i].getAttribute("label");
-                if (edgeLabel !== undefined && outputs !== undefined) {
-                    if (outputs[edgeLabel] !== undefined) {
-                        let nextpayload = outputs[edgeLabel];
-                        if(bpEngine.deb !== null) {
-                            runInNewBT(target, nextpayload, bpEngine, model, bpEngine.deb.getScenarioTime(scen));
-                        }
-                        else{
-                            runInNewBT(target, nextpayload, bpEngine, model, null);
+                let time = bpEngine.deb !== null ? bpEngine.deb.getScenarioTime(scen) : null;
+                if (block !== "general") {
+                    continued = true;
+                    runInNewBT(target, cloned, bpEngine, model, time);
+                }
+                else {
+                    let edgeLabel = edg[i].getAttribute("label");
+                    if (edgeLabel !== undefined && outputs !== undefined) {
+                        if (outputs[edgeLabel] !== undefined) {
+                            let nextpayload = outputs[edgeLabel];
+                            continued = true;
+                            runInNewBT(target, nextpayload, bpEngine, model, time);
                         }
                     }
                 }
@@ -50,15 +55,16 @@ function* goToFollowers(c, payload, bpEngine, model, outputs, scen) {
         // Run the first follower in the same thread.
         let target = edg[0].getTerminal(false);
         if (target !== undefined) {
-            let block = getshape(c.getStyle());
             if (block !== "general") {
-                yield* runInSameBT(edg[0].getTerminal(false), JSON.parse(JSON.stringify(payload)), bpEngine, model, scen);
+                continued = true;
+                yield* runInSameBT(edg[0].getTerminal(false), cloned, bpEngine, model, scen);
             }
             else {
                 let edgeLabel = edg[0].getAttribute("label");
                 if (edgeLabel !== undefined && outputs !== undefined) {
                     if (outputs[edgeLabel] !== undefined) {
                         let nextpayload = outputs[edgeLabel];
+                        continued = true;
                         yield* runInSameBT(edg[0].getTerminal(false), nextpayload, bpEngine, model, scen);
                     }
                 }
@@ -66,9 +72,10 @@ function* goToFollowers(c, payload, bpEngine, model, outputs, scen) {
         }
     }
     else{
-        if(bpEngine.deb !== null) {
-            bpEngine.deb.endScen(scen);
-        }
+        continued = true;
+    }
+    if(!continued && bpEngine.deb !== null) {
+        bpEngine.deb.endScen(scen);
     }
 }
 
