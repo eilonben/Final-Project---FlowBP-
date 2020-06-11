@@ -288,6 +288,19 @@ var testTicTacToe = function(){
     return true;
 };
 
+var testBsyncSections =function () {
+    var expected = ["BeforeError"];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/BsyncSections.xml");
+    try {
+        parse_graph(xml,debug);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
+    }
+    return expected.toString() === resulte.toString();
+}
 
 var debug_testHelloWorld = function () {
     var expected = [{"stages":{"28":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
@@ -604,6 +617,7 @@ var runTests = function() {
     run("ExceptionHandle", testExceptionHandle);    //check that when occur error while executing the JS code on node the execution is terminated.
     run("ExceptionHandle2", testExceptionHandle2);
     run("TicTacToe", testTicTacToe);
+    run("BsyncSections", testBsyncSections);
 
     run("debug_HelloWorld", debug_testHelloWorld);
     run("debug_RandomOrder", debug_testRequestsList);
