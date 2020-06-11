@@ -291,8 +291,12 @@ var testTicTacToe = function(){
 
 var  debug_compareResulte = function(resulte,expected){
     for (let i = 0; i < resulte.length; i++) {
-        if (JSON.stringify( expected[i].stages) != JSON.stringify(resulte[i].stages) || resulte[i].eventSelected!=expected[i].eventSelected)
+        try {
+            if (JSON.stringify(expected[i].stages) != JSON.stringify(resulte[i].stages) || resulte[i].eventSelected != expected[i].eventSelected)
+                return false;
+        }catch (e) {
             return false;
+        }
     }
     return true;
 
