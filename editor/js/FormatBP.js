@@ -194,14 +194,28 @@ FormatBP.prototype.updateEdgesLabels = function (cell, graph, cellValue ) {
 FormatBP.prototype.refresh = function () {
 
     var format = this;
-    // Performance tweak: No refresh needed if not visiblevisible
-    if (this.container.style.width == '0px') {
-        return;
-    }
-
-    this.clear();
     var ui = this.editorUi;
     var graph = ui.editor.graph;
+    if (this.container.style.width == '0px' ) {
+        return;
+    }
+    if (!graph.isCellSelected() ) {
+        ui.formatWidth = (ui.formatWidth >  0.001) ? 0.001 : 240;
+        ui.formatContainer.style.display = (ui.formatWidth >  0.001) ? '' : 'none';
+        ui.refresh();
+        //ui.fireEvent(new mxEventObject('formatWidthChanged'));
+    }
+    // Performance tweak: No refresh needed if not visiblevisible
+
+
+    this.clear();
+ /*   if (!graph.isSelectionEmpty()) {
+
+        ui.formatWidth = (ui.formatWidth > 0) ? 0 : 240;
+        ui.formatContainer.style.display = (ui.formatWidth > 0) ? '' : 'none';
+        ui.refresh();
+        ui.fireEvent(new mxEventObject('formatWidthChanged'));
+    }*/
     var div = document.createElement('div');
     div.style.whiteSpace = 'nowrap';
     div.style.color = 'rgb(112, 112, 112)';
@@ -222,6 +236,12 @@ FormatBP.prototype.refresh = function () {
 
     //no shape is selected
     if (graph.isSelectionEmpty()) {
+        if (ui.format != null) {
+            ui.formatWidth = 0.001;
+            ui.formatContainer.style.display = '';
+            ui.refresh();
+           // ui.fireEvent(new mxEventObject('formatWidthChanged'));
+        }
         /*mxUtils.write(label, mxResources.get('diagram'));
 
         // Adds button to hide the format panel since

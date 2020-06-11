@@ -1408,16 +1408,12 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
         value.setAttribute('label', label);
         edge.setValue(value);
     }
-    else if(source!=null && getshape(source.getStyle())=="bsync" ){
+   /* else if(source!=null && getshape(source.getStyle())=="bsync" ){
         var numberOfOutEdges = this.getNumOfOutEdges(source);
-        if(numberOfOutEdges >= 1)
-            return null;
 
     }else if(source!=null && getshape(source.getStyle())=="startnode" ){
         var numberOfOutEdges = this.getNumOfOutEdges(source);
-        if(numberOfOutEdges >= 1)
-            return null;
-    }
+    }*/
     return edge;
 };
 
