@@ -196,27 +196,26 @@ FormatBP.prototype.refresh = function () {
     var format = this;
     var ui = this.editorUi;
     var graph = ui.editor.graph;
-    if (!graph.isSelectionEmpty()) {
-        ui.formatWidth = (ui.formatWidth > 0) ? 0 : 240;
-        ui.formatContainer.style.display = (ui.formatWidth > 0) ? '' : 'none';
-        ui.refresh();
-        ui.fireEvent(new mxEventObject('formatWidthChanged'));
-    }
-    // Performance tweak: No refresh needed if not visiblevisible
-    if (this.container.style.width == '0px') {
+    if (this.container.style.width == '0px' ) {
         return;
     }
+    if (!graph.isCellSelected() ) {
+        ui.formatWidth = (ui.formatWidth >  0.001) ? 0.001 : 240;
+        ui.formatContainer.style.display = (ui.formatWidth >  0.001) ? '' : 'none';
+        ui.refresh();
+        //ui.fireEvent(new mxEventObject('formatWidthChanged'));
+    }
+    // Performance tweak: No refresh needed if not visiblevisible
+
 
     this.clear();
-    var ui = this.editorUi;
-    var graph = ui.editor.graph;
-    if (!graph.isSelectionEmpty()) {
+ /*   if (!graph.isSelectionEmpty()) {
 
         ui.formatWidth = (ui.formatWidth > 0) ? 0 : 240;
         ui.formatContainer.style.display = (ui.formatWidth > 0) ? '' : 'none';
         ui.refresh();
         ui.fireEvent(new mxEventObject('formatWidthChanged'));
-    }
+    }*/
     var div = document.createElement('div');
     div.style.whiteSpace = 'nowrap';
     div.style.color = 'rgb(112, 112, 112)';
@@ -238,10 +237,10 @@ FormatBP.prototype.refresh = function () {
     //no shape is selected
     if (graph.isSelectionEmpty()) {
         if (ui.format != null) {
-            ui.formatWidth = 0;
+            ui.formatWidth = 0.001;
             ui.formatContainer.style.display = '';
             ui.refresh();
-            ui.fireEvent(new mxEventObject('formatWidthChanged'));
+           // ui.fireEvent(new mxEventObject('formatWidthChanged'));
         }
         /*mxUtils.write(label, mxResources.get('diagram'));
 
