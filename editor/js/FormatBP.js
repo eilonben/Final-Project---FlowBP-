@@ -574,6 +574,9 @@ FormatBP.prototype.refresh = function () {
                     if (parsed != null && parsed != undefined && parsed[i] != null && parsed[i] != undefined) {
                         PayloadsLabelTextBox.setAttribute("value", JSON.stringify(parsed[i]));
                     }
+                    else{
+                        PayloadsLabelTextBox.setAttribute("value", JSON.stringify({}));
+                    }
                     oneTextLabelDiv.appendChild(PayloadsLabelTextBox);
                     oneTextLabelDiv.style.marginBottom = "5px";
                     InnerDIVPayloadsLabel.appendChild(oneTextLabelDiv);
@@ -586,7 +589,17 @@ FormatBP.prototype.refresh = function () {
                     applyButtonLabels.onclick = function () {
                         var Payloads = [];
                         for (var i = 0; i < numOfPayloads; i++) {
-                            let payloadValue = JSON.parse(document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value);
+                            let textVal = document.getElementById("nodeID" + cell.id + "Payloadsnumber" + (i + 1)).value;
+                            let payloadValue = "";
+                            if(textVal!=="") {
+                                try {
+                                    payloadValue = JSON.parse(textVal);
+                                }
+                                catch(e){
+                                    alert("There has been a problem processing payload number " + (i+1) +":\n" + e+".\n" +
+                                        "The payload will be defined as '{}' by default.");
+                                }
+                            }
                             if(payloadValue === "" || payloadValue === undefined || payloadValue ===null){
                                 Payloads.push({});
                             }
