@@ -136,12 +136,12 @@ function getshape(str) {
     arr = arr[0].split("=")[1] != null ? arr[0].split("=")[1].split(".")[1] : "";
     return arr;
 }
-/*
-A function that handles all the fields inside a node relevant for executing BP flow programs
-"code" for the code editor in general blocks
-"sync" for the sync section in bsync nodes
-"log" for the code section in console nodes
- */
+/**
+* A function that handles all the fields inside a node relevant for executing BP flow programs
+* "code" for the code editor in general blocks
+* "sync" for the sync section in bsync nodes
+* "log" for the code section in console nodes
+ **/
 function handleNodeAttributes(bpEngine, c, outputs, cloned, payload, curTime, scen) {
     if(getshape(c.getStyle()) === "console") {
         writeToConsole(bpEngine, JSON.stringify(payload), curTime, scen);
@@ -292,9 +292,9 @@ function startRunning(model, debug) {
         let payloads = [{}];
         if (startNds[i].getAttribute("Payloads") !== undefined) {
             payloads = (JSON.parse(startNds[i].getAttribute("Payloads")));
-            for (let j=0; j<payloads.length; j++){
-                runInNewBT(startNds[i], payloads[j], bpEngine, model, 0);
-            }
+        }
+        for (let j=0; j<payloads.length; j++){
+            runInNewBT(startNds[i], payloads[j], bpEngine, model, 0);
         }
     }
     bpEngine.run().next();
