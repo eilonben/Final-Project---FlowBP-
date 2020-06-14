@@ -26,18 +26,19 @@ BPEngine.prototype.registerBThread = function(bt){
  */
 BPEngine.prototype.run = function*(){
     while (true) {
-        if(this.deb!=null) {
-            this.deb.fixStages();
-        }
         let e = this.getEvent();
-        if (e === null)
+        if (e === null) {
+            if(this.deb!=null) {
+                this.deb.endRecord();
+            }
             yield 'waiting for an event';
+        }
         if(this.deb!=null) {
             this.deb.addEvent(e);
         }
         window.eventSelected = e;
         console.log(e + "\n");
-        writeToConsole("event selected: " + e);
+        writeToConsole(this,"event selected: " + e, -1, -1);
         this.BThreads.forEach(bt => {
             if (isReqWait(bt, e)) {
                 bt.stmt = fixStmt(bt.iterator.next().value)

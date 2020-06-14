@@ -288,22 +288,31 @@ var testTicTacToe = function(){
     return true;
 };
 
-
-var  debug_compareResulte = function(resulte,expected){
-    for (let i = 0; i < resulte.length; i++) {
-        if (JSON.stringify( expected[i].stages) != JSON.stringify(resulte[i].stages) || resulte[i].eventSelected!=expected[i].eventSelected)
-            return false;
+var testBsyncSections =function () {
+    var expected = ["BeforeError"];
+    var resulte = [];
+    var xml = loadXMl("XML_for_tests/BsyncSections.xml");
+    try {
+        parse_graph(xml,debug);
+        resulte = consoleToArray();
+    }catch (e) {
+        console.log(e);
+        return false;
     }
-    return true;
-
+    return expected.toString() === resulte.toString();
 }
 
 var debug_testHelloWorld = function () {
-    var expected = [{"stages":{"28":[{}]},"eventSelected":null},
-        {"stages":{"29":[{}]},"eventSelected":null},
-        {"stages":{"29":[{}]},"eventSelected":"Hello"},
-        {"stages":{"34":[{}]},"eventSelected":null},
-        {"stages":{"34":[{}]},"eventSelected":"World"}];
+    var expected = [{"stages":{"28":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"29":[{}]},"eventSelected":["Hello"],"blocked":{},"syncing":{}},
+        {"stages":{"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"34":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"34":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"34":[{}]},"eventSelected":["World"],"blocked":{},"syncing":{}},
+        {"stages":{"34":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/Hello_World.xml");
     try {
@@ -314,16 +323,22 @@ var debug_testHelloWorld = function () {
         console.log(e);
         return false;
     }
-    return debug_compareResulte(resulte,expected);
+    return JSON.stringify(resulte) == JSON.stringify(expected);
 }
 
 var debug_testRequestsList = function () {
-    var expected = [[{"stages":{"9":[{}]},"eventSelected":null},
-        {"stages":{"10":[{}]},"eventSelected":null},
-        {"stages":{"10":[{}]},"eventSelected":"Goodbye"}],
-        [{"stages":{"9":[{}]},"eventSelected":null},
-        {"stages":{"10":[{}]},"eventSelected":null},
-        {"stages":{"10":[{}]},"eventSelected":"Hi"}]];
+    var expected = [[{"stages":{"9":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"10":[{}]},"eventSelected":["Goodbye"],"blocked":{},"syncing":{}},
+        {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
+        [{"stages":{"9":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"10":[{}]},"eventSelected":["Hi"],"blocked":{},"syncing":{}},
+            {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}]];
     var statistic=[0,0];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HiOrGoodbye.xml");
@@ -338,7 +353,7 @@ var debug_testRequestsList = function () {
         }
 
         for (let i = 0; i < expected.length; i++) {
-            if (debug_compareResulte(resulte,expected[i])) {
+            if (JSON.stringify(resulte) == JSON.stringify(expected[i])) {
                 statistic[i] += 1;
             }
         }
@@ -351,20 +366,33 @@ var debug_testRequestsList = function () {
 }
 
 var debug_testHotCold = function () {
-    var expected = [{"stages":{"23":[{}],"24":[{}],"25":[{}]},"eventSelected":null},
-        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":null},
-        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":"Hot"},
-        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":null},
-        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":"Cold"},
-        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":null},
-        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":"Hot"},
-        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":null},
-        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":"Cold"},
-        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":null},
-        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":"Hot"},
-        {"stages":{"60":[{}],"67":[{}]},"eventSelected":null},
-        {"stages":{"60":[{}],"67":[{}]},"eventSelected":"Cold"},
-        {"stages":{"36":[{}]},"eventSelected":null}];
+    var expected = [{"stages":{"23":[{}],"24":[{}],"25":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}},
+        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}},
+        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}},
+        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}},
+        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}},
+        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"46":[{}],"60":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"46":[{}],"60":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"46":[{}],"60":[{}],"67":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}},
+        {"stages":{"46":[{}],"60":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{"36":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+        {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HotCold.xml");
     try {
@@ -374,75 +402,124 @@ var debug_testHotCold = function () {
         console.log(e);
         return false;
     }
-    return debug_compareResulte(resulte,expected);;
+    return JSON.stringify(resulte) == JSON.stringify(expected);
 }
 
 var debug_testRandomOrder = function () {
-    var expected = [[{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
-        {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
-        {"stages":{"14":[{}],"19":[{}]},"eventSelected":"3"},
-        {"stages":{"14":[{}],"29":[{}]},"eventSelected":null},
-        {"stages":{"14":[{}],"29":[{}]},"eventSelected":"1"},
-        {"stages":{"24":[{}],"29":[{}]},"eventSelected":null},
-        {"stages":{"24":[{}],"29":[{}]},"eventSelected":"2"},
-        {"stages":{"29":[{}]},"eventSelected":null},
-        {"stages":{"29":[{}]},"eventSelected":"4"}],
+    var expected = [
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
 
-        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":"1"},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":"2"},
-            {"stages":{"19":[{}]},"eventSelected":null},
-            {"stages":{"19":[{}]},"eventSelected":"3"},
-            {"stages":{"29":[{}]},"eventSelected":null},
-            {"stages":{"29":[{}]},"eventSelected":"4"}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
 
-        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":"1"},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":"3"},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":"4"},
-            {"stages":{"24":[{}]},"eventSelected":null},
-            {"stages":{"24":[{}]},"eventSelected":"2"}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
 
-        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":"3"},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":"4"},
-            {"stages":{"14":[{}]},"eventSelected":null},
-            {"stages":{"14":[{}]},"eventSelected":"1"},
-            {"stages":{"24":[{}]},"eventSelected":null},
-            {"stages":{"24":[{}]},"eventSelected":"2"}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
 
-            [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
-                {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
-                {"stages":{"14":[{}],"19":[{}]},"eventSelected":"1"},
-                {"stages":{"19":[{}],"24":[{}]},"eventSelected":null},
-                {"stages":{"19":[{}],"24":[{}]},"eventSelected":"3"},
-                {"stages":{"24":[{}],"29":[{}]},"eventSelected":null},
-                {"stages":{"24":[{}],"29":[{}]},"eventSelected":"2"},
-                {"stages":{"29":[{}]},"eventSelected":null},
-                {"stages":{"29":[{}]},"eventSelected":"4"}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
+            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
 
-        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":"3"},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":"1"},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":"4"},
-            {"stages":{"24":[{}]},"eventSelected":null},
-            {"stages":{"24":[{}]},"eventSelected":"2"},
-            {"stages":{},"eventSelected":null}]];
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
+            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
+            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
+            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}]
+    ];
 
     var statistic=[0,0,0,0,0,0];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/RandomOrder.xml");
-    for (var j = 0 ; j<100 ; j++) {
+    for (let j = 0 ; j<100 ; j++) {
         try {
             document.getElementById("ConsoleText1").value="";
             parse_graph(xml,debug);
@@ -452,7 +529,7 @@ var debug_testRandomOrder = function () {
             return false;
         }
         for (let i = 0; i < expected.length; i++) {
-            if (debug_compareResulte(resulte,expected[i])) {
+            if (JSON.stringify(resulte) == JSON.stringify(expected[i])) {
                 statistic[i]+=1;
             }
         }
@@ -470,8 +547,9 @@ var debug_testRandomOrder = function () {
 }
 
 var debug_testPayload =function () {
-    var expected = [{"stages":{"2":[{"x":3},{"y":4}]}},
-        {"stages":{"3":[{"x":3},{"y":4}]}}];
+    var expected = [{"stages":{"2":[{"x":3},{"y":4}]},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}},
+        {"stages":{"3":[{"x":3},{"y":4}]},"eventSelected":null,"blocked":{},"messages":"{\"x\":3}\n{\"y\":4}","syncing":{}},
+        {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/Payloads.xml");
     try {
@@ -481,13 +559,14 @@ var debug_testPayload =function () {
         console.log(e);
         return false;
     }
-    return debug_compareResulte(resulte,expected);
+    return JSON.stringify(resulte) == JSON.stringify(expected);
 }
 
 var debug_testPayloadChange =function () {
-    var expected = [{"stages":{"2":[{"x":3}]}},
-        {"stages":{"9":[{"x":3}]}},
-        {"stages":{"14":[{"x":5}]}}];
+    var expected = [{"stages":{"2":[{"x":3}]},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}},
+        {"stages":{"9":[{"x":3}]},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}},
+        {"stages":{"14":[{"x":5}]},"eventSelected":null,"blocked":{},"messages":"{\"x\":5}","syncing":{}},
+        {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/PayloadsChange.xml");
     try {
@@ -497,14 +576,14 @@ var debug_testPayloadChange =function () {
         console.log(e);
         return false;
     }
-    return debug_compareResulte(resulte,expected);
+    return JSON.stringify(resulte) == JSON.stringify(expected);
 }
 
 var debug_testPayloadsIfElse =function () {
-    var expected = [{"stages":{"20":[{"x":5},{"x":3},{}]}},
-        {"stages":{"6":[{"x":5},{"x":3},{}]}},
-        {"stages":{"10":{"x":3}}},
-        {"stages":{}}];
+    var expected = [{"stages":{"20":[[{"x":5},{"x":3},{}]]},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}},
+        {"stages":{"21":[[{"x":5},{"x":3},{}]]},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}},
+        {"stages":{"34":[{"x":3}]},"eventSelected":null,"blocked":{},"messages":"{\"x\":3}","syncing":{}},
+        {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/PayloadsIfElse.xml");
     try {
@@ -514,7 +593,7 @@ var debug_testPayloadsIfElse =function () {
         console.log(e);
         return false;
     }
-    return debug_compareResulte(resulte,expected);
+    return JSON.stringify(resulte) == JSON.stringify(expected);
 }
 
 var runTests = function() {
@@ -538,6 +617,7 @@ var runTests = function() {
     run("ExceptionHandle", testExceptionHandle);    //check that when occur error while executing the JS code on node the execution is terminated.
     run("ExceptionHandle2", testExceptionHandle2);
     run("TicTacToe", testTicTacToe);
+    run("BsyncSections", testBsyncSections);
 
     run("debug_HelloWorld", debug_testHelloWorld);
     run("debug_RandomOrder", debug_testRequestsList);

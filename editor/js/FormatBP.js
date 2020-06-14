@@ -194,14 +194,28 @@ FormatBP.prototype.updateEdgesLabels = function (cell, graph, cellValue ) {
 FormatBP.prototype.refresh = function () {
 
     var format = this;
-    // Performance tweak: No refresh needed if not visiblevisible
-    if (this.container.style.width == '0px') {
-        return;
-    }
-
-    this.clear();
     var ui = this.editorUi;
     var graph = ui.editor.graph;
+    if (this.container.style.width == '0px' ) {
+        return;
+    }
+    if (!graph.isCellSelected() ) {
+        ui.formatWidth = (ui.formatWidth >  0.001) ? 0.001 : 240;
+        ui.formatContainer.style.display = (ui.formatWidth >  0.001) ? '' : 'none';
+        ui.refresh();
+        //ui.fireEvent(new mxEventObject('formatWidthChanged'));
+    }
+    // Performance tweak: No refresh needed if not visiblevisible
+
+
+    this.clear();
+ /*   if (!graph.isSelectionEmpty()) {
+
+        ui.formatWidth = (ui.formatWidth > 0) ? 0 : 240;
+        ui.formatContainer.style.display = (ui.formatWidth > 0) ? '' : 'none';
+        ui.refresh();
+        ui.fireEvent(new mxEventObject('formatWidthChanged'));
+    }*/
     var div = document.createElement('div');
     div.style.whiteSpace = 'nowrap';
     div.style.color = 'rgb(112, 112, 112)';
@@ -222,6 +236,12 @@ FormatBP.prototype.refresh = function () {
 
     //no shape is selected
     if (graph.isSelectionEmpty()) {
+        if (ui.format != null) {
+            ui.formatWidth = 0.001;
+            ui.formatContainer.style.display = '';
+            ui.refresh();
+           // ui.fireEvent(new mxEventObject('formatWidthChanged'));
+        }
         /*mxUtils.write(label, mxResources.get('diagram'));
 
         // Adds button to hide the format panel since
@@ -417,7 +437,7 @@ FormatBP.prototype.refresh = function () {
             NumberOfOutPutBox.setAttribute("type", "number");
             NumberOfOutPutBox.setAttribute("max", 6);
             NumberOfOutPutBox.setAttribute("min", 0);
-            if (undefined !== value.getAttribute("numberOfOutputs")) {
+            if (undefined != value.getAttribute("numberOfOutputs")) {
                 NumberOfOutPutBox.setAttribute("value", value.getAttribute("numberOfOutputs"));
             } else {
                 NumberOfOutPutBox.setAttribute("value", "1");
@@ -462,7 +482,7 @@ FormatBP.prototype.refresh = function () {
                     OutputLabelTextBox.id = "nodeID" + cell.id + "Outputnumber" + (i + 1);
                     OutputLabelTextBox.setAttribute("type", "text");
 
-                    if (undefined !== value.getAttribute("Outputnumber" + (i + 1))) {
+                    if (undefined != value.getAttribute("Outputnumber" + (i + 1))) {
                         OutputLabelTextBox.setAttribute("value", value.getAttribute("Outputnumber" + (i + 1)));
                     }
                     oneTextLabelDiv.appendChild(OutputLabelTextBox);
@@ -515,7 +535,7 @@ FormatBP.prototype.refresh = function () {
             NumberOfPayloadsBox.setAttribute("type", "number");
             NumberOfPayloadsBox.setAttribute("max", 10);
             NumberOfPayloadsBox.setAttribute("min", 1);
-            if (undefined !== value.getAttribute("numberOfPayloads")) { // fetching the last number of payloads from the node itself
+            if (undefined != value.getAttribute("numberOfPayloads")) { // fetching the last number of payloads from the node itself
                 NumberOfPayloadsBox.setAttribute("value", value.getAttribute("numberOfPayloads"));
             } else {
                 NumberOfPayloadsBox.setAttribute("value", "1");
@@ -551,7 +571,7 @@ FormatBP.prototype.refresh = function () {
                     PayloadsLabelTextBox.setAttribute("type", "text");
                     //checking if there was a former definition for the i'th payload holder
                     var parsed = JSON.parse(value.getAttribute("Payloads"));
-                    if (parsed !== null && parsed !== undefined && parsed[i] != null && parsed[i] !== undefined) {
+                    if (parsed != null && parsed != undefined && parsed[i] != null && parsed[i] != undefined) {
                         PayloadsLabelTextBox.setAttribute("value", JSON.stringify(parsed[i]));
                     }
                     oneTextLabelDiv.appendChild(PayloadsLabelTextBox);
