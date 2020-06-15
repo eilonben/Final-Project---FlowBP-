@@ -86,7 +86,7 @@ var BSyncForm = function (editorUi, cell) {
         if(cellData != null) {
             graph.getModel().beginUpdate();
             cellData.value = "Request: " + linkInput["Request"].value + "\nWait: " + linkInput["Wait"].value + "\nBlock: " + linkInput["Block"].value;
-            graph.fixSizes(cell);
+            graph.fixSizes(cell,true);
             //graph.updateCellSize(cellData, true);
             //divider.geometry.width=cellData.geometry.width;
             // cellData.geometry.width = 0;
