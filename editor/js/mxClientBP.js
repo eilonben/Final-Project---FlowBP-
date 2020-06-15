@@ -1392,8 +1392,8 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
         return null;
 
     //cases by nodes
-    if(source!=null && getshape(source.getStyle())=="general" ){
-        var numberOfOutEdges = this.getNumOfOutEdges(source);
+    if(source!=null && source.bp_type === "General" ){
+        //var numberOfOutEdges = this.getNumOfOutEdges(source);
         // if(numberOfOutEdges >= source.getAttribute('numberOfOutputs',1))
         //     return null;
         var indexLabel = this.findCurrLabel(source, state);
@@ -1408,10 +1408,10 @@ mxGraph.prototype.createEdge = function(parent, id, value, source, target, style
         value.setAttribute('label', label);
         edge.setValue(value);
     }
-   /* else if(source!=null && getshape(source.getStyle())=="bsync" ){
+   /* else if(source!=null && source.bp_type ==="BSync" ){
         var numberOfOutEdges = this.getNumOfOutEdges(source);
 
-    }else if(source!=null && getshape(source.getStyle())=="startnode" ){
+    }else if(source!=null && source.bp_type ==="StartNode" ){
         var numberOfOutEdges = this.getNumOfOutEdges(source);
     }*/
     return edge;
