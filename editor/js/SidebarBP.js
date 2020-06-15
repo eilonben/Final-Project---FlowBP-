@@ -294,6 +294,8 @@ SidebarBP.prototype.addFlowBPPalette = function()
                this.addEntry('bsync', function()
         {
             var cell = sb.createBPShape('BSync', 'flow.bsync');
+            var data = sb.graph.getChildByType(cell,'data');
+            data.value = "Request:\nWait:\nBlock: ";
             return sb.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'BSync');
         }),
 

@@ -163,7 +163,7 @@ GraphBP = function(container, model, renderHint, stylesheet, themes, standalone)
 GraphBP.prototype = Object.create(Graph.prototype);
 
 /** Override
- * if new_constraints field exist return him else return the original function
+ * if new_constraints field exist return it else return the original function
  */
 GraphBP.prototype.getAllConnectionConstraints = function(terminal, source){
      if (terminal != null && terminal.cell != null && terminal.cell.new_constraints != null)

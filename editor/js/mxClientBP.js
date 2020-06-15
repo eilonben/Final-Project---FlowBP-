@@ -757,7 +757,6 @@ mxGraphHandlerBP.prototype.moveCells = function(cells, dx, dy, clone, target, ev
 /*
 Objectives
 1. repaint edges or shapes in black after they were painted in red
-2. Prevent connect start node as a target
  */
 function mxGraphModelBP(root){
     mxGraphModel.call(this, root);
@@ -893,7 +892,6 @@ mxCodecRegistry.register(function()
 Objectives:
 1. when deleting a cell, delete the connection points icons
 2. when graph change, draw connection points of all bp shapes (call show constraint)
-3. when connection an existing edge to inner child of bp cell, reconnect the edge to the cell parent (bp cell)
  */
 function mxGraphViewBP(graph){
     mxGraphView.call(this, graph);
@@ -1636,7 +1634,7 @@ mxGraphModel.prototype.parentForCellChanged = function(cell, parent, index)
 
     if (parent != null)
     {
-        if(parent.bp_cell != null && (cell.bp_cell != null))
+        if((parent.bp_cell != null || parent.edge) && (cell.bp_cell != null))
             return previous;
         if (parent != previous || previous.getIndex(cell) != index)
         {

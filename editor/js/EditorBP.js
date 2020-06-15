@@ -1,5 +1,6 @@
-// Designed to replace the call to Graph to GraphBP
-
+/**
+ * Designed to replace the call to Graph to GraphBP
+*/
 EditorBP = function(chromeless, themes, model, graph, editable){
     Editor.call(this, chromeless, themes, model, graph, editable);
 }
