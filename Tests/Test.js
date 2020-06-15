@@ -366,33 +366,33 @@ var debug_testRequestsList = function () {
 }
 
 var debug_testHotCold = function () {
-    var expected = [{"stages":{"23":[{}],"24":[{}],"25":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}},
-        {"stages":{"26":[{}],"31":[{}],"36":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}},
-        {"stages":{"31":[{}],"41":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}},
-        {"stages":{"36":[{}],"41":[{}],"55":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}},
-        {"stages":{"46":[{}],"55":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}},
-        {"stages":{"36":[{}],"46":[{}],"60":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"46":[{}],"60":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"46":[{}],"60":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"46":[{}],"60":[{}],"67":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}},
-        {"stages":{"46":[{}],"60":[{}],"67":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"36":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}];
+    var expected = [{"stages":{"2":[{}],"3":[{}],"4":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"5":[{}],"10":[{}],"15":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"5":[{}],"10":[{}],"15":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"5":[{}],"10":[{}],"15":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}}
+    ,{"stages":{"5":[{}],"10":[{}],"15":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"10":[{}],"23":[{}],"33":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"10":[{}],"23":[{}],"33":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"10":[{}],"23":[{}],"33":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}}
+    ,{"stages":{"10":[{}],"23":[{}],"33":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"15":[{}],"23":[{}],"28":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"15":[{}],"23":[{}],"28":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"15":[{}],"23":[{}],"28":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}}
+    ,{"stages":{"15":[{}],"23":[{}],"28":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"28":[{}],"33":[{}],"41":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"28":[{}],"33":[{}],"41":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"28":[{}],"33":[{}],"41":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}}
+    ,{"stages":{"28":[{}],"33":[{}],"41":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"15":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"15":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"15":[{}],"41":[{}],"46":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}}
+    ,{"stages":{"15":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"33":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"33":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"33":[{}],"41":[{}],"46":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}}
+    ,{"stages":{"33":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"15":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HotCold.xml");
     try {

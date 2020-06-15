@@ -333,7 +333,7 @@ FormatBP.prototype.refresh = function () {
         label2.style.backgroundColor = this.inactiveTabBackgroundColor;
         label3.style.backgroundColor = this.inactiveTabBackgroundColor;
 
-        //get type of shape from cell style
+       /* //get type of shape from cell style
         var getshape = function (str) {
             var arr = str.split(";");
             var styleShape = arr[0].split("=")[1] ;
@@ -342,7 +342,7 @@ FormatBP.prototype.refresh = function () {
 
         };
 
-
+*/
         var createApplyButton = function () {
             var newButton = document.createElement("BUTTON");
             newButton.appendChild(document.createTextNode("Apply"));
@@ -364,7 +364,7 @@ FormatBP.prototype.refresh = function () {
         }
         if (graph.getModel().isEdge(cell)) {
           //Creates the right-handed toolbar for a Bsync block
-        } else if (getshape(cell.getStyle()) === "bsync") {
+        } else if (cell.bp_type ===  "BSync") {
                 var dlg = new BSyncForm(ui, cell);
                 //dlg.container.style.width="100%";
                 var cont = document.getElementsByClassName("geFormatContainer")[0];
@@ -379,7 +379,7 @@ FormatBP.prototype.refresh = function () {
                 cont.appendChild(bsyncDIV);
 
         //Creates the right-handed toolbar for a general block
-        } else if (getshape(cell.getStyle()) === "general") {
+        } else if (cell.bp_type === "General") {
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
             var generalDIV = document.createElement('div');
@@ -515,7 +515,7 @@ FormatBP.prototype.refresh = function () {
             cont.appendChild(generalDIV);
 
             //Creates the right-handed toolbar for a start block
-        } else if (getshape(cell.getStyle()) === "startnode") {
+        } else if (cell.bp_type ===  "StartNode") {
             // var dlg = new StartNodeForm(ui, cell);
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
@@ -623,7 +623,7 @@ FormatBP.prototype.refresh = function () {
 
         }
         //Creates the right-handed toolbar for a console block
-        else if (getshape(cell.getStyle()) === "console"){
+        else if (cell.bp_type === "Console"){
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
             var consoleDIV = document.createElement('div');
