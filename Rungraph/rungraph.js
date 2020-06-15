@@ -26,13 +26,14 @@ function writeToConsole(bpEngine, message, curTime, scen) {
  * and registers new BThreads for any extra output.
  */
 function* goToFollowers(c, payload, bpEngine, model, outputs, scen) {
-    let cloned = JSON.parse(JSON.stringify(payload));
+
     let edg = model.getEdges(c, false, true, true);
     let continued = false;
     let block = getshape(c.getStyle());
     if (edg.length > 0) {
         // Run extra followers in new threads
         for (let i = 1; i < edg.length; i++) {
+            let cloned = JSON.parse(JSON.stringify(payload));
             let target = edg[i].getTerminal(false);
             if (target !== undefined) {
                 let time = bpEngine.deb !== null ? bpEngine.deb.getScenarioTime(scen) : null;
@@ -52,6 +53,7 @@ function* goToFollowers(c, payload, bpEngine, model, outputs, scen) {
                 }
             }
         }
+        let cloned = JSON.parse(JSON.stringify(payload));
         // Run the first follower in the same thread.
         let target = edg[0].getTerminal(false);
         if (target !== undefined) {
@@ -94,18 +96,17 @@ function runInNewBT(c, payload, bpEngine, model, curTime) {
     bpEngine.registerBThread(function* () {
         let outputs = {};
         //cloning the payload object
+        let scen;
+        if(bpEngine.deb!=null) {
+            scen = bpEngine.deb.newScen(c, curTime, payload);
+        }
         let cloned = JSON.parse(JSON.stringify(payload));
-        outputs = handleNodeAttributes(bpEngine, c,outputs,cloned,payload,curTime, -1);
+        outputs = handleNodeAttributes(bpEngine, c,outputs,cloned,curTime, -1);
         if(outputs === -1){
             window.executeError = true;
             return;
         }
-        let scen;
         //checking if we are in debug mode
-        if(bpEngine.deb!=null) {
-            scen = bpEngine.deb.newScen(c, curTime, cloned);
-        }
-
         if (c.getAttribute("Request") !== undefined || c.getAttribute("Wait") !==undefined || c.getAttribute("Block")!==undefined ) {
             let requested = handleBsync("Request",c,cloned);
             if(requested === -1) {
@@ -130,7 +131,7 @@ function runInNewBT(c, payload, bpEngine, model, curTime) {
 };
 
 function getshape(str) {
-    if(str == null || str == undefined)
+    if(str == null || str === undefined)
         return "";
     let arr = str.split(";");
     arr = arr[0].split("=")[1] != null ? arr[0].split("=")[1].split(".")[1] : "";
@@ -142,9 +143,9 @@ function getshape(str) {
 * "sync" for the sync section in bsync nodes
 * "log" for the code section in console nodes
  **/
-function handleNodeAttributes(bpEngine, c, outputs, cloned, payload, curTime, scen) {
+function handleNodeAttributes(bpEngine, c, outputs, cloned, curTime, scen) {
     if(getshape(c.getStyle()) === "console") {
-        writeToConsole(bpEngine, JSON.stringify(payload), curTime, scen);
+        writeToConsole(bpEngine, JSON.stringify(cloned), curTime, scen);
     }
     if (c.getAttribute("code") !== undefined) {
         try {
@@ -186,15 +187,14 @@ function handleNodeAttributes(bpEngine, c, outputs, cloned, payload, curTime, sc
  */
 function* runInSameBT(c, payload, bpEngine, model, scen) {
     let outputs = {};
-    let cloned = JSON.parse(JSON.stringify(payload));
+
     //checking if we are in debug mode
     if (bpEngine.deb != null) {
-        bpEngine.deb.updateScen(scen, c, cloned);
+        bpEngine.deb.updateScen(scen, c, payload);
     }
 
-    cloned = JSON.parse(JSON.stringify(payload));
-
-    outputs = handleNodeAttributes(bpEngine, c, outputs, cloned, payload, -1, scen);
+    let cloned = JSON.parse(JSON.stringify(payload));
+    outputs = handleNodeAttributes(bpEngine, c, outputs, cloned, -1, scen);
     if(outputs === -1){
         window.executeError = true;
         return;
