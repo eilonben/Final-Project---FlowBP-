@@ -250,10 +250,11 @@ GraphBP.prototype.fixSizes = function(cell, saveDataHeight) {
     var divider = this.getChildByType(cell, 'divider2');
     var divider1 = this.getChildByType(cell, 'divider');
 
-    if (data !== null && payloads !== undefined) {
+    if(payloads !== undefined)
         this.cellSizeUpdated(payloads, true);
+    if (data !== null)
         this.cellSizeUpdated(data, true);
-    }
+
     var cellGeo = mod.getGeometry(cell).clone();
     var dataGeo = mod.getGeometry(data).clone();
     var payloadsGeo = mod.getGeometry(payloads).clone();
@@ -276,7 +277,6 @@ GraphBP.prototype.fixSizes = function(cell, saveDataHeight) {
 
     payloadsGeo.width = cellGeo.width;
     payloadsGeo.y = dividerGeo.y + dividerGeo.height;
-    //payloadsGeo.y = dividerGeo.y + dividerGeo.height;
 
     mod.setGeometry(cell, cellGeo);
     mod.setGeometry(data, dataGeo);
