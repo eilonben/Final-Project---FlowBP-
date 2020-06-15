@@ -18,18 +18,16 @@ debuggerBP.prototype.mod = null;
 // Pre-debbuging info
 // Index of the last undo action in the Undo manager
 debuggerBP.prototype.lastUndo = 0;
-// Cells' sizes
-debuggerBP.prototype.lastCellsSizes = {};
 // Cells' values
 debuggerBP.prototype.lastCellValues = {};
-
-// Cells' sizes without payloads
-debuggerBP.prototype.cellDef = {};
 
 // Number of actions made when the graph was fixed (size/color-wise) before the debugging started
 debuggerBP.prototype.isFixed = 0;
 // Indicator for pre-debugging layer's locking
 debuggerBP.prototype.isLocked = 0;
+
+// Cells' sizes after fixed to their debugging size (payload section is visible)
+debuggerBP.prototype.cellsSizes = {};
 
 // Indicator for type of display during the debugging
 debuggerBP.prototype.toHorizontal = false;
@@ -71,7 +69,6 @@ debuggerBP.prototype.syncing = [];
 // Saves pre-debugging info such as stencils sizes, last undo index in undo manager and cell labels
 debuggerBP.prototype.savePreDebuggingInfo = function () {
     this.lastUndo = this.editor.undoManager.indexOfNextAdd;
-    this.lastCellsSizes = this.getCellsSizes();
     this.lastCellValues = this.getValues();
 }
 
@@ -131,10 +128,18 @@ debuggerBP.prototype.fixAllSizes = function () {
 // and the console to it's current message.
 debuggerBP.prototype.setDebuggingSteps = function () {
     var rec = this.getProgramRecord();
+    this.editor.undoManager.size += rec.length * 2;
     this.updateVertexCells(rec);
     this.setConsoleSteps(rec);
 }
 
+/*
+ * startDebugging:
+ *      1. Saves the graph state before starting the program execution display.
+ *      2. Lock all layers in order to prevent changes as long as the execution is displayed.
+ *      3. Using the undoManger, sets the graph state in accordance to every
+ *         time unit in the program execution record.
+ */
 debuggerBP.prototype.startDebugging = function(toHorizontal){
 
     this.toHorizontal = toHorizontal;
@@ -142,9 +147,7 @@ debuggerBP.prototype.startDebugging = function(toHorizontal){
     this.savePreDebuggingInfo();
     updateConsoleMessage("");
 
-    this.editor.undoManager.size = 10000;
-
-    //lock the option to create news edges
+    // lock the option to create news edges
     let tmpCells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
     tmpCells.forEach(cell => cell.connectable=false);
 
@@ -160,7 +163,7 @@ debuggerBP.prototype.startDebugging = function(toHorizontal){
 
     // Saves the sizes of cells after fixing their sizes for debugging purpose
     // int order to set a cell's size to this size when there is no payload in it
-    this.cellDef = this.getCellsSizes();
+    this.cellsSizes = this.getCellsSizes();
 
     this.setDebuggingSteps();
 
@@ -201,9 +204,7 @@ debuggerBP.prototype.endDebugging = function() {
     this.graph.clearSelection();
     updateConsoleMessage("");
 
-    //this.setLabels();
     this.fixAllOutputsLabels();
-    this.fixDataCells();
     this.makePayloadSectionsVisible(false);
 }
 
@@ -267,11 +268,12 @@ debuggerBP.prototype.getCellsSizes = function() {
     return res;
 }
 
+// Sets a cell's size to size with/without payload.
 debuggerBP.prototype.fixSizes = function(cell, toDef) {
     if(toDef){
         var geo = this.mod.getGeometry(cell).clone();
-        geo.width = this.cellDef[cell.id].width;
-        geo.height = this.cellDef[cell.id].height;
+        geo.width = this.cellsSizes[cell.id].width;
+        geo.height = this.cellsSizes[cell.id].height;
         this.mod.setGeometry(cell, geo);
     }
     else {
@@ -342,8 +344,8 @@ debuggerBP.prototype.updateCell = function(cell, payload, blocked, syncing) {//b
 // Sets cell's size, content and color to their original (pre-debugging) values
 debuggerBP.prototype.setToOriginal = function (cell) {
     var geo = this.mod.getGeometry(cell).clone();
-    geo.width = this.lastCellsSizes[cell.id].width;
-    geo.height = this.lastCellsSizes[cell.id].height;
+    geo.width = this.cellsSizes[cell.id].width;
+    geo.height = this.cellsSizes[cell.id].height;
     var val = this.lastCellValues[cell.id];
     if (cell.bp_cell && cell.bp_type !== "startnode"){
         cell.children.forEach(child =>{

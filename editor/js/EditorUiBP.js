@@ -70,8 +70,7 @@ EditorUiBP.prototype.createTemporaryGraph = function(stylesheet)
     return graph;
 };
 
-// EditorUiBP.prototype.constructor = EditorUi;
-
+// Disables all the actions in the editor except debugging actions
 EditorUiBP.prototype.disableActionsForDebugging = function () {
 
     var actions = Object.values(this.actions.actions);
@@ -88,7 +87,7 @@ EditorUiBP.prototype.disableActionsForDebugging = function () {
     }
 }
 
-
+// Enables all the actions in the editor (which were enabled before the debugging) except debugging actions
 EditorUiBP.prototype.enableActionsAfterDebugging = function () {
 
     for (var i = 0; i < EditorUiBP.prototype.preDebugActions.length; i++) {
@@ -102,33 +101,37 @@ EditorUiBP.prototype.enableActionsAfterDebugging = function () {
     }
 }
 
+// Closes the side menus in order to prevent graph changes during the execution display
 EditorUiBP.prototype.startDebugging = function () {
+    this.editor.graph.clearSelection();
     this.disableActionsForDebugging();
-
     this.toggleFormatPanel(true);
-    this.sidebar.showTooltips = false;
-    this.sidebarContainer.style.width = '0px';
-    this.diagramContainer.style.left = '12px';
-    this.hsplit.style.left = '0px';
+    this.diagramContainer.style.left = '0px';
+    this.hsplit.style.visibility = 'hidden';
     this.sidebarContainer.style.visibility = 'hidden';
 }
 
+// Opens the sidebar menu and fixes the working sheet's location
 EditorUiBP.prototype.endDebugging = function () {
     this.enableActionsAfterDebugging();
-    this.hsplit.style.left = '12px';
     this.sidebarContainer.style.visibility = 'visible';
+    this.hsplit.style.visibility = 'visible';
     this.toggleFormatPanel();
+    this.resetScrollbars();
 }
 
+// Disables the redo and undo buttons
 EditorUiBP.prototype.noUndoRedo = function () {
     this.actions.get('undo').setEnabled(false);
     this.actions.get('redo').setEnabled(false);
 }
 
+// Enables/Disables the debug_back button
 EditorUiBP.prototype.enableDebugBack = function (bool) {
     this.actions.get('debug_back').setEnabled(bool);
 }
 
+// Enables/Disables the debug_next button
 EditorUiBP.prototype.enableDebugNext = function (bool) {
     this.actions.get('debug_next').setEnabled(bool);
 }
@@ -145,6 +148,7 @@ EditorUiBP.prototype.saveFile = function(forceDialog)
     }
 };
 
+// Sets the graph view to horizontal view withput putting the action in the undoManger
 EditorUiBP.prototype.fixView = function() {
     var graph = this.editor.graph;
     var cells = Object.values(graph.model.cells);
