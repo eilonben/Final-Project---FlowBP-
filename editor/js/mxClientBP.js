@@ -274,13 +274,16 @@ function mxConstraintHandlerBP(graph){
     //{key: cell id; value: connection point image}
     this.focusIcons = {};
 
+
 };
+var loc = window.location.pathname;
+mxConstraintHandlerBP.imageBasePathBP = loc.substring(0, loc.lastIndexOf('/')) + '/Image';
 
 mxConstraintHandlerBP.prototype = Object.create(mxConstraintHandler.prototype);
 
-mxConstraintHandlerBP.prototype.OutputPointImage = new mxImage(mxClient.imageBasePath + '/output.png', 10, 10);
+mxConstraintHandlerBP.prototype.OutputPointImage = new mxImage(mxConstraintHandlerBP.imageBasePathBP + '/output.png', 10, 10);
 
-mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxClient.imageBasePath + '/input.png', 10, 10);
+mxConstraintHandlerBP.prototype.InputPointImage = new mxImage(mxConstraintHandlerBP.imageBasePathBP + '/input.png', 10, 10);
 
 mxConstraintHandlerBP.prototype.highlightColor = '#808080';
 
