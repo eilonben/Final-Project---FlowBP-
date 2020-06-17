@@ -515,7 +515,7 @@ FormatBP.prototype.refresh = function () {
             cont.appendChild(generalDIV);
 
             //Creates the right-handed toolbar for a start block
-        } else if (cell.bp_type ===  "StartNode") {
+        } else if (cell.bp_type ===  "startnode") {
             // var dlg = new StartNodeForm(ui, cell);
             var cont = document.getElementsByClassName("geFormatContainer")[0];
             cont.style.width = "22%";
