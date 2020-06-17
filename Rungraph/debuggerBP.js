@@ -2,7 +2,6 @@
  * debbugerBP responsibility is to record information during a program execution, and display this record on demand.
  * The constructor gets the relevant UI as an argument in order to make the changes needed for debugging display.
 */
-
 function debuggerBP(ui){
     this.ui = ui;
     this.editor = ui.editor;
@@ -19,8 +18,6 @@ debuggerBP.prototype.mod = null;
 // Pre-debbuging info
 // Index of the last undo action in the Undo manager
 debuggerBP.prototype.lastUndo = 0;
-// Cells' sizes
-debuggerBP.prototype.lastCellsSizes = {};
 // Cells' values
 debuggerBP.prototype.lastCellValues = {};
 
@@ -28,6 +25,9 @@ debuggerBP.prototype.lastCellValues = {};
 debuggerBP.prototype.isFixed = 0;
 // Indicator for pre-debugging layer's locking
 debuggerBP.prototype.isLocked = 0;
+
+// Cells' sizes after fixed to their debugging size (payload section is visible)
+debuggerBP.prototype.cellsSizes = {};
 
 // Indicator for type of display during the debugging
 debuggerBP.prototype.toHorizontal = false;
@@ -41,7 +41,7 @@ debuggerBP.prototype.scenCounter = 0;
  * For example: x = [-1, -1, -1, 4, 4] indicates that scenario x took part from time = 3,
  * (-1 indicates this scenario didn't took part at this time),
  * and it's payload stayed for 2 time units at block number 4 (cell.id)
- * scenarios field holed a list of all the scenarios on the program execution
+ * scenarios field holds a list of all the scenarios on the program execution
 */
 debuggerBP.prototype.scenarios = {};
 
@@ -49,23 +49,30 @@ debuggerBP.prototype.scenarios = {};
 // where null represents a time slot without a new message
 debuggerBP.prototype.consoleSteps = [""];
 
-// events represents the event occurred during the execution at each time unit
+/* events represents the event occurred during the execution at each time unit.
+ * for example: events = [null, null, "X(0,1)"] indicates that in time = 2 event "X(0,1)" occurred.
+*/
 debuggerBP.prototype.events = [];
 
-// events represents the event occurred during the execution at each time unit
+/* messages represents the message occurred during the execution at each time unit.
+ * Messages can be occurred when entering a console_block.
+ * for example: messages = [null, null, "{"G":2}"] indicates that in time = 2 message "X(0,1)" was printed.
+*/
 debuggerBP.prototype.messages = [];
 
-// events represents the event occurred during the execution at each time unit
+/* syncing represents the sets of syncing blocks at each time unit.
+ * for example: syncing = [null, null, {4,2}, null] indicates that in time = 2 blocks number
+ * 4 and 2 got into syncing state.
+*/
 debuggerBP.prototype.syncing = [];
 
 // Saves pre-debugging info such as stencils sizes, last undo index in undo manager and cell labels
 debuggerBP.prototype.savePreDebuggingInfo = function () {
     this.lastUndo = this.editor.undoManager.indexOfNextAdd;
-    this.lastCellsSizes = this.getCellsSizes();
     this.lastCellValues = this.getValues();
 }
 
-// Return a map of cells ID's and their values
+// Returns a map of cells ID's and their values
 debuggerBP.prototype.getValues = function(){
     var res = {};
 
@@ -104,23 +111,35 @@ debuggerBP.prototype.makePayloadSectionsVisible = function (bool) {
     })
 }
 
-// Fixes cells sizes at the beginning of the debugging.
+// Fixes cells sizes at the beginning of the debugging (in accordance to their children- payload, data...).
 debuggerBP.prototype.fixAllSizes = function () {
-    let isFixed = this.editor.undoManager.indexOfNextAdd;
+    this.mod.beginUpdate();
+
     let cells = Object.values(this.mod.cells).filter(cell => cell.isBPCell());
     cells.forEach(cell => this.fixSizes(cell, false));
     this.fixAllOutputsLabels();
     if(this.toHorizontal)
         this.ui.fixView();
-    this.isFixed = this.editor.undoManager.indexOfNextAdd - isFixed;
+
+    this.mod.endUpdate();
 }
 
+// For each time unit, sets every cell to it's current state (payload, blocked/not blocked, syncing/not syncing),
+// and the console to it's current message.
 debuggerBP.prototype.setDebuggingSteps = function () {
     var rec = this.getProgramRecord();
+    this.editor.undoManager.size += rec.length * 2;
     this.updateVertexCells(rec);
     this.setConsoleSteps(rec);
 }
 
+/*
+ * startDebugging:
+ *      1. Saves the graph state before starting the program execution display.
+ *      2. Lock all layers in order to prevent changes as long as the execution is displayed.
+ *      3. Using the undoManger, sets the graph state in accordance to every
+ *         time unit in the program execution record.
+ */
 debuggerBP.prototype.startDebugging = function(toHorizontal){
 
     this.toHorizontal = toHorizontal;
@@ -128,9 +147,7 @@ debuggerBP.prototype.startDebugging = function(toHorizontal){
     this.savePreDebuggingInfo();
     updateConsoleMessage("");
 
-    this.editor.undoManager.size = 10000;
-
-    //lock the option to create news edges
+    // lock the option to create news edges
     let tmpCells = Object.values(this.mod.cells).filter(cell => cell.isVertex());
     tmpCells.forEach(cell => cell.connectable=false);
 
@@ -140,7 +157,13 @@ debuggerBP.prototype.startDebugging = function(toHorizontal){
     this.isLocked = this.editor.undoManager.indexOfNextAdd - isLocked;
 
     // Fixes the sizes of every cell according to it's content
+    let isFixed = this.editor.undoManager.indexOfNextAdd;
     this.fixAllSizes();
+    this.isFixed = this.editor.undoManager.indexOfNextAdd - isFixed;
+
+    // Saves the sizes of cells after fixing their sizes for debugging purpose
+    // int order to set a cell's size to this size when there is no payload in it
+    this.cellsSizes = this.getCellsSizes();
 
     this.setDebuggingSteps();
 
@@ -181,9 +204,7 @@ debuggerBP.prototype.endDebugging = function() {
     this.graph.clearSelection();
     updateConsoleMessage("");
 
-    //this.setLabels();
     this.fixAllOutputsLabels();
-    this.fixDataCells();
     this.makePayloadSectionsVisible(false);
 }
 
@@ -247,11 +268,12 @@ debuggerBP.prototype.getCellsSizes = function() {
     return res;
 }
 
+// Sets a cell's size to size with/without payload.
 debuggerBP.prototype.fixSizes = function(cell, toDef) {
     if(toDef){
         var geo = this.mod.getGeometry(cell).clone();
-        geo.width = this.lastCellsSizes[cell.id].width;
-        geo.height = this.lastCellsSizes[cell.id].height;
+        geo.width = this.cellsSizes[cell.id].width;
+        geo.height = this.cellsSizes[cell.id].height;
         this.mod.setGeometry(cell, geo);
     }
     else {
@@ -322,8 +344,8 @@ debuggerBP.prototype.updateCell = function(cell, payload, blocked, syncing) {//b
 // Sets cell's size, content and color to their original (pre-debugging) values
 debuggerBP.prototype.setToOriginal = function (cell) {
     var geo = this.mod.getGeometry(cell).clone();
-    geo.width = this.lastCellsSizes[cell.id].width;
-    geo.height = this.lastCellsSizes[cell.id].height;
+    geo.width = this.cellsSizes[cell.id].width;
+    geo.height = this.cellsSizes[cell.id].height;
     var val = this.lastCellValues[cell.id];
     if (cell.bp_cell && cell.bp_type !== "startnode"){
         cell.children.forEach(child =>{
@@ -384,7 +406,14 @@ function updateConsoleMessage(msg) {
     }
 };
 
-// Fixes all the scenarios to the current time unit (max length of the scenarios)
+debuggerBP.prototype.addSyncing = function (curScen) {
+    if (this.syncing[curScen.length] === null)
+        this.syncing[curScen.length] = new Set();
+    this.syncing[curScen.length].add(curScen[curScen.length - 1][0]);
+}
+
+// Fixes the arrays of syncing, blocks, messages and all the scenarios to the current
+// time unit (max length of the scenarios)
 debuggerBP.prototype.fixStages = function() {
 
     let scens = Object.values(this.scenarios);
@@ -393,9 +422,8 @@ debuggerBP.prototype.fixStages = function() {
 
     //fix syncing
     let numOfFixes = curTime - this.syncing.length;
-    for (let j = 0; j < numOfFixes + 1; j++)
-        this.syncing.push([]);
-    this.syncing.push([]);
+    for (let j = 0; j < numOfFixes + 2; j++)
+        this.syncing.push(null);
 
     //fix scenes
     for (let i = 0; i < scens.length; i++) {
@@ -403,7 +431,7 @@ debuggerBP.prototype.fixStages = function() {
         let numOfFixes = curTime - curScen.length;
         for (let j = 0; j < numOfFixes + 2; j++) {
             if(curScen[curScen.length - 1][0] !== -1)
-                this.syncing[curScen.length].push(curScen[curScen.length - 1][0]);
+                this.addSyncing(curScen);
             curScen.push(curScen[curScen.length - 1]);
         }
         curScen.push(curScen[curScen.length - 1]);
@@ -411,25 +439,25 @@ debuggerBP.prototype.fixStages = function() {
 
     //fix events
     numOfFixes = curTime - this.events.length;
-    for (let j = 0; j < numOfFixes + 1; j++)
+    for (let j = 0; j < numOfFixes + 2; j++)
         this.events.push(-1);
-    this.events.push([]);
 
     // fix blocked
     numOfFixes = curTime - this.blocked.length;
-    for (let j = 0; j < numOfFixes + 2; j++)
+    for (let j = 0; j < numOfFixes + 3; j++)
         this.blocked.push(null);
-    this.blocked.push([]);
 
 };
 
 debuggerBP.prototype.addEvent = function(e) {
     this.fixStages();
-    this.events[this.events.length - 1].push(e);
+    this.events[this.events.length - 1] = e;
 }
 
 debuggerBP.prototype.addBlocked = function(c) {
-    this.blocked[this.blocked.length - 1].push(c);
+    if(this.blocked[this.blocked.length - 1] === null)
+        this.blocked[this.blocked.length - 1] = new Set();
+    this.blocked[this.blocked.length - 1].add(c);
 }
 
 debuggerBP.prototype.getNumOfSteps = function(){
@@ -452,8 +480,40 @@ function eqSet(as, bs) {
     return true;
 }
 
-// Builds a program record, where each cell of the output contains the content of cells,
-// the selected event and the blocked/wait blocks
+/* Builds a program record, where each cell of the output contains the content of cells,
+ * the selected event, the blocked blocks and blocks at syncing point at each time unit.
+ * For example:
+ * rec = [{stages: {2: [{"X": 4}, {"Y": 6}]},
+ *          eventSelected: null,
+ *          blocked: {},
+ *          messages:null,
+ *          syncing: {}},
+ *        {stages: {3: [{"X": 3}, {"Y": 4}], 4: [{"X": 5}, {"Y": 7}]},
+ *          eventSelected: null,
+ *          blocked: {},
+ *          messages:["Hello", "World"]],
+ *          syncing: {}},
+ *        {stages: {3: [{"X": 3}, {"Y": 4}], 4: [{"X": 5}, {"Y": 7}]},
+ *          eventSelected: null,
+ *          blocked: {},
+ *          messages: null,
+ *          syncing: {3, 4}},
+ *        {stages: {3: [{"X": 3}, {"Y": 4}], 4: [{"X": 5}, {"Y": 7}]},
+ *          eventSelected: "X",
+ *          blocked: {},
+ *          messages: null,
+ *          syncing: {3, 4}},
+ *        {stages: {3: [{"X": 3}, {"Y": 4}], 4: [{"X": 5}, {"Y": 7}]},
+ *          eventSelected: null,
+ *          blocked: {5}},
+ *          messages: null,
+ *          syncing: {}}]
+ * Every cell in this list represents the program state at this time unit.
+ * For example, at time = 0 block number 2 holds two payloads- {"X": 4} and {"Y": 6}, there are no
+ * blocked blocks, no blocks in syncing state, no messages and no selected event.
+ * At time = 2 blocks number 3 and 4 are at syncing state, and at time = 3 an event has been selected.
+ * At time = 4 blocks number 3 and 4 holds some payloads, and block number 5 is blocked.
+*/
 debuggerBP.prototype.getProgramRecord = function() {
     var res = []
     var curBlocked = new Set();
@@ -474,9 +534,9 @@ debuggerBP.prototype.getProgramRecord = function() {
         if(this.messages[step] != "")
             curStage.messages = this.messages[step];
         if(this.blocked[step] != null)
-            curBlocked = new Set(this.blocked[step]);
+            curBlocked = this.blocked[step];
         curStage.blocked = curBlocked;
-        curStage.syncing = new Set(this.syncing[step]);
+        curStage.syncing = this.syncing[step] !== null ? this.syncing[step] : new Set();
         if((Object.values(curStage.stages).length > 0 || curStage.eventSelected !== null) && diff(lastStage, curStage))
             res.push(curStage)
         lastStage = curStage;
@@ -538,7 +598,7 @@ debuggerBP.prototype.endRecord = function() {
     //fix syncing
     let numOfFixes = curTime - this.syncing.length;
     for (let j = 0; j < numOfFixes; j++)
-        this.syncing.push([]);
+        this.syncing.push(null);
 
     //fix scenes
     for (let i = 0; i < scens.length; i++) {
@@ -557,5 +617,4 @@ debuggerBP.prototype.endRecord = function() {
     numOfFixes = curTime - this.blocked.length;
     for (let j = 0; j < numOfFixes + 1; j++)
         this.blocked.push(null);
-
 }
