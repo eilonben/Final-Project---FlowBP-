@@ -303,16 +303,16 @@ var testBsyncSections =function () {
 }
 
 var debug_testHelloWorld = function () {
-    var expected = [{"stages":{"28":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"29":[{}]},"eventSelected":["Hello"],"blocked":{},"syncing":{}},
-        {"stages":{"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"34":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"34":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"34":[{}]},"eventSelected":["World"],"blocked":{},"syncing":{}},
-        {"stages":{"34":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}];
+    var expected = [{"stages":{"28":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"29":[{}]},"eventSelected":"Hello","blocked":{},"syncing":{}}
+    ,{"stages":{"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"34":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"34":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"34":[{}]},"eventSelected":"World","blocked":{},"syncing":{}}
+    ,{"stages":{"34":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/Hello_World.xml");
     try {
@@ -327,18 +327,18 @@ var debug_testHelloWorld = function () {
 }
 
 var debug_testRequestsList = function () {
-    var expected = [[{"stages":{"9":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{"10":[{}]},"eventSelected":["Goodbye"],"blocked":{},"syncing":{}},
-        {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-        {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
-        [{"stages":{"9":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"10":[{}]},"eventSelected":["Hi"],"blocked":{},"syncing":{}},
-            {"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}]];
+    var expected = [[{"stages":{"9":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{"10":[{}]},"eventSelected":"Goodbye","blocked":{},"syncing":{}}
+    ,{"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+    ,{"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
+        [{"stages":{"9":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"10":[{}]},"eventSelected":"Hi","blocked":{},"syncing":{}}
+        ,{"stages":{"10":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}]];
     var statistic=[0,0];
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HiOrGoodbye.xml");
@@ -369,30 +369,31 @@ var debug_testHotCold = function () {
     var expected = [{"stages":{"2":[{}],"3":[{}],"4":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"5":[{}],"10":[{}],"15":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"5":[{}],"10":[{}],"15":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
-    ,{"stages":{"5":[{}],"10":[{}],"15":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}}
+    ,{"stages":{"5":[{}],"10":[{}],"15":[{}]},"eventSelected":"Hot","blocked":{},"syncing":{}}
     ,{"stages":{"5":[{}],"10":[{}],"15":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"10":[{}],"23":[{}],"33":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"10":[{}],"23":[{}],"33":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
-    ,{"stages":{"10":[{}],"23":[{}],"33":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}}
+    ,{"stages":{"10":[{}],"23":[{}],"33":[{}]},"eventSelected":"Cold","blocked":{},"syncing":{}}
     ,{"stages":{"10":[{}],"23":[{}],"33":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"15":[{}],"23":[{}],"28":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"15":[{}],"23":[{}],"28":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
-    ,{"stages":{"15":[{}],"23":[{}],"28":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}}
+    ,{"stages":{"15":[{}],"23":[{}],"28":[{}]},"eventSelected":"Hot","blocked":{},"syncing":{}}
     ,{"stages":{"15":[{}],"23":[{}],"28":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"28":[{}],"33":[{}],"41":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"28":[{}],"33":[{}],"41":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
-    ,{"stages":{"28":[{}],"33":[{}],"41":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}}
+    ,{"stages":{"28":[{}],"33":[{}],"41":[{}]},"eventSelected":"Cold","blocked":{},"syncing":{}}
     ,{"stages":{"28":[{}],"33":[{}],"41":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"15":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"15":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
-    ,{"stages":{"15":[{}],"41":[{}],"46":[{}]},"eventSelected":["Hot"],"blocked":{},"syncing":{}}
+    ,{"stages":{"15":[{}],"41":[{}],"46":[{}]},"eventSelected":"Hot","blocked":{},"syncing":{}}
     ,{"stages":{"15":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"33":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"33":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
-    ,{"stages":{"33":[{}],"41":[{}],"46":[{}]},"eventSelected":["Cold"],"blocked":{},"syncing":{}}
+    ,{"stages":{"33":[{}],"41":[{}],"46":[{}]},"eventSelected":"Cold","blocked":{},"syncing":{}}
     ,{"stages":{"33":[{}],"41":[{}],"46":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{"15":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
     ,{"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}];
+
     var resulte = [];
     var xml = loadXMl("XML_for_tests/HotCold.xml");
     try {
@@ -407,113 +408,113 @@ var debug_testHotCold = function () {
 
 var debug_testRandomOrder = function () {
     var expected = [
-        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":"3","blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":"1","blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":"2","blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":"4","blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
 
-        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":"1","blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":"2","blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":"3","blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":"4","blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
 
-        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":"1","blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":"3","blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":"4","blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":"2","blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
 
-        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":"3","blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":"4","blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":"1","blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":"2","blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
 
-        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
-            {"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":"1","blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":"3","blocked":{},"syncing":{}}
+        ,{"stages":{"19":[{}],"24":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":"2","blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":"4","blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}],
 
-        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":["3"],"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":["1"],"blocked":{},"syncing":{}},
-            {"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["4"],"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":["2"],"blocked":{},"syncing":{}},
-            {"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}},
-            {"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}]
+        [{"stages":{"12":[{}],"13":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":"3","blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"19":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":"1","blocked":{},"syncing":{}}
+        ,{"stages":{"14":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":"4","blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":"2","blocked":{},"syncing":{}}
+        ,{"stages":{"24":[{}],"29":[{}]},"eventSelected":null,"blocked":{},"syncing":{}}
+        ,{"stages":{},"eventSelected":null,"blocked":{},"messages":null,"syncing":{}}]
     ];
 
     var statistic=[0,0,0,0,0,0];
