@@ -785,7 +785,7 @@ mxGraphModel.prototype.terminalForCellChanged = function(edge, terminal, isSourc
         terminal.insertEdge(edge, isSource);
 
         //	repaint eadge or shape in black
-        if(terminal.repaint)
+        if(terminal.repaint && ((terminal.isStartNode()) || (!isSource && terminal.isBPCell())))
         {
             var new_style = mxUtils.setStyle(terminal.getStyle(), 'strokeColor', '#000000');
             //after fixing the cell it will repaint in black
