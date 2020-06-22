@@ -35,23 +35,29 @@ function checkCellValidation(cell) {
 
     }
     //shape - start node
-    else if(getshape(cell.getStyle()) == "startnode") {
+    else if(cell.isStartNode()) {
             var startNode = cell;
             if(startNode.edges == null || startNode.edges.length == 0)
                 return false;
+    }
+    //shape - shape without source
+    else if(cell.isBPCell()) {
+        //check if the shape contains input edges
+        if(cell.edges == null || cell.edges.filter(e => e.target == cell).length == 0)
+            return false;
     }
     return true;
 }
 
 /**
- * find all invalid cells in the graph and paint them
+ * find all invalid cells in the graph and paint them, and check if any start node exists
  * @param model - <mxGraphModel> to check his cells validation
- * @returns {Array<mxCell>}
+ * @returns {Array}
  */
 function findInvalidCells(model) {
     var invalidCells = [];
     const cells = Object.values(model.cells);
-
+    // find all invalid cells in the graph and paint them
     for (var i = 0; i < cells.length; i++) {
         if(!checkCellValidation(cells[i]))
             invalidCells.push(cells[i]);
@@ -59,6 +65,23 @@ function findInvalidCells(model) {
     paint_cells(model, invalidCells);
     return invalidCells;
 };
+
+/**
+ * check Graph Validation
+ * @param model - <mxGraphModel> to check his cells validation
+ * @returns {string}
+ */
+function checkGraphValidation(model){
+
+    const cells = Object.values(model.cells);
+    let startNodeMissing = cells.filter(cell => cell.isStartNode()).length == 0;
+
+    let invalidCells = findInvalidCells(model);
+
+    var output = (startNodeMissing ? "Missing start node\n" : "") +
+        (invalidCells.length > 0 ? "Disconnected node or edge" : "");
+    return output;
+}
 
 /**
  * @param xml_code

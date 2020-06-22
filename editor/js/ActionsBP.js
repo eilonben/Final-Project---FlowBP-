@@ -46,12 +46,10 @@ ActionsBP.prototype.init = function (actions) {
 
         var code = mxUtils.getPrettyXml(ui.editor.getGraphXml());
 
-        // if invalidCells is not empty -> there are edges without source or target OR start node without edges
-        var invalidCells = findInvalidCells(graph.getModel());
-
-        //Confirm that the graph is valid
-        if(invalidCells.length !== 0)
-            mxUtils.alert("Graph is Invalid! lonely start node or edge");
+        // check graph validation
+        var ValidationMassage = checkGraphValidation(graph.getModel());
+        if (ValidationMassage !== "")
+            mxUtils.alert("Graph is Invalid!\n" + ValidationMassage);
         else
         {
             showConsole.call(this);
@@ -107,8 +105,9 @@ ActionsBP.prototype.init = function (actions) {
         }
 
         // if invalidCells is not empty -> there are edges without source or target OR start node without edges
-        if (findInvalidCells(graph.getModel()).length != 0) {
-            mxUtils.alert("Graph is Invalid! disconnected start node or edge");
+        var ValidationMassage = checkGraphValidation(graph.getModel());
+        if (ValidationMassage !== "") {
+            mxUtils.alert("Graph is Invalid!\n" + ValidationMassage);
             return;
         }
         if(window.executeError) {
