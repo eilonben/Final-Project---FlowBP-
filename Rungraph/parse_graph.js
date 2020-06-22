@@ -66,7 +66,11 @@ function findInvalidCells(model) {
     return invalidCells;
 };
 
-
+/**
+ * check Graph Validation
+ * @param model - <mxGraphModel> to check his cells validation
+ * @returns {string}
+ */
 function checkGraphValidation(model){
 
     const cells = Object.values(model.cells);
