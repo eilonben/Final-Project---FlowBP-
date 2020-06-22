@@ -119,7 +119,7 @@ ActionsBP.prototype.init = function (actions) {
 
         showConsole.call(this);
 
-        deb.startDebugging(true);
+        deb.startDebugging(false);
 
     }, null, null);
 

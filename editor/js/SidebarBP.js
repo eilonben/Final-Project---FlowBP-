@@ -243,10 +243,10 @@ SidebarBP.prototype.setCellAttributes = function(value, geometry, style, type, b
 SidebarBP.prototype.createBPShape = function(name, shape)
 {
     // data
-    let textGeometry = new mxGeometry(0, mxGraph.headLineSize, 0, 0);
+    let textGeometry = new mxGeometry(0, mxGraph.headLineSize, 160, 90 - mxGraph.headLineSize);
     let textStyle = 'text;fillColor=none;align=left;verticalAlign=top;overflow=hidden;rotatable=0;points=[];part=1;resizeParent=1;';
     let data = this.setCellAttributes('', textGeometry,textStyle,'data',false, true);
-
+    // this.graph.cellSizeUpdated(data, true);
     // divider line
     let dividerGeometry = new mxGeometry(0, mxGraph.headLineSize * 0.7, 160, 8);
     let lineStyle = 'line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;rotatable=0;points=[];part=1;resizeParent=1;connectable=0;';

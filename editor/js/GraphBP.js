@@ -243,21 +243,26 @@ Graph.prototype.selectAllForDebugging = function() {
  * adjust all inner cells sizes of bp shape cell
  * @param cell - <mxCell>
  */
-GraphBP.prototype.fixSizes = function(cell) {
+GraphBP.prototype.fixSizes = function(cell, saveDataHeight) {
     var mod = this.getModel();
     var payloads = this.getChildByType(cell, 'payloads');
     var data = this.getChildByType(cell, 'data');
     var divider = this.getChildByType(cell, 'divider2');
     var divider1 = this.getChildByType(cell, 'divider');
-    if (data !== null && payloads !== undefined) {
+
+    if(payloads !== undefined)
         this.cellSizeUpdated(payloads, true);
+    if (data !== null)
         this.cellSizeUpdated(data, true);
-    }
+
     var cellGeo = mod.getGeometry(cell).clone();
     var dataGeo = mod.getGeometry(data).clone();
     var payloadsGeo = mod.getGeometry(payloads).clone();
     var dividerGeo = mod.getGeometry(divider).clone();
     var divider1Geo = mod.getGeometry(divider1).clone();
+
+    if(data!= null && saveDataHeight)
+        dataGeo.height = Math.max(90 - mxGraph.headLineSize,data.geometry.height) ;
 
     cellGeo.width = Math.max(dataGeo.width, payloadsGeo.width, cellGeo.width);
     cellGeo.height = dataGeo.height + payloadsGeo.height + dividerGeo.height + divider1Geo.height + mxGraph.headLineSize * 0.7;
@@ -272,7 +277,6 @@ GraphBP.prototype.fixSizes = function(cell) {
 
     payloadsGeo.width = cellGeo.width;
     payloadsGeo.y = dividerGeo.y + dividerGeo.height;
-    //payloadsGeo.y = dividerGeo.y + dividerGeo.height;
 
     mod.setGeometry(cell, cellGeo);
     mod.setGeometry(data, dataGeo);
