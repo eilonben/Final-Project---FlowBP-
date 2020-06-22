@@ -79,7 +79,7 @@ function checkGraphValidation(model){
     let invalidCells = findInvalidCells(model);
 
     var output = (startNodeMissing ? "Missing start node\n" : "") +
-        (invalidCells.length > 0 ? "Disconnected start node or edge" : "");
+        (invalidCells.length > 0 ? "Disconnected node or edge" : "");
     return output;
 }
 
