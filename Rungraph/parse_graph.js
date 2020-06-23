@@ -40,12 +40,12 @@ function checkCellValidation(cell) {
             if(startNode.edges == null || startNode.edges.length == 0)
                 return false;
     }
-    //shape - shape without source
-    else if(cell.isBPCell()) {
-        //check if the shape contains input edges
-        if(cell.edges == null || cell.edges.filter(e => e.target == cell).length == 0)
-            return false;
-    }
+    // //shape - shape without source
+    // else if(cell.isBPCell()) {
+    //     //check if the shape contains input edges
+    //     if(cell.edges == null || cell.edges.filter(e => e.target == cell).length == 0)
+    //         return false;
+    // }
     return true;
 }
 
